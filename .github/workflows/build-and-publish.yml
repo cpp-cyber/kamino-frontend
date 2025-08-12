@@ -39,7 +39,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
-          context: ./my-app
+          context: .
           tags: ${{ env.IMAGE_NAME }}:latest
           labels: ${{ steps.meta.output.labels }}
           cache-from: type=gha
