@@ -51,7 +51,7 @@ export default function AdminVMsPage() {
   }
 
   return (
-    <AuthGuard>
+    <AuthGuard adminOnly>
       <PageLayout
         breadcrumbs={breadcrumbs}
       >

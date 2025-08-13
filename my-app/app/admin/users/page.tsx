@@ -56,7 +56,7 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <AuthGuard>
+    <AuthGuard adminOnly>
       <PageLayout breadcrumbs={breadcrumbs}>
         <div className="@container/main flex flex-1 flex-col gap-2">
           <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">

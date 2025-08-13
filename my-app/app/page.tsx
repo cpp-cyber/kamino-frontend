@@ -153,7 +153,7 @@ export default function Page() {
                             </p>
                             <div className="flex items-center space-x-2 text-xs text-muted-foreground mt-1">
                               <span>
-                                {template.vms.length} {template.vms.length === 1 ? "VM" : "VMs"}
+                                {(template.vms || []).length} {(template.vms || []).length === 1 ? "VM" : "VMs"}
                               </span>
                               <span>•</span>
                               <span>{template.deployments || 'N/A'} deployments</span>

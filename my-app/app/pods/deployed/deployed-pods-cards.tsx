@@ -79,30 +79,38 @@ export function SectionCards({ pods, onDelete }: SectionCardsProps) {
                   </TableRow>
                 </TableHeader>
               <TableBody>
-                {pod.vms.map((vm) => (
-                  <TableRow key={vm.vmid}>
-                    <TableCell className="font-medium px-4">{vm.name}</TableCell>
-                    <TableCell>
-                      {vm.maxcpu > 0 ? 
-                        `${((vm.cpu || 0) * 100).toFixed(1)}% (${vm.maxcpu} cores)` : 
-                        'N/A'
-                      }
+                {(pod.vms || []).length > 0 ? (
+                  (pod.vms || []).map((vm) => (
+                    <TableRow key={vm.vmid}>
+                      <TableCell className="font-medium px-4">{vm.name}</TableCell>
+                      <TableCell>
+                        {vm.maxcpu > 0 ? 
+                          `${((vm.cpu || 0) * 100).toFixed(1)}% (${vm.maxcpu} cores)` : 
+                          'N/A'
+                        }
+                      </TableCell>
+                      <TableCell>
+                        {vm.maxmem > 0 ? 
+                          `${formatBytes((vm.mem || 0))} / ${formatBytes(vm.maxmem)} (${(((vm.mem || 0) / vm.maxmem) * 100).toFixed(1)}%)` : 
+                          'N/A'
+                        }
+                      </TableCell>
+                      <TableCell>
+                        {formatBytes(vm.maxdisk)}
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge status={vm.status} />
+                      </TableCell>
+                      <TableCell>{formatUptime(vm.uptime)}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center text-muted-foreground py-4">
+                      No virtual machines found in this pod
                     </TableCell>
-                    <TableCell>
-                      {vm.maxmem > 0 ? 
-                        `${formatBytes((vm.mem || 0))} / ${formatBytes(vm.maxmem)} (${(((vm.mem || 0) / vm.maxmem) * 100).toFixed(1)}%)` : 
-                        'N/A'
-                      }
-                    </TableCell>
-                    <TableCell>
-                      {formatBytes(vm.maxdisk)}
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge status={vm.status} />
-                    </TableCell>
-                    <TableCell>{formatUptime(vm.uptime)}</TableCell>
                   </TableRow>
-                ))}
+                )}
               </TableBody>
             </Table>
             {/* <hr className="w-full border-t text-muted-foreground mt-2 pt-2" />
