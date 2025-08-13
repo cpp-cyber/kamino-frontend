@@ -9,6 +9,7 @@ import {
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -19,6 +20,7 @@ import Image from "next/image"
 import { DeployedPod } from "@/lib/types"
 import { StatusBadge } from "@/components/status-badges"
 import { formatBytes, formatUptime } from "@/lib/utils"
+import Link from "next/link"
 
 type SectionCardsProps = {
   pods: DeployedPod[]
@@ -82,7 +84,17 @@ export function SectionCards({ pods, onDelete }: SectionCardsProps) {
                 {(pod.vms || []).length > 0 ? (
                   (pod.vms || []).map((vm) => (
                     <TableRow key={vm.vmid}>
-                      <TableCell className="font-medium px-4">{vm.name}</TableCell>
+                      <TableCell className="font-medium">
+                        <Button variant="link" size="sm" className="-ml-1">
+                            <Link 
+                              href={`https://gonk.sdc.cpp:8006/#v1:0:=qemu%2F${vm.vmid}:4::::::::`} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                            >
+                            {vm.name}
+                          </Link>
+                        </Button>
+                      </TableCell>
                       <TableCell>
                         {vm.maxcpu > 0 ? 
                           `${((vm.cpu || 0) * 100).toFixed(1)}% (${vm.maxcpu} cores)` : 
@@ -112,6 +124,9 @@ export function SectionCards({ pods, onDelete }: SectionCardsProps) {
                   </TableRow>
                 )}
               </TableBody>
+              <TableCaption className="text-xs">
+                Click on the name of a VM to open it in Proxmox
+              </TableCaption>
             </Table>
             {/* <hr className="w-full border-t text-muted-foreground mt-2 pt-2" />
             <div className="text-xs text-muted-foreground w-full inline-flex justify-between">

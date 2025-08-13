@@ -13,13 +13,13 @@ type SectionCardsProps = {
 export function SectionCards({ pods, onDeploy }: SectionCardsProps) {
   return (
     <section className="mx-auto max-w-7xl py-8">
-      <div className="container px-4 md:px-6">
+      <div className="container">
         {pods.length === 0 ? (
           <div className="flex items-center justify-center h-32">
             <div className="text-muted-foreground">No pods available</div>
           </div>
         ) : (
-          <div className="flex flex-wrap items-center justify-center gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 place-items-center">
             {pods.map((pod, index) => (
               <TemplateCard key={pod.name || index} template={pod} onDeploy={onDeploy} />
             ))}
@@ -34,7 +34,7 @@ export function SectionCards({ pods, onDeploy }: SectionCardsProps) {
 function TemplateCard({ template, onDeploy }: { template: PodTemplate; onDeploy: (template: PodTemplate) => void }) {
   return (
     <div 
-      className="opacity-100 hover:opacity-95 transition-all duration-300 group h-[480px] w-100 overflow-hidden rounded-xl bg-card shadow-lg hover:shadow-xl border cursor-pointer"
+      className="opacity-100 hover:opacity-95 transition-all duration-300 group h-[480px] w-full max-w-xl overflow-hidden rounded-xl bg-card shadow-lg hover:shadow-xl border cursor-pointer"
       onClick={() => onDeploy(template)}
     >
       {/* Pod Image */}
@@ -57,7 +57,7 @@ function TemplateCard({ template, onDeploy }: { template: PodTemplate; onDeploy:
         
         {/* Pod Release Date */}
         {template.created_at && (
-          <div className="mb-2 flex items-center text-xs text-muted-foreground">
+          <div className="mb-1 -mt-2 flex items-center text-xs text-muted-foreground">
             <CalendarIcon className="mr-1.5 h-4 w-4" />
             {new Date(template.created_at).toLocaleDateString(undefined, {
               year: "numeric",

@@ -137,13 +137,13 @@ export async function getAllDeployedPods(): Promise<DeployedPod[]> {
   return data.pods || []
 }
 
-export async function deletePod(podId: string): Promise<void> {
+export async function deletePod(podName: string): Promise<void> {
   const response = await fetch(`/api/proxmox/pods/delete`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ "pod_id": podId })
+    body: JSON.stringify({ "pod_id": podName })
   })
   
   if (!response.ok) {
