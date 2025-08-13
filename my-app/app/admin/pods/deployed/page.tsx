@@ -107,7 +107,7 @@ export default function AdminPage() {
   }
 
   return (
-    <AuthGuard>
+    <AuthGuard adminOnly>
       <PageLayout
         breadcrumbs={breadcrumbs}
       >

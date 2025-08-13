@@ -150,18 +150,18 @@ export function PodsTableCore({
                 </TableCell>
                 <TableCell>
                   <span className="text-green-600 dark:text-green-400 font-medium">
-                    {pod.vms.filter(vm => vm.status === 'running').length}
+                    {(pod.vms || []).filter(vm => vm.status === 'running').length}
                   </span>
                 </TableCell>
                 <TableCell>
                   <span className="text-red-600 dark:text-red-400 font-medium">
-                    {pod.vms.filter(vm => vm.status !== 'running').length}
+                    {(pod.vms || []).filter(vm => vm.status !== 'running').length}
                   </span>
                 </TableCell>
                 <TableCell className="text-muted-foreground">
                   <div className="truncate">
                     {(() => {
-                      const longestUptime = getLongestUptime(pod.vms)
+                      const longestUptime = getLongestUptime(pod.vms || [])
                       return longestUptime ? formatUptime(longestUptime) : 'N/A'
                     })()}
                   </div>

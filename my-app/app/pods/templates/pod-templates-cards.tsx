@@ -85,11 +85,11 @@ function TemplateCard({ template, onDeploy }: { template: PodTemplate; onDeploy:
             {/* VMs */}
             <div className="flex-1 flex justify-center">
               <div className="flex flex-col items-center text-center">
-                <div className="text-sm font-bold mb-1">{template.vms.length}</div>
+                <div className="text-sm font-bold mb-1">{(template.vms || []).length}</div>
                 <div className="flex items-center space-x-1">
                   <ServerIcon className="h-4 w-4 text-muted-foreground" />
                   <span className="text-xs text-muted-foreground">
-                    {template.vms.length === 1 ? "VM" : "VMs"}
+                    {(template.vms || []).length === 1 ? "VM" : "VMs"}
                   </span>
                 </div>
               </div>

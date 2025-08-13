@@ -79,7 +79,7 @@ export default function AdminPodTemplatePage() {
   }
 
   return (
-    <AuthGuard>
+    <AuthGuard adminOnly>
       <PageLayout
         breadcrumbs={breadcrumbs}
       >

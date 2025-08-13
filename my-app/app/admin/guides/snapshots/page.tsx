@@ -8,7 +8,7 @@ const breadcrumbs = [{ label: "Snapshots Guide", href: "/admin/guides/snapshots"
 export default function AdminSnapshotsGuide() {
 
   return (
-    <AuthGuard>
+    <AuthGuard adminOnly>
       <PageLayout
         breadcrumbs={breadcrumbs}
       >
