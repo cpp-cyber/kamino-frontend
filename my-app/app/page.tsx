@@ -16,6 +16,8 @@ import { useApiState } from "@/hooks/use-api-state"
 import { getPodTemplates, getDeployedPods } from "@/lib/api"
 import { LoadingSpinnerSmall } from "@/components/ui/loading-spinner"
 import { ErrorDisplay } from "@/components/ui/error-display"
+import { Button } from "@/components/ui/button"
+import { Eye } from "lucide-react"
 
 export default function Page() {
   const { data: deployedPods, loading: deployedLoading, error: deployedError } = useApiState({
@@ -30,7 +32,7 @@ export default function Page() {
     <div className="flex flex-col items-center justify-center min-h-[125px] text-center">
       <h1 className="text-4xl font-bold text-primary">Kamino Dashboard</h1>
       <p className="text-primary/90 mt-2">
-        Browse, deploy, and manage your own instance of our curated interactive pod environments.
+        Browse, deploy, and manage your own instance of our curated interactive pod environments
       </p>
     </div>
   )
@@ -42,13 +44,16 @@ export default function Page() {
         <Card className="@container/card mt-8">
           <CardHeader>
             <CardTitle>
-              My Deployed Pods
+              <span className="text-xl font-bold text-foreground">My Deployed Pods</span>
               <div className="text-xs text-muted-foreground mt-1">
-              These are pods you have already deployed and can interact with.
+              Pods you have already deployed and can interact with
               </div>
             </CardTitle>
             <CardAction className="text-xs">
-              <Link href="/pods/deployed" passHref>View All</Link>
+              <Button variant="link" size="sm" className="mt-2">
+                <Eye />
+                <Link href="/pods/deployed" passHref>View All</Link>
+              </Button>
             </CardAction>
           </CardHeader>
           <Separator className="-mb-2"/>
@@ -109,13 +114,16 @@ export default function Page() {
         <Card className="@container/card mt-12">
           <CardHeader>
             <CardTitle>
-              Pod Templates
+              <span className="text-xl font-bold text-foreground">Pod Templates</span>
               <div className="text-xs text-muted-foreground mt-1">
-              These are pre-made pods of virtual machines that are then turned into templates and available for users to clone.
+              Pre-made pods of virtual machines that are then turned into templates and available for users to clone
               </div>
             </CardTitle>
             <CardAction className="text-xs">
-              <Link href="/pods/templates" passHref>View All</Link>
+              <Button variant="link" size="sm" className="mt-2">
+                <Eye />
+                <Link href="/pods/templates" passHref>View All</Link>
+              </Button>
             </CardAction>
           </CardHeader>
           <Separator className="-mb-2"/>

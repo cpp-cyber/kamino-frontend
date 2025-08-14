@@ -7,7 +7,7 @@ import { AuthGuard } from "@/components/auth-guard"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { ErrorDisplay } from "@/components/ui/error-display"
 import { useApiState } from "@/hooks/use-api-state"
-import { getDeployedPods } from "@/lib/api"
+import { deletePod, getDeployedPods } from "@/lib/api"
 import { DeployedPod } from "@/lib/types"
 import { SectionCards } from "@/app/pods/deployed/deployed-pods-cards"
 import {
@@ -34,12 +34,12 @@ export default function Page() {
 
   const handleConfirmDelete = () => {
     setAlertOpen(false)
-    // Here you would typically call your delete/destroy API
-    // destroyPod(selectedPod.name)
-    console.log(`Destroying pod: ${selectedPod?.name}`)
-    
-    // Show toast notification
-    toast.success(`Pod "${selectedPod?.name}" has been queued for deletion and will be removed shortly.`)
+    if (selectedPod) {
+      deletePod(selectedPod.name)
+      console.log(`Destroying pod: ${selectedPod.name}`)
+      // Show toast notification
+      toast.success(`Pod "${selectedPod.name}" has been queued for deletion and will be removed shortly.`)
+    }
   }
 
   const pageHeader = (

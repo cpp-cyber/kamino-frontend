@@ -31,10 +31,8 @@ export default function AdminPage() {
   const [selectedVM, setSelectedVM] = useState<{ vmid: number, node: string, action: 'start' | 'stop' } | null>(null)
   const [isVMActionProcessing, setIsVMActionProcessing] = useState(false)
 
-  const handleRefresh = async () => {
+  const handleRefresh = () => {
     setRefreshKey(prev => prev + 1)
-    // Simulate async operation
-    await new Promise(resolve => setTimeout(resolve, 500))
   }
 
   const handleDeleteClick = (pod: DeployedPod) => {
@@ -43,10 +41,8 @@ export default function AdminPage() {
   }
 
   const handleBulkDeleteClick = (pods: DeployedPod[]) => {
-    // For bulk delete, we'll use a different approach - show count in dialog
     setSelectedPod({ name: `${pods.length} pods`, vms: [] } as DeployedPod)
     setAlertOpen(true)
-    // Store the actual pods for deletion
     setSelectedPods(pods)
   }
 
@@ -71,7 +67,6 @@ export default function AdminPage() {
       }
       setAlertOpen(false)
       setSelectedPod(null)
-      // Note: In a real app, you might want to refetch the data or update the local state
     } catch (error) {
       toast.error(`Failed to delete pod(s): ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
@@ -98,7 +93,6 @@ export default function AdminPage() {
       }
       setVmActionAlertOpen(false)
       setSelectedVM(null)
-      // Note: In a real app, you might want to refetch the data or update the local state
     } catch (error) {
       toast.error(`Failed to ${selectedVM.action} VM: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {

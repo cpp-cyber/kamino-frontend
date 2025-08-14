@@ -1,7 +1,7 @@
 "use client"
 
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { LoadingSpinner } from "@/components/ui/loading-spinner"
+import { LoadingSpinnerSmall } from "@/components/ui/loading-spinner"
 import { Button } from "@/components/ui/button"
 import { RefreshCw } from "lucide-react"
 
@@ -14,13 +14,13 @@ interface ResourcesStateProps {
 export function ResourcesState({ loading, error, refetch }: ResourcesStateProps) {
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-4">
         <Card className="@container/card mb-6">
           <CardHeader>
             <CardTitle>Total Cluster Resources</CardTitle>
           </CardHeader>
-          <div className="flex items-center justify-center py-12">
-            <LoadingSpinner />
+          <div className="flex items-center justify-center min-h-58">
+            <LoadingSpinnerSmall />
           </div>
         </Card>
         
@@ -28,8 +28,8 @@ export function ResourcesState({ loading, error, refetch }: ResourcesStateProps)
           <CardHeader>
             <CardTitle>Node Resources</CardTitle>
           </CardHeader>
-          <div className="flex items-center justify-center py-12">
-            <LoadingSpinner />
+          <div className="flex items-center justify-center min-h-137">
+            <LoadingSpinnerSmall />
           </div>
         </Card>
       </div>
@@ -38,7 +38,7 @@ export function ResourcesState({ loading, error, refetch }: ResourcesStateProps)
 
   if (error) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-4">
         <Card className="@container/card">
           <CardHeader>
             <CardTitle>Resource Monitoring Error</CardTitle>

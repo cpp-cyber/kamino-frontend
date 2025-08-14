@@ -102,6 +102,8 @@ export default function Footer4Col() {
                     <a
                       className="text-secondary-foreground/70 transition"
                       href={href}
+                      target="_blank" 
+                      rel="noopener noreferrer"
                     >
                       {text}
                     </a>
@@ -132,8 +134,10 @@ export default function Footer4Col() {
                 {helpfulLinks.map(({ text, href }) => (
                   <li key={text}>
                     <a
-                      href={href}
                       className='text-secondary-foreground/70 transition'
+                      href={href}
+                      target="_blank" 
+                      rel="noopener noreferrer"
                     >
                       <span className="text-secondary-foreground/70 transition">
                         {text}
