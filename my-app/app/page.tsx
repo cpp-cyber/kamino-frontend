@@ -86,9 +86,6 @@ export default function Page() {
                           </div>
                           <div className="flex flex-col">
                             <h3 className="text-lg font-semibold text-foreground">{pod.name}</h3>
-                            <p className="text-muted-foreground text-sm line-clamp-2">
-                              {pod.description || 'No description available'}
-                            </p>
                             <div className="text-xs text-muted-foreground mt-1">
                               {/* Deployed {new Date(pod.deployed_at).toLocaleDateString()} */}
                             </div>
@@ -145,23 +142,21 @@ export default function Page() {
                           role="button"
                         >
                           <div className="bg-sidebar-accent-foreground/10 text-sidebar-primary-foreground flex size-16 items-center justify-center rounded-lg overflow-hidden shadow-lg shrink-0">
-                            {/* <Image
-                              src={pod.icon || "/kaminoLogo.svg"}
-                              alt={`${pod.name} Logo`}
+                            <Image
+                              src={`/api/proxmox/templates/images/${template.image_path}`}
+                              alt={template.name}
                               width={64}
                               height={64}
+                              unoptimized
                               className="size-16 object-cover rounded-lg"
-                            /> */}
-                            <Image src="/kaminoLogo.svg" alt="Kamino Logo" width={56} height={56} className="size-14" />
+                            />
+                            {/* <Image src="/kaminoLogo.svg" alt="Kamino Logo" width={56} height={56} className="size-14" /> */}
                           </div>
                           <div className="flex flex-col">
                             <h3 className="text-lg font-semibold text-foreground">{template.name}</h3>
-                            <p className="text-muted-foreground text-sm line-clamp-2">
-                              {template.description || 'No description available'}
-                            </p>
                             <div className="flex items-center space-x-2 text-xs text-muted-foreground mt-1">
                               <span>
-                                {(template.vms || []).length} {(template.vms || []).length === 1 ? "VM" : "VMs"}
+                                {(template.vm_count || 0)} {template.vm_count === 1 ? "VM" : "VMs"}
                               </span>
                               <span>•</span>
                               <span>{template.deployments || 'N/A'} deployments</span>

@@ -20,12 +20,12 @@ import {
   DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu"
 import { PodTemplate } from "@/lib/types"
-import { getPodTemplates } from "@/lib/api"
+import { getAllPodTemplates } from "@/lib/api"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { PodTemplateStatusBadge } from "@/components/status-badges"
 
 interface PodTemplateTableProps {
-  onTemplateAction: (templateName: string, action: 'hide' | 'delete') => void
+  onTemplateAction: (templateName: string, action: 'toggle' | 'delete') => void
 }
 
 export function PodTemplateTable({ onTemplateAction }: PodTemplateTableProps) {
@@ -43,7 +43,7 @@ export function PodTemplateTable({ onTemplateAction }: PodTemplateTableProps) {
     try {
       setIsLoading(true)
       setError(null)
-      const data = await getPodTemplates()
+      const data = await getAllPodTemplates()
       setPodTemplates(data)
       setFilteredPodTemplates(data)
     } catch (err) {
@@ -55,8 +55,7 @@ export function PodTemplateTable({ onTemplateAction }: PodTemplateTableProps) {
 
   React.useEffect(() => {
     const filtered = podTemplates.filter((template) =>
-      template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (template.status && template.status.toLowerCase().includes(searchTerm.toLowerCase()))
+      template.name.toLowerCase().includes(searchTerm.toLowerCase())
     )
     setFilteredPodTemplates(filtered)
   }, [searchTerm, podTemplates])
@@ -127,9 +126,9 @@ export function PodTemplateTable({ onTemplateAction }: PodTemplateTableProps) {
             {filteredPodTemplates.map((podTemplate) => (
               <TableRow key={podTemplate.name}>
                 <TableCell className="font-medium px-4">{podTemplate.name}</TableCell>
-                <TableCell>{podTemplate.deployments || 'N/A'}</TableCell>
+                <TableCell>{podTemplate.deployments}</TableCell>
                 <TableCell>
-                  <PodTemplateStatusBadge status={podTemplate.status || 'public'} />
+                  <PodTemplateStatusBadge status={podTemplate.visible === true ? 'public' : 'private'} />
                 </TableCell>
                 <TableCell  className="text-end px-6">
                   <DropdownMenu>
@@ -140,18 +139,22 @@ export function PodTemplateTable({ onTemplateAction }: PodTemplateTableProps) {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem
-                        onClick={() => onTemplateAction(podTemplate.name, 'hide')}
+                        onClick={() => onTemplateAction(podTemplate.name, 'toggle')}
                         className="cursor-pointer"
                       >
-                        <EyeOff className="mr-2 h-4 w-4" />
-                        Hide
+                        {podTemplate.visible === true ? (
+                          <EyeOff className="mr-2" />
+                        ) : (
+                          <MoreVertical className="mr-2" />
+                        )}
+                        {podTemplate.visible === true ? 'Hide' : 'Make Public'}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator className="mt-3" />
                       <DropdownMenuItem
                         onClick={() => onTemplateAction(podTemplate.name, 'delete')}
                         className="cursor-pointer text-destructive focus:text-destructive"
                       >
-                        <Trash2 className="mr-2 h-4 w-4" />
+                        <Trash2 className="mr-2" />
                         Delete
                       </DropdownMenuItem>
                     </DropdownMenuContent>

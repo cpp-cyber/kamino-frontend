@@ -1,11 +1,16 @@
 export interface PodTemplate {
   name: string
-  vms: VirtualMachine[]
   description?: string
-  icon?: string
+  image?: string
+  image_path?: string
+  visible?: boolean
+  vm_count: number
+  deployments?: number 
   created_at?: string
-  deployments?: number
-  status?: string
+}
+
+export interface UnpublishedPodTemplate {
+  name: string
 }
 
 export interface PodTemplateResponse {
@@ -33,7 +38,6 @@ export interface User {
   isAdmin: boolean
   // Actual field names from the API response
   createdDate?: string
-  lastLogin?: string
   // Additional potential field names from Active Directory
   whenCreated?: string
   lastLogon?: string
@@ -41,6 +45,10 @@ export interface User {
   last_logon?: string
   createdAt?: string
   created?: string
+}
+
+export interface Group {
+  name: string
 }
 
 export interface UserLogin {

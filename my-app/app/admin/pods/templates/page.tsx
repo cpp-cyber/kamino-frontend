@@ -15,14 +15,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { toggleTemplateVisibility } from "@/lib/api"
 
 const breadcrumbs = [{ label: "Pod Templates", href: "/admin/pods/templates" }]
 
 // Placeholder API functions (to be implemented later)
-const hidePodTemplate = async (templateName: string) => {
-  // TODO: Implement actual API call
-  // await api.hidePodTemplate(templateName)
-  console.log(`Hide template: ${templateName}`)
+const templateVisibility = async (templateName: string) => {
+  await toggleTemplateVisibility(templateName)
+  console.log(`Toggled template: ${templateName}`)
   return Promise.resolve()
 }
 
@@ -35,10 +35,10 @@ const deletePodTemplate = async (templateName: string) => {
 
 export default function AdminPodTemplatePage() {
   const [alertOpen, setAlertOpen] = useState(false)
-  const [selectedTemplate, setSelectedTemplate] = useState<{ name: string, action: 'hide' | 'delete' } | null>(null)
+  const [selectedTemplate, setSelectedTemplate] = useState<{ name: string, action: 'toggle' | 'delete' } | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
 
-  const handleTemplateAction = async (templateName: string, action: 'hide' | 'delete') => {
+  const handleTemplateAction = async (templateName: string, action: 'toggle' | 'delete') => {
     setSelectedTemplate({ name: templateName, action })
     setAlertOpen(true)
   }
@@ -48,9 +48,9 @@ export default function AdminPodTemplatePage() {
     
     setIsProcessing(true)
     try {
-      if (selectedTemplate.action === 'hide') {
-        await hidePodTemplate(selectedTemplate.name)
-        toast.success(`Template "${selectedTemplate.name}" has been hidden`)
+      if (selectedTemplate.action === 'toggle') {
+        await templateVisibility(selectedTemplate.name)
+        toast.success(`Template "${selectedTemplate.name}" has been toggle`)
       } else {
         await deletePodTemplate(selectedTemplate.name)
         toast.success(`Template "${selectedTemplate.name}" has been deleted`)
@@ -67,12 +67,12 @@ export default function AdminPodTemplatePage() {
 
   const getActionText = () => {
     if (!selectedTemplate) return ''
-    return selectedTemplate.action === 'hide' ? 'hide' : 'permanently delete'
+    return selectedTemplate.action === 'toggle' ? 'toggle' : 'permanently delete'
   }
 
   const getActionDescription = () => {
     if (!selectedTemplate) return ''
-    if (selectedTemplate.action === 'hide') {
+    if (selectedTemplate.action === 'toggle') {
       return 'This template will be hidden from the available templates list. You can unhide it later from the admin settings.'
     }
     return 'This action cannot be undone. This will permanently delete the template and remove all associated data.'
@@ -115,8 +115,8 @@ export default function AdminPodTemplatePage() {
               className={selectedTemplate?.action === 'delete' ? "bg-destructive hover:bg-destructive/90" : ""}
             >
               {isProcessing ? 
-                `${selectedTemplate?.action === 'hide' ? 'Hiding' : 'Deleting'}...` : 
-                `${selectedTemplate?.action === 'hide' ? 'Hide' : 'Delete'}`
+                `${selectedTemplate?.action === 'toggle' ? 'Toggling' : 'Deleting'}...` : 
+                `${selectedTemplate?.action === 'toggle' ? 'Toggle' : 'Delete'}`
               }
             </AlertDialogAction>
           </AlertDialogFooter>

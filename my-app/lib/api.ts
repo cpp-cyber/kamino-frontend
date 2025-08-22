@@ -9,7 +9,8 @@ import {
   SessionResponse,
   VirtualMachine,
   VirtualMachinesResponse,
-  ProxmoxResourcesResponse
+  ProxmoxResourcesResponse,
+  UnpublishedPodTemplate
 } from './types'
 
 // Request deduplication cache
@@ -104,6 +105,16 @@ export async function getPodTemplates(): Promise<PodTemplate[]> {
     'podTemplates',
     () => fetch('/api/proxmox/templates', { cache: 'no-store' })
   )
+  console.log('Fetched pod templates:', data.templates)
+  return data.templates || []
+}
+
+export async function getAllPodTemplates(): Promise<PodTemplate[]> {
+  const data: PodTemplateResponse = await deduplicatedFetch(
+    'podTemplates',
+    () => fetch('/api/admin/proxmox/templates', { cache: 'no-store' })
+  )
+  console.log('Fetched pod templates:', data.templates)
   return data.templates || []
 }
 
@@ -204,6 +215,7 @@ export async function getAllUsers(): Promise<User[]> {
     'allUsers',
     () => fetch('/api/admin/users', { cache: 'no-store', credentials: 'include' })
   )
+  console.log('Fetched users:', data.users)
   return data.users || []
 }
 
@@ -217,5 +229,84 @@ export async function deleteUser(username: string): Promise<void> {
 
   if (!response.ok) {
     throw new Error(`Failed to delete user: ${response.status} ${response.statusText}`)
+  }
+}
+
+export async function publishTemplate(template: PodTemplate): Promise<void> {
+  const response = await fetch(`/api/admin/proxmox/templates/publish`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(template)
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to create template: ${response.status} ${response.statusText}`)
+  }
+}
+
+export async function updateTemplate(template: PodTemplate): Promise<void> {
+  const response = await fetch(`/api/admin/proxmox/templates/update`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(template)
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to update template: ${response.status} ${response.statusText}`)
+  }
+}
+
+export async function getUnpublishedTemplates(): Promise<UnpublishedPodTemplate[]> {
+  const data: { templates: UnpublishedPodTemplate[] } = await deduplicatedFetch(
+    'unpublishedTemplates',
+    () => fetch('/api/admin/proxmox/templates/unpublished', { cache: 'no-store', credentials: 'include' })
+  )
+  return data.templates || []
+}
+
+// Upload template image file
+export async function uploadTemplateImage(file: File): Promise<string> {
+  // Validate file size on frontend
+  if (file.size === 0) {
+    throw new Error('File is empty')
+  }
+
+  // Validate file type on frontend (basic check)
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+  if (!allowedTypes.includes(file.type)) {
+    throw new Error(`Unsupported file type: ${file.type}`)
+  }
+
+  const formData = new FormData()
+  formData.append('image', file)
+
+  const response = await fetch('/api/admin/proxmox/templates/image/upload', {
+    method: 'POST',
+    credentials: 'include',
+    body: formData
+  })
+  
+  if (!response.ok) {
+    const errorText = await response.text()
+    throw new Error(`Failed to upload image: ${response.status} ${response.statusText} - ${errorText}`)
+  }
+  
+  const data = await response.json()
+  return data.filename
+}
+
+export async function toggleTemplateVisibility(templateName: string): Promise<void> {
+  const response = await fetch(`/api/admin/proxmox/templates/toggle`, {
+    method: 'POST',
+    credentials: 'include',
+    body: JSON.stringify({ template_name: templateName })
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to toggle template visibility: ${response.status} ${response.statusText}`)
   }
 }

@@ -1,7 +1,7 @@
 "use client"
 
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { RocketIcon, ServerIcon, CalendarIcon } from "lucide-react"
+import { MarkdownRenderer } from "@/components/ui/markdown-renderer"
+import { RocketIcon, ServerIcon } from "lucide-react"
 import Image from "next/image"
 import { PodTemplate } from "@/lib/types"
 
@@ -42,10 +42,11 @@ function TemplateCard({ template, onDeploy }: { template: PodTemplate; onDeploy:
         <div className="absolute inset-0 flex">
           <div className="w-full h-full relative overflow-hidden">
             <Image 
-              src="/kaminoLogo.svg" 
-              alt="Kamino Logo" 
+              src={`/api/proxmox/templates/images/${template.image_path}`}
+              alt={template.name}
               fill
-              className="object-cover object-top opacity-15 transition-transform duration-300 group-hover:scale-105" 
+              unoptimized
+              className="object-cover object-top transition-transform duration-300 group-hover:scale-105" 
             />
             <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-primary/5" />
           </div>
@@ -56,8 +57,8 @@ function TemplateCard({ template, onDeploy }: { template: PodTemplate; onDeploy:
       <div className="flex h-[280px] flex-col p-6">
         
         {/* Pod Release Date */}
-        {template.created_at && (
-          <div className="mb-1 -mt-2 flex items-center text-xs text-muted-foreground">
+        {/* {template.created_at && (
+          <div className="mb-2 -mt-2 flex items-center text-xs text-muted-foreground justify-end">
             <CalendarIcon className="mr-1.5 h-4 w-4" />
             {new Date(template.created_at).toLocaleDateString(undefined, {
               year: "numeric",
@@ -65,18 +66,22 @@ function TemplateCard({ template, onDeploy }: { template: PodTemplate; onDeploy:
               day: "numeric",
             })}
           </div>
-        )}
+        )} */}
 
         {/* Pod Name */}
-        <h3 className="mb-3 text-2xl font-bold">{template.name}</h3>
+        <h3 className="mb-1 text-2xl font-bold">{template.name}</h3>
         
         {/* Pod Description */}
-        <ScrollArea 
-          className="mb-4 text-sm text-muted-foreground line-clamp-4 leading-relaxed cursor-text"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {template.description || 'No description available'}
-        </ScrollArea>
+        <div className="mb-4 text-base text-muted-foreground leading-relaxed h-[120px] overflow-hidden">
+          <div className="h-full relative">
+            <MarkdownRenderer
+              content={template.description || 'No description available'}
+              variant="card"
+              className="h-full overflow-hidden"
+            />
+            <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-card to-transparent pointer-events-none" />
+          </div>
+        </div>
 
         {/* Pod Stats */}
         <div className="mt-auto pt-1">
@@ -85,11 +90,11 @@ function TemplateCard({ template, onDeploy }: { template: PodTemplate; onDeploy:
             {/* VMs */}
             <div className="flex-1 flex justify-center">
               <div className="flex flex-col items-center text-center">
-                <div className="text-sm font-bold mb-1">{(template.vms || []).length}</div>
+                <div className="text-sm font-bold mb-1">{template.vm_count}</div>
                 <div className="flex items-center space-x-1">
                   <ServerIcon className="h-4 w-4 text-muted-foreground" />
                   <span className="text-xs text-muted-foreground">
-                    {(template.vms || []).length === 1 ? "VM" : "VMs"}
+                    {(template.vm_count || 0) === 1 ? "VM" : "VMs"}
                   </span>
                 </div>
               </div>
@@ -101,7 +106,7 @@ function TemplateCard({ template, onDeploy }: { template: PodTemplate; onDeploy:
             {/* Deployments */}
             <div className="flex-1 flex justify-center">
               <div className="flex flex-col items-center text-center">
-                <div className="text-sm font-bold mb-1">{template.deployments || 'N/A'}</div>
+                <div className="text-sm font-bold mb-1">{template.deployments}</div>
                 <div className="flex items-center space-x-1">
                   <RocketIcon className="h-4 w-4 text-muted-foreground" />
                   <span className="text-xs text-muted-foreground">
