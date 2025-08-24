@@ -69,7 +69,7 @@ function TemplateCard({ template, onDeploy }: { template: PodTemplate; onDeploy:
         )} */}
 
         {/* Pod Name */}
-        <h3 className="mb-1 text-2xl font-bold">{template.name}</h3>
+        <h3 className="mb-1 text-2xl font-bold">{template.name.replaceAll('_', ' ')}</h3>
         
         {/* Pod Description */}
         <div className="mb-4 text-base text-muted-foreground leading-relaxed h-[120px] overflow-hidden">

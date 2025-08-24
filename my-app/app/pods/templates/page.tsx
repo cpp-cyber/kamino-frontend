@@ -84,79 +84,62 @@ export default function Page() {
           <SectionCards pods={pods} onDeploy={handleDeployClick} />
         )}
         
-        {/* Confirm popup */}
-        {/* <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>
-                Deploy {selectedPod?.name || 'this pod'}?
-              </AlertDialogTitle>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleConfirmDeploy}>
-                Deploy
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog> */}
-
+        {/* Details + Clone Popup */}
         <Dialog open={alertOpen} onOpenChange={setAlertOpen}>
           <VisuallyHidden.Root>
-            <DialogTitle>Your dialog title</DialogTitle>
+            <DialogTitle>Title</DialogTitle>
           </VisuallyHidden.Root>
-          <DialogContent className="max-w-full md:min-w-2xl min-h-[60vh] p-6 bg-card">
+          <DialogContent className="max-w-full md:min-w-2xl p-6 bg-card">
           {selectedPod && (
             <div>
               <div className="space-y-6">
               {/* Top section with image, date, and title */}
-                <div className="flex gap-4">
+                <div className="flex gap-4 pb-2">
                   {/* Square image */}
                   <div className="flex-shrink-0">
-                  <div className="w-48 h-48 rounded-lg border bg-muted overflow-hidden shadow-lg">
-                    {selectedPod.image_path ? (
-                    <Image 
-                      src={`/api/proxmox/templates/images/${selectedPod.image_path}`}
-                      alt={selectedPod.name}
-                      className="w-full h-full object-cover"
-                      unoptimized
-                      width={192}
-                      height={192}
-                    />
-                    ) : (
-                    <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
-                      No Image
+                    <div className="w-48 h-48 rounded-lg border bg-muted overflow-hidden shadow-xl">
+                      {selectedPod.image_path ? (
+                      <Image 
+                        src={`/api/proxmox/templates/images/${selectedPod.image_path}`}
+                        alt={selectedPod.name}
+                        className="w-full h-full object-cover"
+                        unoptimized
+                        width={192}
+                        height={192}
+                      />
+                      ) : (
+                      <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
+                        No Image
+                      </div>
+                      )}
                     </div>
-                    )}
                   </div>
-                </div>
                   
                   {/* Date and title */}
                   <div className="flex-1 flex flex-col justify-center">
-                  {selectedPod.created_at && (
-                    <p className="flex items-center text-xs text-muted-foreground">
-                    <CalendarIcon className="mr-1.5 h-4 w-4" />
-                    {new Date(selectedPod.created_at).toLocaleDateString(undefined, {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    })}
-                    </p>
-                  )}
-                  <h1 className="text-4xl font-semibold leading-tight text-wrap">
-                    {selectedPod.name}
-                  </h1>
+                    {selectedPod.created_at && (
+                      <p className="flex items-center text-xs text-muted-foreground">
+                      <CalendarIcon className="mr-1.5 h-4 w-4" />
+                      {new Date(selectedPod.created_at).toLocaleDateString(undefined, {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                      </p>
+                    )}
+                    <h1 className="text-4xl font-semibold leading-tight text-wrap">
+                      {selectedPod.name.replaceAll('_', ' ')}
+                    </h1>
                   </div>
                 </div>
-                
-                
+                                
                 {/* Scrollable description */}
-                <div className="space-y-2">
-                  <ScrollArea className="h-100 w-full p-3 rounded-md text-lg text-muted-foreground leading-relaxed overflow-hidden">
-                  <MarkdownRenderer 
-                    content={selectedPod.description || 'No description available'} 
-                    variant="compact"
-                  />
+                <div className="space-y-2 ">
+                  <ScrollArea className="h-[350px] w-full border rounded-md p-2">
+                    <MarkdownRenderer 
+                      content={selectedPod.description || 'No description available'} 
+                      variant="compact"
+                    />
                   </ScrollArea>
                 </div>
                 
@@ -178,7 +161,7 @@ export default function Page() {
                     </div>
 
                     {/* Separator */}
-                    <div className="h-6 w-px bg-border" />
+                    <div className="h-6 w-[2px] bg-border" />
                     
                     {/* Deployments */}
                     <div className="flex-1 flex justify-center">
@@ -192,7 +175,6 @@ export default function Page() {
                         </div>
                       </div>
                     </div>
-
                   </div>
                 </div>
               </div>

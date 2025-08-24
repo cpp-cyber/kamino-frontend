@@ -63,6 +63,7 @@ export function MarkdownRenderer({
               <Image
                 src={src}
                 alt={alt || ''}
+                unoptimized
                 className="max-w-full max-h-96 object-contain rounded-md mb-2"
                 width={384}
                 height={384}

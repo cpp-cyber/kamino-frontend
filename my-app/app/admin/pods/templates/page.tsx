@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react"
 import { useState } from "react"
 import { toast } from "sonner"
 import { AuthGuard } from "@/components/auth-guard"
@@ -15,7 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { toggleTemplateVisibility } from "@/lib/api"
+import { deleteTemplate, toggleTemplateVisibility } from "@/lib/api"
 
 const breadcrumbs = [{ label: "Pod Templates", href: "/admin/pods/templates" }]
 
@@ -27,55 +28,51 @@ const templateVisibility = async (templateName: string) => {
 }
 
 const deletePodTemplate = async (templateName: string) => {
-  // TODO: Implement actual API call
-  // await api.deletePodTemplate(templateName)
+  await deleteTemplate(templateName)
   console.log(`Delete template: ${templateName}`)
   return Promise.resolve()
 }
 
 export default function AdminPodTemplatePage() {
   const [alertOpen, setAlertOpen] = useState(false)
-  const [selectedTemplate, setSelectedTemplate] = useState<{ name: string, action: 'toggle' | 'delete' } | null>(null)
+  const [selectedTemplate, setSelectedTemplate] = useState<{ name: string } | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
 
   const handleTemplateAction = async (templateName: string, action: 'toggle' | 'delete') => {
-    setSelectedTemplate({ name: templateName, action })
+    // If toggling visibility, call API immediately and avoid confirmation dialog.
+    if (action === 'toggle') {
+      setIsProcessing(true)
+      try {
+        await templateVisibility(templateName)
+        toast.success(`Template "${templateName}" has been toggled`)
+      } catch (error) {
+        toast.error(`Failed to toggle template: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      } finally {
+        setIsProcessing(false)
+      }
+      return
+    }
+
+    // For destructive actions (delete), show confirmation dialog.
+    setSelectedTemplate({ name: templateName })
     setAlertOpen(true)
   }
 
   const handleConfirmTemplateAction = async () => {
     if (!selectedTemplate) return
-    
+
+    // Dialog is only used for deletes now
     setIsProcessing(true)
     try {
-      if (selectedTemplate.action === 'toggle') {
-        await templateVisibility(selectedTemplate.name)
-        toast.success(`Template "${selectedTemplate.name}" has been toggle`)
-      } else {
-        await deletePodTemplate(selectedTemplate.name)
-        toast.success(`Template "${selectedTemplate.name}" has been deleted`)
-      }
+      await deletePodTemplate(selectedTemplate.name)
+      toast.success(`Template "${selectedTemplate.name}" has been deleted`)
       setAlertOpen(false)
       setSelectedTemplate(null)
-      // Note: The table will refresh automatically or you might want to trigger a refresh
     } catch (error) {
-      toast.error(`Failed to ${selectedTemplate.action} template: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      toast.error(`Failed to delete template: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
       setIsProcessing(false)
     }
-  }
-
-  const getActionText = () => {
-    if (!selectedTemplate) return ''
-    return selectedTemplate.action === 'toggle' ? 'toggle' : 'permanently delete'
-  }
-
-  const getActionDescription = () => {
-    if (!selectedTemplate) return ''
-    if (selectedTemplate.action === 'toggle') {
-      return 'This template will be hidden from the available templates list. You can unhide it later from the admin settings.'
-    }
-    return 'This action cannot be undone. This will permanently delete the template and remove all associated data.'
   }
 
   return (
@@ -96,28 +93,25 @@ export default function AdminPodTemplatePage() {
         </div>
       </PageLayout>
 
-      {/* Template Action Confirmation Dialog */}
+      {/* Template Deletion Confirmation Dialog */}
       <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              Are you sure you want to {getActionText()} &quot;{selectedTemplate?.name}&quot;?
+              Are you sure you want to delete "{selectedTemplate?.name}"?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {getActionDescription()}
+              This action cannot be undone. This will permanently delete all personalizations (NOT Proxmox data)
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isProcessing}>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleConfirmTemplateAction} 
+            <AlertDialogAction
+              onClick={handleConfirmTemplateAction}
               disabled={isProcessing}
-              className={selectedTemplate?.action === 'delete' ? "bg-destructive hover:bg-destructive/90" : ""}
+              className="bg-destructive hover:bg-destructive/90"
             >
-              {isProcessing ? 
-                `${selectedTemplate?.action === 'toggle' ? 'Toggling' : 'Deleting'}...` : 
-                `${selectedTemplate?.action === 'toggle' ? 'Toggle' : 'Delete'}`
-              }
+              {isProcessing ? 'Deleting...' : 'Delete'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { SearchIcon, MoreVertical, EyeOff, Trash2, RefreshCcw } from "lucide-react"
+import { SearchIcon, MoreVertical, EyeOff, Trash2, RefreshCcw, Eye } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -90,7 +90,7 @@ export function PodTemplateTable({ onTemplateAction }: PodTemplateTableProps) {
             <div className="relative flex-1 max-w-sm">
               <SearchIcon className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search templates by name or status..."
+                placeholder="Search templates by name..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-8 bg-background"
@@ -128,7 +128,7 @@ export function PodTemplateTable({ onTemplateAction }: PodTemplateTableProps) {
                 <TableCell className="font-medium px-4">{podTemplate.name}</TableCell>
                 <TableCell>{podTemplate.deployments}</TableCell>
                 <TableCell>
-                  <PodTemplateStatusBadge status={podTemplate.visible === true ? 'public' : 'private'} />
+                  <PodTemplateStatusBadge status={podTemplate.visible === true ? 'public' : 'hidden'} />
                 </TableCell>
                 <TableCell  className="text-end px-6">
                   <DropdownMenu>
@@ -145,9 +145,9 @@ export function PodTemplateTable({ onTemplateAction }: PodTemplateTableProps) {
                         {podTemplate.visible === true ? (
                           <EyeOff className="mr-2" />
                         ) : (
-                          <MoreVertical className="mr-2" />
+                          <Eye className="mr-2" />
                         )}
-                        {podTemplate.visible === true ? 'Hide' : 'Make Public'}
+                        {podTemplate.visible === true ? 'Hide' : 'Show'}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator className="mt-3" />
                       <DropdownMenuItem

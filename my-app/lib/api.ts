@@ -260,6 +260,20 @@ export async function updateTemplate(template: PodTemplate): Promise<void> {
   }
 }
 
+export async function deleteTemplate(templateName: string): Promise<void> {
+  const response = await fetch(`/api/admin/proxmox/templates/delete`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ template_name: templateName })
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to delete template: ${response.status} ${response.statusText}`)
+  }
+}
+
 export async function getUnpublishedTemplates(): Promise<UnpublishedPodTemplate[]> {
   const data: { templates: UnpublishedPodTemplate[] } = await deduplicatedFetch(
     'unpublishedTemplates',
