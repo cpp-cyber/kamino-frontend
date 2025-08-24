@@ -98,7 +98,7 @@ export default function AdminPodTemplatePage() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              Are you sure you want to delete "{selectedTemplate?.name}"?
+              Are you sure you want to delete &quot;{selectedTemplate?.name}&quot;?
             </AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete all personalizations (NOT Proxmox data)

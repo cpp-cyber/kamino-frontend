@@ -16,7 +16,7 @@ import {
   SidebarMenuItem,
   SidebarFooter,
 } from "@/components/ui/sidebar"
-import { Camera, Copy, CopyPlusIcon, Edit, Eye, LayoutDashboard, Rocket, Server, User } from "lucide-react"
+import { Camera, Copy, CopyPlusIcon, Edit, LayoutDashboard, Rocket, Server, User } from "lucide-react"
 
 const data = {
   navMain: [
