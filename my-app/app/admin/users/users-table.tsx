@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { User } from "@/lib/types"
+import { GetUsersResponse, User } from "@/lib/types"
 import { getAllUsers } from "@/lib/api"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { Button } from "@/components/ui/button"
@@ -20,7 +20,7 @@ interface UsersTableProps {
 export function UsersTable({ onDelete, onRefresh }: UsersTableProps) {
   const [searchTerm, setSearchTerm] = React.useState("")
   const [isRefreshing, setIsRefreshing] = React.useState(false)
-  const [users, setUsers] = React.useState<User[]>([])
+  const [usersData, setUsersData] = React.useState<GetUsersResponse>({ users: [], count: 0, admin_count: 0, disabled_count: 0 })
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
   
@@ -29,7 +29,7 @@ export function UsersTable({ onDelete, onRefresh }: UsersTableProps) {
   const [itemsPerPage, setItemsPerPage] = React.useState(10)
 
   // Apply filters
-  const filteredUsers = useUserFilters({ users, searchTerm })
+  const filteredUsers = useUserFilters({ users: usersData.users, searchTerm })
 
   const handleRefresh = async () => {
     setIsRefreshing(true)
@@ -50,8 +50,8 @@ export function UsersTable({ onDelete, onRefresh }: UsersTableProps) {
     try {
       setLoading(true)
       setError(null)
-      const usersData = await getAllUsers()
-      setUsers(usersData)
+      const fetchedUsersData = await getAllUsers()
+      setUsersData(fetchedUsersData)
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to fetch users'
       setError(errorMessage)
@@ -117,7 +117,7 @@ export function UsersTable({ onDelete, onRefresh }: UsersTableProps) {
   return (
     <div className="space-y-4">
       {/* Header Stats */}
-      <HeaderStats users={users} />
+      <HeaderStats usersData={usersData} />
 
       {/* Users Table */}
       <div className="rounded-md border">

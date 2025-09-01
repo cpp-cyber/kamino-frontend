@@ -14,12 +14,12 @@ export function useUserFilters({ users, searchTerm }: UseUserFiltersProps) {
     
     return users.filter(user => {
       // Search in username
-      if (user.username.toLowerCase().includes(lowercaseSearch)) {
+      if (user.name.toLowerCase().includes(lowercaseSearch)) {
         return true
       }
       
       // Search in groups
-      if (user.groups.some(group => group.toLowerCase().includes(lowercaseSearch))) {
+      if (user.groups.some(group => group.name.toLowerCase().includes(lowercaseSearch))) {
         return true
       }
       

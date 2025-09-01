@@ -17,6 +17,7 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar"
 import { Camera, Copy, CopyPlusIcon, Edit, LayoutDashboard, Rocket, Server, User } from "lucide-react"
+import { IconUsersGroup } from "@tabler/icons-react"
 
 const data = {
   navMain: [
@@ -41,6 +42,12 @@ const data = {
           url: "/admin/users",
           isActive: false,
           icon: User
+        },
+        {
+          title: "Groups",
+          url: "/admin/groups",
+          isActive: false,
+          icon: IconUsersGroup
         },
         {
           title: "Deployed Pods",

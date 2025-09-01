@@ -17,19 +17,19 @@ export function NodeResources({ resources }: NodeResourcesProps) {
         <CardTitle>Node Resources</CardTitle>
       </CardHeader>
       <div className="grid grid-cols-1 gap-6 @xl/card:grid-cols-2 @5xl/card:grid-cols-3 px-6">
-        {resources.nodes.length === 0 ? (
+        {resources.cluster.nodes.length === 0 ? (
           <div className="col-span-full text-center py-8 text-muted-foreground">
             No node data available.
           </div>
         ) : (
-          resources.nodes.map((node) => {
-            const cpuUsage = (node.cpu_usage * 100).toFixed(2)
-            const memoryUsage = calculateUtilization(node.memory_used, node.memory_total)
-            const storageUsage = calculateUtilization(node.storage_used, node.storage_total)
+          resources.cluster.nodes.map((node) => {
+            const cpuUsage = (node.resources.cpu_usage * 100).toFixed(2)
+            const memoryUsage = calculateUtilization(node.resources.memory_used, node.resources.memory_total)
+            const storageUsage = calculateUtilization(node.resources.storage_used, node.resources.storage_total)
             
             return (
-              <Card key={node.node_name} className="@container/card px-4">
-                <CardDescription className="capitalize">{node.node_name}</CardDescription>
+              <Card key={node.name} className="@container/card px-4">
+                <CardDescription className="capitalize">{node.name}</CardDescription>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="flex items-center gap-2">
@@ -42,8 +42,8 @@ export function NodeResources({ resources }: NodeResourcesProps) {
                     <div 
                       className="absolute left-0 h-full bg-blue-500 transition-all duration-300 ease-in-out rounded-full animate-[grow-right_1s_ease-out]"
                       style={{ 
-                        width: `${Math.min(node.cpu_usage * 100, 100)}%`,
-                        '--target-width': `${Math.min(node.cpu_usage * 100, 100)}%`
+                        width: `${Math.min(node.resources.cpu_usage * 100, 100)}%`,
+                        '--target-width': `${Math.min(node.resources.cpu_usage * 100, 100)}%`
                       } as React.CSSProperties & { '--target-width': string }}
                     />
                   </div>

@@ -5,19 +5,15 @@ import { PageLayout } from "@/app/admin/admin-page-layout"
 import { HeaderStats } from "@/app/admin/dashboard/header-stats"
 import { HeaderStatsState } from "@/app/admin/dashboard/header-stats-state"
 import { ResourcesState } from "@/app/admin/dashboard/resources-state"
-import { getProxmoxResources } from "@/lib/api"
+import { getDashboardData } from "@/lib/api"
 import { useApiState } from "@/hooks/use-api-state"
-import { useDashboardStats } from "@/hooks/use-dashboard-stats"
 import { ClusterResources } from "@/app/admin/dashboard/cluster-resources"
 import { NodeResources } from "@/app/admin/dashboard/node-resources"
 
 export default function AdminPage() {
-  // Fetch dashboard stats (pod templates, deployed pods, VMs)
-  const { stats, loading: statsLoading, error: statsError, refetch: refetchStats } = useDashboardStats()
-  
-  // Fetch Proxmox resources (cluster and node data)
-  const { data: resources, loading: resourcesLoading, error: resourcesError, refetch: refetchResources } = useApiState({
-    fetchFn: getProxmoxResources,
+  // Fetch unified dashboard data
+  const { data: dashboardData, loading, error, refetch } = useApiState({
+    fetchFn: getDashboardData,
     deps: []
   })
 
@@ -27,27 +23,27 @@ export default function AdminPage() {
         <div className="@container/main flex flex-1 flex-col gap-2">
           <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
             {/* Header Stats Section */}
-            {statsLoading || statsError ? (
+            {loading || error ? (
               <HeaderStatsState 
-                loading={statsLoading} 
-                error={statsError} 
-                refetch={refetchStats} 
+                loading={loading} 
+                error={error} 
+                refetch={refetch} 
               />
-            ) : (
-              <HeaderStats stats={stats} />
-            )}
+            ) : dashboardData ? (
+              <HeaderStats stats={dashboardData.stats} />
+            ) : null}
 
             {/* Resources Section */}
-            {resourcesLoading || resourcesError ? (
+            {loading || error ? (
               <ResourcesState 
-                loading={resourcesLoading} 
-                error={resourcesError} 
-                refetch={refetchResources} 
+                loading={loading} 
+                error={error} 
+                refetch={refetch} 
               />
-            ) : resources ? (
+            ) : dashboardData ? (
               <>
-                <ClusterResources resources={resources} />
-                <NodeResources resources={resources} />
+                <ClusterResources resources={{ cluster: dashboardData.stats.cluster }} />
+                <NodeResources resources={{ cluster: dashboardData.stats.cluster }} />
               </>
             ) : null}
           </div>

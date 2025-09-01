@@ -18,6 +18,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { formatRelativeTime } from '@/lib/utils'
 
 interface UsersTableColumnsProps {
   users: User[]
@@ -45,42 +46,6 @@ export function UsersTableColumns({
     }
   }
 
-  const formatRelativeTime = (dateString: string) => {
-    try {
-      // Parse UTC timestamp and convert to local time
-      const date = new Date(dateString.endsWith('Z') ? dateString : dateString + 'Z')
-      const now = new Date()
-      const diffInMs = now.getTime() - date.getTime()
-      
-      // Convert to different time units
-      const seconds = Math.floor(diffInMs / 1000)
-      const minutes = Math.floor(seconds / 60)
-      const hours = Math.floor(minutes / 60)
-      const days = Math.floor(hours / 24)
-      const weeks = Math.floor(days / 7)
-      const months = Math.floor(days / 30)
-      const years = Math.floor(days / 365)
-      
-      if (years > 0) {
-        return years === 1 ? '1 year ago' : `${years} years ago`
-      } else if (months > 0) {
-        return months === 1 ? '1 month ago' : `${months} months ago`
-      } else if (weeks > 0) {
-        return weeks === 1 ? '1 week ago' : `${weeks} weeks ago`
-      } else if (days > 0) {
-        return days === 1 ? '1 day ago' : `${days} days ago`
-      } else if (hours > 0) {
-        return hours === 1 ? '1 hour ago' : `${hours} hours ago`
-      } else if (minutes > 0) {
-        return minutes === 1 ? '1 minute ago' : `${minutes} minutes ago`
-      } else {
-        return seconds <= 30 ? 'Just now' : `${seconds} seconds ago`
-      }
-    } catch {
-      return dateString // Return original string if parsing fails
-    }
-  }
-
   return (
     <Table>
       <TableHeader className="bg-muted text-muted-foreground">
@@ -88,28 +53,29 @@ export function UsersTableColumns({
           <TableHead className="min-w-[200px] px-4">Username</TableHead>
           <TableHead className="min-w-[120px]">Groups</TableHead>
           <TableHead className="min-w-[120px]">Created</TableHead>
+          <TableHead className="min-w-[120px]">Status</TableHead>
           <TableHead className="w-[100px]">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {users.length === 0 && (
           <TableRow key="empty-state">
-            <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+            <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
               No users found.
             </TableCell>
           </TableRow>
         )}
         {users.map((user) => (
-          <TableRow key={user.username} className="hover:bg-muted/50">
+          <TableRow key={user.name} className="hover:bg-muted/50">
             <TableCell className="font-medium px-4">
-              <span>{user.username}</span>
+              <span>{user.name}</span>
             </TableCell>
             <TableCell>
               <div className="flex flex-wrap gap-1">
                 {user.groups.length > 0 ? (
                   user.groups.map((group) => (
-                    <Badge key={group} variant="secondary" className="text-xs">
-                      {group}
+                    <Badge key={group.name} variant="secondary" className="text-xs">
+                      {group.name}
                     </Badge>
                   ))
                 ) : (
@@ -120,12 +86,20 @@ export function UsersTableColumns({
             <TableCell className="text-muted-foreground">
               <Tooltip>
                 <TooltipTrigger>
-                  {user.createdDate ? formatRelativeTime(user.createdDate) : "Never"}
+                  {user.created_at ? formatRelativeTime(user.created_at) : "Never"}
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{user.createdDate ? formatDateTime(user.createdDate) : "Never"}</p>
+                  <p>{user.created_at ? formatDateTime(user.created_at) : "Never"}</p>
                 </TooltipContent>
               </Tooltip>
+            </TableCell>
+            <TableCell>
+              <Badge 
+                variant={user.enabled ? "secondary" : "destructive"}
+                className={user.enabled ? "bg-green-600 text-white dark:bg-green-700" : ""}
+              >
+                {user.enabled ? "Enabled" : "Disabled"}
+              </Badge>
             </TableCell>
             <TableCell>
               <Button
@@ -133,10 +107,10 @@ export function UsersTableColumns({
                 size="sm"
                 onClick={(e) => onDelete(user, e)}
                 className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                disabled={user.isAdmin}
+                disabled={user.is_admin}
               >
                 <Trash2 className="h-4 w-4" />
-                <span className="sr-only">Delete user {user.username}</span>
+                <span className="sr-only">Delete user {user.name}</span>
               </Button>
             </TableCell>
           </TableRow>

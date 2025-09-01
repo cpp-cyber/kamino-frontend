@@ -42,7 +42,7 @@ function TemplateCard({ template, onDeploy }: { template: PodTemplate; onDeploy:
         <div className="absolute inset-0 flex">
           <div className="w-full h-full relative overflow-hidden">
             <Image 
-              src={`/api/proxmox/templates/images/${template.image_path}`}
+              src={`/api/v1/template/image/${template.image_path}`}
               alt={template.name}
               fill
               unoptimized
@@ -55,18 +55,6 @@ function TemplateCard({ template, onDeploy }: { template: PodTemplate; onDeploy:
 
       {/* Pod Content */}
       <div className="flex h-[280px] flex-col p-6">
-        
-        {/* Pod Release Date */}
-        {/* {template.created_at && (
-          <div className="mb-2 -mt-2 flex items-center text-xs text-muted-foreground justify-end">
-            <CalendarIcon className="mr-1.5 h-4 w-4" />
-            {new Date(template.created_at).toLocaleDateString(undefined, {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            })}
-          </div>
-        )} */}
 
         {/* Pod Name */}
         <h3 className="mb-1 text-2xl font-bold">{template.name.replaceAll('_', ' ')}</h3>

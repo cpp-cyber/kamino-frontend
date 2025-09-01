@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     sessionPromise = (async () => {
       try {
-        const response = await fetch('/api/session', { credentials: 'include' })
+        const response = await fetch('/api/v1/session', { credentials: 'include' })
         if (response.ok) {
           const data = await response.json()
           const result = {
@@ -99,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(async () => {
     try {
-      await fetch('/api/logout', { method: 'POST', credentials: 'include' })
+      await fetch('/api/v1/logout', { method: 'POST', credentials: 'include' })
       // Clear cache and update state
       sessionCache = null
       sessionPromise = null

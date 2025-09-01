@@ -14,16 +14,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { startVM, stopVM } from "@/lib/api"
+import { startVM, shutdownVM, rebootVM } from "@/lib/api"
 
 const breadcrumbs = [{ label: "Virtual Machines", href: "/admin/vms" }]
 
 export default function AdminVMsPage() {
   const [alertOpen, setAlertOpen] = useState(false)
-  const [selectedVM, setSelectedVM] = useState<{ vmid: number, node: string, action: 'start' | 'stop' } | null>(null)
-  const [isProcessing, setIsProcessing] = useState(false)
+  const [selectedVM, setSelectedVM] = useState<{ vmid: number, node: string, action: 'start' | 'shutdown' | 'reboot' } | null>(null)
 
-  const handleVMAction = async (vmid: number, node: string, action: 'start' | 'stop') => {
+  const handleVMAction = async (vmid: number, node: string, action: 'start' | 'shutdown' | 'reboot') => {
     setSelectedVM({ vmid, node, action })
     setAlertOpen(true)
   }
@@ -31,22 +30,23 @@ export default function AdminVMsPage() {
   const handleConfirmVMAction = async () => {
     if (!selectedVM) return
     
-    setIsProcessing(true)
     try {
       if (selectedVM.action === 'start') {
         await startVM(selectedVM.vmid, selectedVM.node)
         toast.success(`VM ${selectedVM.vmid} is starting...`)
-      } else {
-        await stopVM(selectedVM.vmid, selectedVM.node)
-        toast.success(`VM ${selectedVM.vmid} is stopping...`)
+      } else if (selectedVM.action === 'shutdown') {
+        await shutdownVM(selectedVM.vmid, selectedVM.node)
+        toast.success(`VM ${selectedVM.vmid} is shutting down...`)
+      } else if (selectedVM.action === 'reboot') {
+        await rebootVM(selectedVM.vmid, selectedVM.node)
+        toast.success(`VM ${selectedVM.vmid} is rebooting...`)
       }
       setAlertOpen(false)
       setSelectedVM(null)
-      // Note: The table will refresh automatically or you might want to trigger a refresh
     } catch (error) {
       toast.error(`Failed to ${selectedVM.action} VM: ${error instanceof Error ? error.message : 'Unknown error'}`)
-    } finally {
-      setIsProcessing(false)
+      setAlertOpen(false)
+      setSelectedVM(null)
     }
   }
 
@@ -77,16 +77,12 @@ export default function AdminVMsPage() {
             </AlertDialogTitle>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isProcessing}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleConfirmVMAction} 
-              disabled={isProcessing}
-              className={selectedVM?.action === 'stop' ? "bg-destructive hover:bg-destructive/90" : ""}
+              className={selectedVM?.action === 'shutdown' ? "bg-destructive hover:bg-destructive/90" : ""}
             >
-              {isProcessing ? 
-                `${selectedVM?.action === 'start' ? 'Starting' : 'Stopping'}...` : 
-                `${selectedVM?.action === 'start' ? 'Start' : 'Stop'}`
-              }
+              {selectedVM?.action === 'start' ? 'Start' : selectedVM?.action === 'shutdown' ? 'Shutdown' : 'Reboot'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

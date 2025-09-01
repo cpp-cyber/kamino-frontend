@@ -1,16 +1,23 @@
 "use client"
 
-import { ArrowUpDown, PlayIcon, SquareIcon } from "lucide-react"
+import { ArrowUpDown, PlayIcon, SquareIcon, MoreVertical, RotateCcw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ColumnDef } from "@tanstack/react-table"
 import { VirtualMachine } from "@/lib/types"
 import { StatusBadge } from "@/components/status-badges"
 import { formatBytes, formatUptime } from "@/lib/utils"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator
+} from "@/components/ui/dropdown-menu"
 import Link from "next/link"
 
 // Column definitions for the VMs table
 export const createVMTableColumns = (
-  onVMAction: (vmid: number, node: string, action: 'start' | 'stop') => void
+  onVMAction: (vmid: number, node: string, action: 'start' | 'shutdown' | 'reboot') => void
 ): ColumnDef<VirtualMachine>[] => [
   {
     accessorKey: "vmid",
@@ -22,7 +29,7 @@ export const createVMTableColumns = (
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           ID
-          <ArrowUpDown className="h-4 w-4" />
+          <ArrowUpDown className="size-3 -ml-1 text-muted-foreground" />
         </Button>
       )
     },
@@ -40,10 +47,10 @@ export const createVMTableColumns = (
           variant="ghost"
           size="sm"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="-ml-2"
+          className="-ml-4.5"
         >
           Node
-          <ArrowUpDown className="h-4 w-4" />
+          <ArrowUpDown className="size-3 -ml-1 text-muted-foreground" />
         </Button>
       )
     },
@@ -60,10 +67,10 @@ export const createVMTableColumns = (
           variant="ghost"
           size="sm"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="-ml-2"
+          className="-ml-4.5"
         >
           Name
-          <ArrowUpDown className="h-4 w-4" />
+          <ArrowUpDown className="size-3 -ml-1 text-muted-foreground" />
         </Button>
       )
     },
@@ -95,10 +102,10 @@ export const createVMTableColumns = (
           variant="ghost"
           size="sm"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="-ml-2"
+          className="-ml-4.5"
         >
           Pool
-          <ArrowUpDown className="h-4 w-4" />
+          <ArrowUpDown className="size-3 -ml-1 text-muted-foreground" />
         </Button>
       )
     },
@@ -115,10 +122,10 @@ export const createVMTableColumns = (
           variant="ghost"
           size="sm"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="-ml-2"
+          className="-ml-4.5"
         >
           CPU
-          <ArrowUpDown className="h-4 w-4" />
+          <ArrowUpDown className="size-3 -ml-1 text-muted-foreground" />
         </Button>
       )
     },
@@ -150,10 +157,10 @@ export const createVMTableColumns = (
           variant="ghost"
           size="sm"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="-ml-2"
+          className="-ml-4.5"
         >
           Memory
-          <ArrowUpDown className="h-4 w-4" />
+          <ArrowUpDown className="size-3 -ml-1 text-muted-foreground" />
         </Button>
       )
     },
@@ -185,10 +192,10 @@ export const createVMTableColumns = (
           variant="ghost"
           size="sm"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="-ml-2"
+          className="-ml-4.5"
         >
           Disk
-          <ArrowUpDown className="h-4 w-4" />
+          <ArrowUpDown className="size-3 -ml-1 text-muted-foreground" />
         </Button>
       )
     },
@@ -206,10 +213,10 @@ export const createVMTableColumns = (
           variant="ghost"
           size="sm"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="-ml-2"
+          className="-ml-4.5"
         >
           Status
-          <ArrowUpDown className="h-4 w-4" />
+          <ArrowUpDown className="size-3 -ml-1 text-muted-foreground" />
         </Button>
       )
     },
@@ -226,10 +233,10 @@ export const createVMTableColumns = (
           variant="ghost"
           size="sm"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="-ml-2"
+          className="-ml-4.5"
         >
           Uptime
-          <ArrowUpDown className="h-4 w-4" />
+          <ArrowUpDown className="size-3 -ml-1 text-muted-foreground" />
         </Button>
       )
     },
@@ -245,22 +252,39 @@ export const createVMTableColumns = (
     cell: ({ row }) => {
       const vm = row.original
       return (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onVMAction(vm.vmid, vm.node, vm.status === 'running' ? 'stop' : 'start')}
-          className={`h-8 w-8 p-0 ${
-            vm.status === 'running' 
-              ? "text-destructive hover:text-destructive hover:bg-destructive/10" 
-              : "text-green-600 hover:text-green-600 hover:bg-green-600/10"
-          }`}
-        >
-          {vm.status === 'running' ? (
-            <SquareIcon className="h-4 w-4" />
-          ) : (
-            <PlayIcon className="h-4 w-4" />
-          )}
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button size="sm" variant="ghost" className="ml-3">
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem
+              onClick={() => onVMAction(vm.vmid, vm.node, 'start')}
+              disabled={vm.status === 'running'}
+              className="cursor-pointer"
+            >
+              <PlayIcon className="mr-2 h-4 w-4 text-green-600" />
+              Start
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => onVMAction(vm.vmid, vm.node, 'shutdown')}
+              disabled={vm.status !== 'running'}
+              className="cursor-pointer"
+            >
+              <SquareIcon className="mr-2 h-4 w-4 text-destructive" />
+              Shutdown
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => onVMAction(vm.vmid, vm.node, 'reboot')}
+              className="cursor-pointer"
+            >
+              <RotateCcw className="mr-2 h-4 w-4 text-blue-600" />
+              Reboot
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       )
     },
     enableSorting: false,

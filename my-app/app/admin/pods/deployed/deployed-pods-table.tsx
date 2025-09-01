@@ -16,7 +16,7 @@ import { usePodExpansion } from "./use-pod-expansion"
 interface DeployedPodsTableProps {
   onDelete: (pod: DeployedPod) => void
   onBulkDelete: (pods: DeployedPod[]) => void
-  onVMAction: (vmid: number, node: string, action: 'start' | 'stop') => void
+  onVMAction: (vmid: number, node: string, action: 'start' | 'shutdown' | 'reboot') => void
   onRefresh?: () => Promise<void> | void
 }
 

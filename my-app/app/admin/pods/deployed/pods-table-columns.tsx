@@ -22,7 +22,7 @@ interface PodsTableCoreProps {
   onToggleRow: (podName: string) => void
   onToggleAllRows: () => void
   onDelete: (pod: DeployedPod, event: React.MouseEvent) => void
-  onVMAction: (vmid: number, node: string, action: 'start' | 'stop') => void
+  onVMAction: (vmid: number, node: string, action: 'start' | 'shutdown' | 'reboot') => void
   selectedPods: Set<string>
   onSelectionChange: (selectedPods: Set<string>) => void
 }

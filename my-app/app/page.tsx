@@ -18,8 +18,13 @@ import { LoadingSpinnerSmall } from "@/components/ui/loading-spinner"
 import { ErrorDisplay } from "@/components/ui/error-display"
 import { Button } from "@/components/ui/button"
 import { Eye } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { PodDeployDialog } from "@/components/pod-deploy-dialog"
+import { usePodDeployment } from "@/hooks/use-pod-deployment"
 
 export default function Page() {
+  const { isDialogOpen, selectedPod, openDeployDialog, closeDeployDialog } = usePodDeployment()
+  
   const { data: deployedPods, loading: deployedLoading, error: deployedError } = useApiState({
     fetchFn: getDeployedPods,
   })
@@ -75,17 +80,17 @@ export default function Page() {
                           role="button"
                         >
                           <div className="bg-sidebar-accent-foreground/10 text-sidebar-primary-foreground flex size-16 items-center justify-center rounded-lg overflow-hidden shadow-lg shrink-0">
-                            {/* <Image
-                              src={pod.icon || "https://i.imgur.com/C4l2RaF.jpeg"}
+                            <Image
+                              src={pod.template?.image_path ? `/api/v1/template/image/${pod.template.image_path}` : '/kaminoLogo.svg'}
                               alt={`${pod.name} Logo`}
                               width={64}
                               height={64}
                               className="size-16 object-cover rounded-lg"
-                            /> */}
-                            <Image src="/kaminoLogo.svg" alt="Kamino Logo" width={56} height={56} className="size-14" />
+                              unoptimized
+                            />
                           </div>
                           <div className="flex flex-col">
-                            <h3 className="text-lg font-semibold text-foreground">{pod.name}</h3>
+                            <h3 className="text-lg font-semibold text-foreground">{pod.template?.name ? pod.template.name.replaceAll('_', ' ') : pod.name}</h3>
                             <div className="text-xs text-muted-foreground mt-1">
                               {/* Deployed {new Date(pod.deployed_at).toLocaleDateString()} */}
                             </div>
@@ -136,36 +141,30 @@ export default function Page() {
                 ) : (
                   <div className="space-y-4">
                     {podTemplates.slice(0, 3).map((template, index) => (
-                      <Link key={template.name || index} href="/pods/templates" passHref>
-                        <div
-                          className="flex items-center gap-4 p-4 bg-card rounded-xl w-full cursor-pointer transition hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-                          role="button"
-                        >
-                          <div className="bg-sidebar-accent-foreground/10 text-sidebar-primary-foreground flex size-16 items-center justify-center rounded-lg overflow-hidden shadow-lg shrink-0">
-                            <Image
-                              src={`/api/proxmox/templates/images/${template.image_path}`}
-                              alt={template.name}
-                              width={64}
-                              height={64}
-                              unoptimized
-                              className="size-16 object-cover rounded-lg"
-                            />
-                            {/* <Image src="/kaminoLogo.svg" alt="Kamino Logo" width={56} height={56} className="size-14" /> */}
-                          </div>
-                          <div className="flex flex-col">
-                            <h3 className="text-lg font-semibold text-foreground">{template.name}</h3>
-                            <div className="flex items-center space-x-2 text-xs text-muted-foreground mt-1">
-                              <span>
-                                {(template.vm_count || 0)} {template.vm_count === 1 ? "VM" : "VMs"}
-                              </span>
-                              <span>•</span>
-                              <span>{template.deployments || 'N/A'} deployments</span>
-                              {/* <span>•</span>
-                              <span>Created {new Date(template.created_at).toLocaleDateString()}</span> */}
-                            </div>
+                      <div
+                        key={template.name || index}
+                        onClick={() => openDeployDialog(template)}
+                        className="flex items-center gap-4 p-4 bg-card rounded-xl w-full cursor-pointer transition hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                        role="button"
+                      >
+                        <div className="bg-sidebar-accent-foreground/10 text-sidebar-primary-foreground flex size-16 items-center justify-center rounded-lg overflow-hidden shadow-lg shrink-0">
+                          <Image
+                            src={`/api/v1/template/image/${template.image_path}`}
+                            alt={template.name}
+                            width={64}
+                            height={64}
+                            unoptimized
+                            className="size-16 object-cover rounded-lg"
+                          />
+                        </div>
+                        <div className="flex flex-col">
+                          <h3 className="text-lg font-semibold text-foreground">{template.name}</h3>
+                          <div className="flex items-center space-x-2 mt-1">
+                            <Badge>{(template.vm_count || 0)} {template.vm_count === 1 ? "VM" : "VMs"}</Badge>
+                            <Badge>{template.deployments} Deployments</Badge>
                           </div>
                         </div>
-                      </Link>
+                      </div>
                     ))}
                     {podTemplates.length > 3 && (
                       <div className="text-center pt-4">
@@ -180,6 +179,13 @@ export default function Page() {
             )}
           </CardContent>
         </Card>
+
+        {/* Centralized Deploy Dialog */}
+        <PodDeployDialog 
+          isOpen={isDialogOpen}
+          onClose={closeDeployDialog}
+          selectedPod={selectedPod}
+        />
       </PageLayout>
     </AuthGuard>
   )

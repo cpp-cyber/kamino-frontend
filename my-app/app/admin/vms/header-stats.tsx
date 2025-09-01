@@ -1,10 +1,12 @@
 import React from 'react'
 import {
   Card,
+  CardAction,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { Boxes, MonitorCheck, MonitorXIcon } from 'lucide-react'
 
 interface HeaderStatsProps {
   totalCount: number
@@ -20,6 +22,9 @@ export function HeaderStats({ totalCount, runningCount }: HeaderStatsProps) {
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
             {totalCount}
           </CardTitle>
+          <CardAction>
+            <Boxes />
+          </CardAction>
         </CardHeader>
       </Card>
       <Card className="@container/card">
@@ -30,6 +35,9 @@ export function HeaderStats({ totalCount, runningCount }: HeaderStatsProps) {
               {runningCount}
             </span>
           </CardTitle>
+          <CardAction>
+            <MonitorCheck />
+          </CardAction>
         </CardHeader>
       </Card>
       <Card className="@container/card">
@@ -40,6 +48,9 @@ export function HeaderStats({ totalCount, runningCount }: HeaderStatsProps) {
               {totalCount - runningCount}
             </span>
           </CardTitle>
+          <CardAction>
+            <MonitorXIcon />
+          </CardAction>
         </CardHeader>
       </Card>
     </div>

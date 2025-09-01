@@ -13,7 +13,7 @@ import { VMTablePagination } from "./vm-table-pagination"
 import { useVMFilters } from "./use-vm-filters"
 
 interface VMsTableProps {
-  onVMAction: (vmid: number, node: string, action: 'start' | 'stop') => void
+  onVMAction: (vmid: number, node: string, action: 'start' | 'shutdown' | 'reboot') => void
 }
 
 export function VMsTable({ onVMAction }: VMsTableProps) {

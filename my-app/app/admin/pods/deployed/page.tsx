@@ -14,7 +14,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { deletePod, startVM, stopVM } from "@/lib/api"
+import { deletePod, startVM, shutdownVM, rebootVM } from "@/lib/api"
 import { DeployedPod } from "@/lib/types"
 
 const breadcrumbs = [{ label: "Deployed Pods", href: "/admin/pods/deployed" }]
@@ -28,8 +28,7 @@ export default function AdminPage() {
   
   // VM action confirmation state
   const [vmActionAlertOpen, setVmActionAlertOpen] = useState(false)
-  const [selectedVM, setSelectedVM] = useState<{ vmid: number, node: string, action: 'start' | 'stop' } | null>(null)
-  const [isVMActionProcessing, setIsVMActionProcessing] = useState(false)
+  const [selectedVM, setSelectedVM] = useState<{ vmid: number, node: string, action: 'start' | 'shutdown' | 'reboot' } | null>(null)
 
   const handleRefresh = () => {
     setRefreshKey(prev => prev + 1)
@@ -74,7 +73,7 @@ export default function AdminPage() {
     }
   }
 
-  const handleVMAction = async (vmid: number, node: string, action: 'start' | 'stop') => {
+  const handleVMAction = async (vmid: number, node: string, action: 'start' | 'shutdown' | 'reboot') => {
     setSelectedVM({ vmid, node, action })
     setVmActionAlertOpen(true)
   }
@@ -82,21 +81,23 @@ export default function AdminPage() {
   const handleConfirmVMAction = async () => {
     if (!selectedVM) return
     
-    setIsVMActionProcessing(true)
     try {
       if (selectedVM.action === 'start') {
         await startVM(selectedVM.vmid, selectedVM.node)
         toast.success(`VM ${selectedVM.vmid} is starting...`)
-      } else {
-        await stopVM(selectedVM.vmid, selectedVM.node)
-        toast.success(`VM ${selectedVM.vmid} is stopping...`)
+      } else if (selectedVM.action === 'shutdown') {
+        await shutdownVM(selectedVM.vmid, selectedVM.node)
+        toast.success(`VM ${selectedVM.vmid} is shutting down...`)
+      } else if (selectedVM.action === 'reboot') {
+        await rebootVM(selectedVM.vmid, selectedVM.node)
+        toast.success(`VM ${selectedVM.vmid} is rebooting...`)
       }
       setVmActionAlertOpen(false)
       setSelectedVM(null)
     } catch (error) {
       toast.error(`Failed to ${selectedVM.action} VM: ${error instanceof Error ? error.message : 'Unknown error'}`)
-    } finally {
-      setIsVMActionProcessing(false)
+      setVmActionAlertOpen(false)
+      setSelectedVM(null)
     }
   }
 
@@ -157,16 +158,12 @@ export default function AdminPage() {
             </AlertDialogTitle>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isVMActionProcessing}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleConfirmVMAction} 
-              disabled={isVMActionProcessing}
-              className={selectedVM?.action === 'stop' ? "bg-destructive hover:bg-destructive/90" : ""}
+              className={selectedVM?.action === 'shutdown' ? "bg-destructive hover:bg-destructive/90" : ""}
             >
-              {isVMActionProcessing ? 
-                `${selectedVM?.action === 'start' ? 'Starting' : 'Stopping'}...` : 
-                `${selectedVM?.action === 'start' ? 'Start' : 'Stop'}`
-              }
+              {selectedVM?.action === 'start' ? 'Start' : selectedVM?.action === 'shutdown' ? 'Shutdown' : 'Reboot'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

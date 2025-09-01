@@ -41,8 +41,8 @@ export default function AdminUsersPage() {
     try {
       if (selectedUser) {
         // Single delete
-        await deleteUser(selectedUser.username)
-        toast.success(`User "${selectedUser.username}" has been deleted successfully.`)
+        await deleteUser(selectedUser.name)
+        toast.success(`User "${selectedUser.name}" has been deleted successfully.`)
       }
       setAlertOpen(false)
       setSelectedUser(null)
@@ -80,7 +80,7 @@ export default function AdminUsersPage() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              Are you sure you want to delete &quot;{selectedUser?.username}&quot;?
+              Are you sure you want to delete &quot;{selectedUser?.name}&quot;?
             </AlertDialogTitle>
           </AlertDialogHeader>
           <AlertDialogFooter>

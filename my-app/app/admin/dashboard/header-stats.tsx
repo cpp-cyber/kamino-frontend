@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { DashboardStats } from "@/hooks/use-dashboard-stats"
+import { DashboardStats } from "@/lib/types"
 import { Copy, Rocket, Server, Users } from "lucide-react"
 
 interface HeaderStatsProps {
@@ -24,7 +24,7 @@ export function HeaderStats({ stats }: HeaderStatsProps) {
             <Users/>
           </CardAction>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {stats.usersCount}
+            {stats.users}
           </CardTitle>
         </CardHeader>
       </Card>
@@ -35,7 +35,7 @@ export function HeaderStats({ stats }: HeaderStatsProps) {
             <Copy/>
           </CardAction>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {stats.podTemplatesCount}
+            {stats.published_templates}
           </CardTitle>
         </CardHeader>
       </Card>
@@ -46,7 +46,7 @@ export function HeaderStats({ stats }: HeaderStatsProps) {
             <Rocket/>
           </CardAction>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {stats.deployedPodsCount}
+            {stats.deployed_pods}
           </CardTitle>
         </CardHeader>
       </Card>
@@ -57,7 +57,7 @@ export function HeaderStats({ stats }: HeaderStatsProps) {
             <Server/>
           </CardAction>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {stats.virtualMachinesCount}
+            {stats.vms}
           </CardTitle>
         </CardHeader>
       </Card>
