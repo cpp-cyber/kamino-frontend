@@ -86,3 +86,28 @@ export const formatDateTime = (dateString: string) => {
     return dateString // Return original string if parsing fails
   }
 }
+
+// Common sorting functions for table columns
+export const createDateSortingFn = () => {
+  return (rowA: { original: Record<string, unknown> }, rowB: { original: Record<string, unknown> }, columnId: string) => {
+    const aValue = rowA.original[columnId] as string
+    const bValue = rowB.original[columnId] as string
+    
+    if (!aValue || !bValue) {
+      if (!aValue && !bValue) return 0
+      return !aValue ? 1 : -1
+    }
+    
+    const aDate = new Date(aValue.endsWith('Z') ? aValue : aValue + 'Z')
+    const bDate = new Date(bValue.endsWith('Z') ? bValue : bValue + 'Z')
+    return bDate.getTime() - aDate.getTime() // Newest first by default
+  }
+}
+
+export const createAlphabeticalSortingFn = () => {
+  return (rowA: { original: Record<string, unknown> }, rowB: { original: Record<string, unknown> }, columnId: string) => {
+    const aValue = String(rowA.original[columnId] || '').toLowerCase()
+    const bValue = String(rowB.original[columnId] || '').toLowerCase()
+    return aValue.localeCompare(bValue)
+  }
+}

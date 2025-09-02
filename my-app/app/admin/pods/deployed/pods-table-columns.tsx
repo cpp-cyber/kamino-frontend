@@ -1,7 +1,14 @@
 import React from 'react'
-import { ChevronDownIcon, ChevronRightIcon, Trash2Icon } from "lucide-react"
+import { ChevronDownIcon, ChevronRightIcon, Trash2Icon, MoreVertical, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator
+} from "@/components/ui/dropdown-menu"
 import {
   Table,
   TableBody,
@@ -25,6 +32,7 @@ interface PodsTableCoreProps {
   onVMAction: (vmid: number, node: string, action: 'start' | 'shutdown' | 'reboot') => void
   selectedPods: Set<string>
   onSelectionChange: (selectedPods: Set<string>) => void
+  onBulkDelete: () => void
 }
 
 export function PodsTableCore({
@@ -36,7 +44,8 @@ export function PodsTableCore({
   onDelete,
   onVMAction,
   selectedPods,
-  onSelectionChange
+  onSelectionChange,
+  onBulkDelete
 }: PodsTableCoreProps) {
   const isAllSelected = pods.length > 0 && selectedPods.size === pods.length
   const isSomeSelected = selectedPods.size > 0 && selectedPods.size < pods.length
@@ -104,7 +113,33 @@ export function PodsTableCore({
           <TableHead className="min-w-[80px]">Running</TableHead>
           <TableHead className="min-w-[80px]">Stopped</TableHead>
           <TableHead className="min-w-[150px]">Longest Uptime</TableHead>
-          <TableHead className="w-[100px]">Actions</TableHead>
+          <TableHead className="w-[100px]">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  className="cursor-pointer text-muted-foreground"
+                  disabled
+                >
+                  <EyeOff className="mr-2 h-4 w-4" />
+                  Hide ({selectedPods.size})
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={onBulkDelete}
+                  className="cursor-pointer text-destructive focus:text-destructive"
+                  disabled={selectedPods.size === 0}
+                >
+                  <Trash2Icon className="mr-2 h-4 w-4" />
+                  Delete ({selectedPods.size})
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -167,14 +202,30 @@ export function PodsTableCore({
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={(e) => onDelete(pod, e)}
-                    className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                  >
-                    <Trash2Icon className="h-4 w-4" />
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="h-8 w-8 p-0">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        className="cursor-pointer text-muted-foreground"
+                        disabled
+                      >
+                        <EyeOff className="mr-2 h-4 w-4" />
+                        Hide
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={(e) => onDelete(pod, e)}
+                        className="cursor-pointer text-destructive focus:text-destructive"
+                      >
+                        <Trash2Icon className="mr-2 h-4 w-4" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </TableCell>
               </TableRow>
               {expandedRows.has(pod.name) && (

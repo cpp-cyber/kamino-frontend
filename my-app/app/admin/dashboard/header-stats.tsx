@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { DashboardStats } from "@/lib/types"
-import { Copy, Rocket, Server, Users } from "lucide-react"
+import { Boxes, Copy, Rocket, Users } from "lucide-react"
 
 interface HeaderStatsProps {
   stats: DashboardStats
@@ -54,7 +54,7 @@ export function HeaderStats({ stats }: HeaderStatsProps) {
         <CardHeader>
           <CardDescription>Virtual Machines</CardDescription>
           <CardAction>
-            <Server/>
+            <Boxes/>
           </CardAction>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
             {stats.vms}

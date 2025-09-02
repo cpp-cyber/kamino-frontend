@@ -5,7 +5,7 @@ import { toast } from "sonner"
 import { AuthGuard } from "@/components/auth-guard"
 import { PageLayout } from "@/app/admin/admin-page-layout"
 import { GroupsTable } from "@/app/admin/groups/groups-table"
-import { deleteGroup } from "@/lib/api"
+import { deleteGroup, renameGroup } from "@/lib/api"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,7 +33,6 @@ export default function AdminGroupsPage() {
   const [renameDialogOpen, setRenameDialogOpen] = useState(false)
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null)
   const [newGroupName, setNewGroupName] = useState("")
-  const [isDeleting, setIsDeleting] = useState(false)
   const [isRenaming, setIsRenaming] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
 
@@ -56,7 +55,6 @@ export default function AdminGroupsPage() {
   }
 
   const handleConfirmDelete = async () => {
-    setIsDeleting(true)
     try {
       if (selectedGroup) {
         // Single delete
@@ -69,8 +67,6 @@ export default function AdminGroupsPage() {
       handleRefresh()
     } catch (error) {
       toast.error(`Failed to delete group: ${error instanceof Error ? error.message : 'Unknown error'}`)
-    } finally {
-      setIsDeleting(false)
     }
   }
 
@@ -79,8 +75,7 @@ export default function AdminGroupsPage() {
     
     setIsRenaming(true)
     try {
-      // TODO: Implement rename group API call when available
-      // await renameGroup(selectedGroup.name, newGroupName.trim())
+      await renameGroup(selectedGroup.name, newGroupName.trim())
       toast.success(`Group renamed from "${selectedGroup.name}" to "${newGroupName.trim()}" successfully.`)
       setRenameDialogOpen(false)
       setSelectedGroup(null)
@@ -122,13 +117,12 @@ export default function AdminGroupsPage() {
             </AlertDialogTitle>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleConfirmDelete} 
-              disabled={isDeleting}
               className="bg-destructive hover:bg-destructive/90"
             >
-              {isDeleting ? "Deleting..." : "Delete"}
+              Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

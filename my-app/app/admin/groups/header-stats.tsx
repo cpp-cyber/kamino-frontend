@@ -27,7 +27,6 @@ interface HeaderStatsProps {
 
 export function HeaderStats({ groupsData, onGroupCreated }: HeaderStatsProps) {
   const [groupName, setGroupName] = useState("")
-  const [isCreating, setIsCreating] = useState(false)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,7 +37,6 @@ export function HeaderStats({ groupsData, onGroupCreated }: HeaderStatsProps) {
       return
     }
 
-    setIsCreating(true)
     try {
       await createGroup(groupName.trim())
       toast.success(`Group "${groupName.trim()}" has been created successfully`)
@@ -48,8 +46,6 @@ export function HeaderStats({ groupsData, onGroupCreated }: HeaderStatsProps) {
       onGroupCreated?.()
     } catch (error) {
       toast.error(`Failed to create group: ${error instanceof Error ? error.message : 'Unknown error'}`)
-    } finally {
-      setIsCreating(false)
     }
   }
 
@@ -95,17 +91,16 @@ export function HeaderStats({ groupsData, onGroupCreated }: HeaderStatsProps) {
                     placeholder="Group Name" 
                     value={groupName}
                     onChange={(e) => setGroupName(e.target.value)}
-                    disabled={isCreating}
                     required
                   />
                 </div>
               </div>
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button ref={closeButtonRef} variant="outline" type="button" disabled={isCreating}>Cancel</Button>
+                  <Button ref={closeButtonRef} variant="outline" type="button">Cancel</Button>
                 </DialogClose>
-                <Button type="submit" disabled={isCreating || !groupName.trim()}>
-                  {isCreating ? "Creating..." : "Create"}
+                <Button type="submit" disabled={!groupName.trim()}>
+                  Create
                 </Button>
               </DialogFooter>
             </form>

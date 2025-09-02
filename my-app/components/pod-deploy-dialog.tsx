@@ -214,7 +214,7 @@ export function PodDeployDialog({ isOpen, onClose, selectedPod }: PodDeployDialo
               <Button 
                 onClick={handleConfirmDeploy}
                 size="sm"
-                className="w-full h-10 text-sm bg-gradient-to-r from-kamino-green to-kamino-yellow font-medium hover:brightness-90 cursor-pointer"
+                className="w-full h-10 text-sm bg-gradient-to-r from-kamino-green to-kamino-yellow font-medium hover:brightness-90 cursor-pointer !text-white"
               >
                 <Rocket />
                 Deploy

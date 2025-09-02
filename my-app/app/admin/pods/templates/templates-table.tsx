@@ -157,7 +157,7 @@ export function PodTemplateTable({ onTemplateAction }: PodTemplateTableProps) {
                         )}
                         {podTemplate.visible === true ? 'Hide' : 'Show'}
                       </DropdownMenuItem>
-                      <DropdownMenuSeparator className="mt-3" />
+                      <DropdownMenuSeparator />
                       <DropdownMenuItem
                         onClick={() => onTemplateAction(podTemplate.name, 'delete')}
                         className="cursor-pointer text-destructive focus:text-destructive"

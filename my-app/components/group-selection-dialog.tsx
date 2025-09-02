@@ -1,0 +1,139 @@
+"use client"
+
+import React, { useState, useEffect } from 'react'
+import { Group } from '@/lib/types'
+import { getGroups } from '@/lib/api'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { toast } from "sonner"
+import { LoadingSpinner } from "@/components/ui/loading-spinner"
+
+interface GroupSelectionDialogProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  title: string
+  description: string
+  onConfirm: (groupName: string) => void
+  selectedUsersCount: number
+  isRemoveOperation?: boolean // New prop to indicate if this is a remove operation
+}
+
+export function GroupSelectionDialog({ 
+  open, 
+  onOpenChange, 
+  title,
+  description,
+  onConfirm,
+  selectedUsersCount,
+  isRemoveOperation = false
+}: GroupSelectionDialogProps) {
+  const [selectedGroup, setSelectedGroup] = useState<string>("")
+  const [availableGroups, setAvailableGroups] = useState<Group[]>([])
+  const [loading, setLoading] = useState(false)
+
+  // Load available groups when dialog opens
+  useEffect(() => {
+    if (open) {
+      loadGroups()
+      setSelectedGroup("") // Reset selection
+    }
+  }, [open])
+
+  const loadGroups = async () => {
+    try {
+      setLoading(true)
+      const response = await getGroups()
+      let filteredGroups = response.groups
+      
+      // Filter out protected groups for remove operations
+      if (isRemoveOperation) {
+        filteredGroups = response.groups.filter(group => {
+          const lowerName = group.name.toLowerCase()
+          return !lowerName.includes('kamino') && !lowerName.includes('admin')
+        })
+      }
+      
+      setAvailableGroups(filteredGroups)
+    } catch (error) {
+      console.error('Failed to load groups:', error)
+      toast.error('Failed to load available groups')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleConfirm = () => {
+    if (!selectedGroup) {
+      toast.error('Please select a group')
+      return
+    }
+    
+    onConfirm(selectedGroup)
+    onOpenChange(false)
+    setSelectedGroup("")
+  }
+
+  const handleCancel = () => {
+    onOpenChange(false)
+    setSelectedGroup("")
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>
+            {description}
+            <br />
+            <span className="font-medium">Selected users: {selectedUsersCount}</span>
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="py-4">
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <LoadingSpinner message="Loading groups..." />
+            </div>
+          ) : (
+            <Select value={selectedGroup} onValueChange={setSelectedGroup}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a group" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableGroups.map((group) => (
+                  <SelectItem key={group.name} value={group.name}>
+                    {group.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={handleCancel}>
+            Cancel
+          </Button>
+          <Button onClick={handleConfirm} disabled={!selectedGroup || loading}>
+            Confirm
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}

@@ -164,8 +164,6 @@ export function DeployedPodsTable({ onDelete, onBulkDelete, onVMAction, onRefres
           onSearchChange={setSearchTerm}
           itemsPerPage={itemsPerPage}
           onItemsPerPageChange={setItemsPerPage}
-          selectedPodsCount={selectedPods.size}
-          onBulkDelete={handleBulkDelete}
           onRefresh={handleRefresh}
           isRefreshing={isRefreshing}
         />
@@ -179,6 +177,7 @@ export function DeployedPodsTable({ onDelete, onBulkDelete, onVMAction, onRefres
           onDelete={handleDeleteClick}
           onVMAction={onVMAction}
           onSelectionChange={setSelectedPods}
+          onBulkDelete={handleBulkDelete}
         />
       </div>
 

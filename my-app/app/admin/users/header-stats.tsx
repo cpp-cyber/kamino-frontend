@@ -1,6 +1,7 @@
 "use client"
 
-// import { useState } from "react"
+import { useState, useRef } from "react"
+import { toast } from "sonner"
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { GetUsersResponse } from "@/lib/types"
 import { User, Shield, UserRoundX, Plus } from "lucide-react"
@@ -17,10 +18,44 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { createUser } from "@/lib/api"
+
+interface HeaderStatsProps {
+  usersData: GetUsersResponse
+  onUserCreated?: () => void
+}
 
 
-export function HeaderStats({ usersData }: { usersData: GetUsersResponse }) {
-  // const [dialogOpen, setDialogOpen] = useState(false)
+export function HeaderStats({ usersData, onUserCreated }: HeaderStatsProps) {
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
+  const closeButtonRef = useRef<HTMLButtonElement>(null)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (!username.trim()) {
+      toast.error("Username is required")
+      return
+    }
+
+    if (!password.trim()) {
+      toast.error("Password is required")
+      return
+    }
+
+    try {
+      await createUser(username.trim(), password.trim())
+      toast.success(`User "${username.trim()}" has been created successfully`)
+      setUsername("")
+      setPassword("")
+      // Close dialog using the ref
+      closeButtonRef.current?.click()
+      onUserCreated?.()
+    } catch (error) {
+      toast.error(`Failed to create user: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
+  }
 
   return (
     <>
@@ -61,42 +96,58 @@ export function HeaderStats({ usersData }: { usersData: GetUsersResponse }) {
         
 
         <Dialog>
-          <form>
-            <DialogTrigger asChild>
-              <Button 
-              className="h-full w-full min-h-[100px] bg-gradient-to-r from-kamino-green to-kamino-yellow font-medium hover:brightness-90 cursor-pointer shadow !text-white rounded-xl"
-              type="button"
-              >
-              <Plus />
-              Create Users
-            </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+          <DialogTrigger asChild>
+            <Button 
+            className="h-full w-full min-h-[100px] bg-gradient-to-r from-kamino-green to-kamino-yellow font-medium hover:brightness-90 cursor-pointer shadow !text-white rounded-xl"
+            type="button"
+            >
+            <Plus />
+            Create Users
+          </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <form onSubmit={handleSubmit} className="flex flex-col space-y-6">
               <DialogHeader>
-                <DialogTitle>Edit profile</DialogTitle>
+                <DialogTitle>Create User</DialogTitle>
                 <DialogDescription>
-                  Make changes to your profile here. Click save when you&apos;re
-                  done.
+                  Create a new user account with username and password
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4">
                 <div className="grid gap-3">
-                  <Label htmlFor="name-1">Name</Label>
-                  <Input id="name-1" name="name" defaultValue="Pedro Duarte" />
+                  <Label htmlFor="username-1">Username</Label>
+                  <Input 
+                    id="username-1" 
+                    name="username" 
+                    placeholder="Enter username" 
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                  />
                 </div>
                 <div className="grid gap-3">
-                  <Label htmlFor="username-1">Username</Label>
-                  <Input id="username-1" name="username" defaultValue="@peduarte" />
+                  <Label htmlFor="password-1">Password</Label>
+                  <Input 
+                    id="password-1" 
+                    name="password" 
+                    type="password"
+                    placeholder="Enter password" 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
                 </div>
               </div>
               <DialogFooter>
                 <DialogClose asChild>
-                  <Button variant="outline">Cancel</Button>
+                  <Button ref={closeButtonRef} variant="outline" type="button">Cancel</Button>
                 </DialogClose>
-                <Button type="submit">Save changes</Button>
+                <Button type="submit" disabled={!username.trim() || !password.trim()}>
+                  Create
+                </Button>
               </DialogFooter>
-            </DialogContent>
-          </form>
+            </form>
+          </DialogContent>
         </Dialog>
       </div>
     </>

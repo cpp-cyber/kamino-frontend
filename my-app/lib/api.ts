@@ -233,7 +233,7 @@ export async function getAllUsers(): Promise<GetUsersResponse> {
 
 // Delete a single user
 export async function deleteUser(username: string): Promise<void> {
-  const response = await fetch(`/api/v1/admin/users/delete`, {
+  const response = await fetch(`/api/v1/admin/user/delete`, {
     method: 'POST',
     credentials: 'include',
     body: JSON.stringify({ "username": username })
@@ -241,6 +241,38 @@ export async function deleteUser(username: string): Promise<void> {
 
   if (!response.ok) {
     throw new Error(`Failed to delete user: ${response.status} ${response.statusText}`)
+  }
+}
+
+// Enable a user (placeholder function - API endpoint may need to be implemented)
+export async function enableUser(username: string): Promise<void> {
+  const response = await fetch(`/api/v1/admin/user/enable`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ "username": username })
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to enable user: ${response.status} ${response.statusText}`)
+  }
+}
+
+// Disable a user (placeholder function - API endpoint may need to be implemented)
+export async function disableUser(username: string): Promise<void> {
+  const response = await fetch(`/api/v1/admin/user/disable`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ "username": username })
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to disable user: ${response.status} ${response.statusText}`)
   }
 }
 
@@ -371,4 +403,92 @@ export async function createGroup(groupName: string): Promise<void> {
   if (!response.ok) {
     throw new Error(`Failed to create group: ${response.status} ${response.statusText}`)
   }
+}
+
+// Rename an existing group
+export async function renameGroup(oldName: string, newName: string): Promise<void> {
+  console.log(`Renaming group from "${oldName}" to "${newName}"`)
+
+  const response = await fetch(`/api/v1/admin/group/rename`, {
+    method: 'POST',
+    credentials: 'include',
+    body: JSON.stringify({ "old_name": oldName, "new_name": newName })
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to rename group: ${response.status} ${response.statusText}`)
+  }
+}
+
+// Create a new user
+export async function createUser(username: string, password: string): Promise<void> {
+  const response = await fetch(`/api/v1/admin/user/create`, {
+    method: 'POST',
+    credentials: 'include',
+    body: JSON.stringify({ "username": username, "password": password })
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to create user: ${response.status} ${response.statusText}`)
+  }
+}
+
+// Update user groups
+export async function updateUserGroups(username: string, groups: string[]): Promise<void> {
+  const response = await fetch(`/api/v1/admin/user/groups`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify({ "username": username, "groups": groups })
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to update user groups: ${response.status} ${response.statusText}`)
+  }
+}
+
+// Bulk add users to a group
+export async function bulkAddUsersToGroup(usernames: string[], groupName: string): Promise<void> {
+  const response = await fetch(`/api/v1/admin/group/members/add`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify({ 
+      "group": groupName,
+      "usernames": usernames
+    })
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to add users to group: ${response.status} ${response.statusText}`)
+  }
+}
+
+// Bulk remove users from a group
+export async function bulkRemoveUsersFromGroup(usernames: string[], groupName: string): Promise<void> {
+  const response = await fetch(`/api/v1/admin/group/members/remove`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify({ 
+      "group": groupName,
+      "usernames": usernames
+    })
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to remove users from group: ${response.status} ${response.statusText}`)
+  }
+}
+
+// Bulk delete users
+export async function bulkDeleteUsers(usernames: string[]): Promise<void> {
+  const promises = usernames.map(username => deleteUser(username))
+  await Promise.all(promises)
 }

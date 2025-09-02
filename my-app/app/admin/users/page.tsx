@@ -5,7 +5,8 @@ import { toast } from "sonner"
 import { AuthGuard } from "@/components/auth-guard"
 import { PageLayout } from "@/app/admin/admin-page-layout"
 import { UsersTable } from "@/app/admin/users/users-table"
-import { deleteUser } from "@/lib/api"
+import { EditGroupsDialog } from "@/app/admin/users/edit-groups-dialog"
+import { deleteUser, enableUser, disableUser } from "@/lib/api"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,8 +22,9 @@ const breadcrumbs = [{ label: "Users", href: "/admin/users" }]
 
 export default function AdminUsersPage() {
   const [alertOpen, setAlertOpen] = useState(false)
+  const [editGroupsOpen, setEditGroupsOpen] = useState(false)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
-  const [isDeleting, setIsDeleting] = useState(false)
+  const [selectedAction, setSelectedAction] = useState<'enable' | 'disable' | 'editGroups' | 'delete' | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
 
   const handleRefresh = async () => {
@@ -31,27 +33,64 @@ export default function AdminUsersPage() {
     await new Promise(resolve => setTimeout(resolve, 500))
   }
 
-  const handleDeleteClick = (user: User) => {
+  const handleUserAction = (user: User, action: 'enable' | 'disable' | 'editGroups' | 'delete') => {
     setSelectedUser(user)
+    setSelectedAction(action)
+    
+    if (action === 'editGroups') {
+      setEditGroupsOpen(true)
+      return
+    }
+    
     setAlertOpen(true)
   }
 
-  const handleConfirmDelete = async () => {
-    setIsDeleting(true)
+  const getActionText = () => {
+    if (!selectedAction) return ''
+    switch (selectedAction) {
+      case 'enable': return 'enable'
+      case 'disable': return 'disable'
+      case 'delete': return 'delete'
+      default: return selectedAction
+    }
+  }
+
+  const getActionButtonText = () => {
+    if (!selectedAction) return ''
+    switch (selectedAction) {
+      case 'enable': return 'Enable'
+      case 'disable': return 'Disable'
+      case 'delete': return 'Delete'
+      default: return selectedAction
+    }
+  }
+
+  const handleConfirmAction = async () => {
+    if (!selectedUser || !selectedAction) return
+    
     try {
-      if (selectedUser) {
-        // Single delete
-        await deleteUser(selectedUser.name)
-        toast.success(`User "${selectedUser.name}" has been deleted successfully.`)
+      switch (selectedAction) {
+        case 'enable':
+          await enableUser(selectedUser.name)
+          toast.success(`User "${selectedUser.name}" has been enabled successfully.`)
+          break
+        case 'disable':
+          await disableUser(selectedUser.name)
+          toast.success(`User "${selectedUser.name}" has been disabled successfully.`)
+          break
+        case 'delete':
+          await deleteUser(selectedUser.name)
+          toast.success(`User "${selectedUser.name}" has been deleted successfully.`)
+          break
       }
+      
       setAlertOpen(false)
       setSelectedUser(null)
+      setSelectedAction(null)
       // Trigger a refresh of the users table
       handleRefresh()
     } catch (error) {
-      toast.error(`Failed to delete user: ${error instanceof Error ? error.message : 'Unknown error'}`)
-    } finally {
-      setIsDeleting(false)
+      toast.error(`Failed to ${getActionText()} user: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
 
@@ -67,7 +106,7 @@ export default function AdminUsersPage() {
               </p>
             </div>
             <UsersTable 
-              onDelete={handleDeleteClick} 
+              onUserAction={handleUserAction} 
               onRefresh={handleRefresh}
               key={refreshKey}
             />
@@ -75,26 +114,33 @@ export default function AdminUsersPage() {
         </div>
       </PageLayout>
 
-      {/* Delete Confirmation Dialog */}
+      {/* Action Confirmation Dialog */}
       <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              Are you sure you want to delete &quot;{selectedUser?.name}&quot;?
+              Are you sure you want to {getActionText()} &quot;{selectedUser?.name}&quot;?
             </AlertDialogTitle>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction 
-              onClick={handleConfirmDelete} 
-              disabled={isDeleting}
-              className="bg-destructive hover:bg-destructive/90"
+              onClick={handleConfirmAction} 
+              className={selectedAction === 'delete' ? "bg-destructive hover:bg-destructive/90" : ""}
             >
-              {isDeleting ? "Deleting..." : "Delete"}
+              {getActionButtonText()}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Edit Groups Dialog */}
+      <EditGroupsDialog
+        user={selectedUser}
+        open={editGroupsOpen}
+        onOpenChange={setEditGroupsOpen}
+        onSuccess={handleRefresh}
+      />
     </AuthGuard>
   )
 }

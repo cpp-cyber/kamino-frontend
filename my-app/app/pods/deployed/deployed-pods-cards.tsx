@@ -157,7 +157,7 @@ export function SectionCards({ pods, onDelete }: SectionCardsProps) {
                 </Card>
                 
                 {/* Description */}
-                <ScrollArea className="min-h-[300px] w-full border rounded-xl p-4 shadow order-2 lg:order-1">
+                <ScrollArea className="min-h-[300px] max-h-[425px] w-full border rounded-xl p-4 shadow order-2 lg:order-1">
                   <MarkdownRenderer 
                     content={pod.template?.description ? pod.template.description : 'No description available'} 
                     variant="compact"
