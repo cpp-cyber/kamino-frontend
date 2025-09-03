@@ -40,7 +40,7 @@ export function NodeResources({ resources }: NodeResourcesProps) {
                   </div>
                   <div className="relative w-full h-2 bg-muted rounded-full overflow-hidden">
                     <div 
-                      className="absolute left-0 h-full bg-blue-500 transition-all duration-300 ease-in-out rounded-full animate-[grow-right_1s_ease-out]"
+                      className="absolute left-0 h-full bg-gradient-to-r from-foreground/80 to-foreground/60 transition-all duration-300 ease-in-out rounded-full animate-[grow-right_1s_ease-out]"
                       style={{ 
                         width: `${Math.min(node.resources.cpu_usage * 100, 100)}%`,
                         '--target-width': `${Math.min(node.resources.cpu_usage * 100, 100)}%`
@@ -58,7 +58,7 @@ export function NodeResources({ resources }: NodeResourcesProps) {
                   </div>
                   <div className="relative w-full h-2 bg-muted rounded-full overflow-hidden">
                     <div 
-                      className="absolute left-0 h-full bg-green-500 transition-all duration-300 ease-in-out rounded-full animate-[grow-right_1s_ease-out]"
+                      className="absolute left-0 h-full bg-gradient-to-r from-foreground/70 to-foreground/50 transition-all duration-300 ease-in-out rounded-full animate-[grow-right_1s_ease-out]"
                       style={{ 
                         width: `${Math.min(memoryUsage, 100)}%`,
                         '--target-width': `${Math.min(memoryUsage, 100)}%`
@@ -76,7 +76,7 @@ export function NodeResources({ resources }: NodeResourcesProps) {
                   </div>
                   <div className="relative w-full h-2 bg-muted rounded-full overflow-hidden">
                     <div 
-                      className="absolute left-0 h-full bg-orange-500 transition-all duration-300 ease-in-out rounded-full animate-[grow-right_1s_ease-out]"
+                      className="absolute left-0 h-full bg-gradient-to-r from-foreground/60 to-foreground/40 transition-all duration-300 ease-in-out rounded-full animate-[grow-right_1s_ease-out]"
                       style={{ 
                         width: `${Math.min(storageUsage, 100)}%`,
                         '--target-width': `${Math.min(storageUsage, 100)}%`

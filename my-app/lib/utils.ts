@@ -111,3 +111,12 @@ export const createAlphabeticalSortingFn = () => {
     return aValue.localeCompare(bValue)
   }
 }
+
+// Parse group names from newline-separated text
+export function parseGroupNamesFromText(text: string): string[] {
+  return text
+    .trim()
+    .split('\n')
+    .map(line => line.trim())
+    .filter(line => line.length > 0)
+}

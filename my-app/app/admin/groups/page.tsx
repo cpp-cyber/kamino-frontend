@@ -5,7 +5,7 @@ import { toast } from "sonner"
 import { AuthGuard } from "@/components/auth-guard"
 import { PageLayout } from "@/app/admin/admin-page-layout"
 import { GroupsTable } from "@/app/admin/groups/groups-table"
-import { deleteGroup, renameGroup } from "@/lib/api"
+import { deleteGroups, renameGroup } from "@/lib/api"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -58,7 +58,7 @@ export default function AdminGroupsPage() {
     try {
       if (selectedGroup) {
         // Single delete
-        await deleteGroup(selectedGroup.name)
+        await deleteGroups([selectedGroup.name])
         toast.success(`Group "${selectedGroup.name}" has been deleted successfully.`)
       }
       setAlertOpen(false)

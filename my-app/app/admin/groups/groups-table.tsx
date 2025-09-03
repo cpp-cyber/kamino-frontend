@@ -56,17 +56,52 @@ export function GroupsTable({ onGroupAction }: GroupsTableProps) {
     setFilteredGroups(filtered)
   }, [searchTerm, groupsData])
 
+  // Apply sorting to filtered groups before pagination
+  const sortedGroups = React.useMemo(() => {
+    if (sorting.length === 0) return filteredGroups
+    
+    const sortedData = [...filteredGroups]
+    const sort = sorting[0]
+    
+    sortedData.sort((a, b) => {
+      let aValue: any
+      let bValue: any
+      
+      if (sort.id === 'created_at') {
+        aValue = a.created_at ? new Date(a.created_at) : new Date(0)
+        bValue = b.created_at ? new Date(b.created_at) : new Date(0)
+      } else if (sort.id === 'name') {
+        aValue = a.name.toLowerCase()
+        bValue = b.name.toLowerCase()
+      } else if (sort.id === 'user_count') {
+        aValue = a.user_count || 0
+        bValue = b.user_count || 0
+      } else if (sort.id === 'can_modify') {
+        aValue = a.can_modify || false
+        bValue = b.can_modify || false
+      } else {
+        return 0
+      }
+      
+      if (aValue < bValue) return sort.desc ? 1 : -1
+      if (aValue > bValue) return sort.desc ? -1 : 1
+      return 0
+    })
+    
+    return sortedData
+  }, [filteredGroups, sorting])
+
   // Reset to page 1 when search changes or items per page changes
   React.useEffect(() => {
     setCurrentPage(1)
   }, [searchTerm, itemsPerPage])
 
   // Pagination calculations
-  const totalItems = filteredGroups.length
+  const totalItems = sortedGroups.length
   const totalPages = Math.ceil(totalItems / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
-  const paginatedGroups = filteredGroups.slice(startIndex, endIndex)
+  const paginatedGroups = sortedGroups.slice(startIndex, endIndex)
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)

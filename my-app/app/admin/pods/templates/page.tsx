@@ -16,19 +16,19 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { deleteTemplate, toggleTemplateVisibility } from "@/lib/api"
+import { deleteTemplates, toggleTemplateVisibility } from "@/lib/api"
 
 const breadcrumbs = [{ label: "Pod Templates", href: "/admin/pods/templates" }]
 
 // Placeholder API functions (to be implemented later)
 const templateVisibility = async (templateName: string) => {
-  await toggleTemplateVisibility(templateName)
+  await toggleTemplateVisibility([templateName])
   console.log(`Toggled template: ${templateName}`)
   return Promise.resolve()
 }
 
 const deletePodTemplate = async (templateName: string) => {
-  await deleteTemplate(templateName)
+  await deleteTemplates([templateName])
   console.log(`Delete template: ${templateName}`)
   return Promise.resolve()
 }

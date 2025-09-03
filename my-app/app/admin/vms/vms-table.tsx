@@ -50,6 +50,53 @@ export function VMsTable({ onVMAction }: VMsTableProps) {
     availableNodes
   })
 
+  // Apply sorting to filtered VMs before pagination
+  const sortedVMs = React.useMemo(() => {
+    if (sorting.length === 0) return filteredVMs
+    
+    const sortedData = [...filteredVMs]
+    const sort = sorting[0]
+    
+    sortedData.sort((a, b) => {
+      let aValue: any
+      let bValue: any
+      
+      if (sort.id === 'vmid') {
+        aValue = a.vmid
+        bValue = b.vmid
+      } else if (sort.id === 'name') {
+        aValue = a.name.toLowerCase()
+        bValue = b.name.toLowerCase()
+      } else if (sort.id === 'node') {
+        aValue = a.node.toLowerCase()
+        bValue = b.node.toLowerCase()
+      } else if (sort.id === 'status') {
+        aValue = a.status.toLowerCase()
+        bValue = b.status.toLowerCase()
+      } else if (sort.id === 'cpu') {
+        aValue = a.cpu
+        bValue = b.cpu
+      } else if (sort.id === 'mem') {
+        aValue = a.mem
+        bValue = b.mem
+      } else if (sort.id === 'uptime') {
+        aValue = a.uptime
+        bValue = b.uptime
+      } else if (sort.id === 'disk') {
+        aValue = a.disk
+        bValue = b.disk
+      } else {
+        return 0
+      }
+      
+      if (aValue < bValue) return sort.desc ? 1 : -1
+      if (aValue > bValue) return sort.desc ? -1 : 1
+      return 0
+    })
+    
+    return sortedData
+  }, [filteredVMs, sorting])
+
   React.useEffect(() => {
     loadVMs()
   }, [])
@@ -73,10 +120,11 @@ export function VMsTable({ onVMAction }: VMsTableProps) {
   }, [searchTerm, showRunningOnly, showStoppedVMs, selectedNodes, itemsPerPage])
 
   // Pagination calculations
-  const totalItems = filteredVMs.length
+  const totalItems = sortedVMs.length
   const totalPages = Math.ceil(totalItems / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
+  const paginatedVMs = sortedVMs.slice(startIndex, endIndex)
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
@@ -126,7 +174,7 @@ export function VMsTable({ onVMAction }: VMsTableProps) {
           onRefresh={loadVMs}
         />
         <VMTableCore
-          vms={filteredVMs}
+          vms={paginatedVMs}
           currentPage={currentPage}
           itemsPerPage={itemsPerPage}
           sorting={sorting}

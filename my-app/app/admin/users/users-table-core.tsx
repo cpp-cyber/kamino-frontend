@@ -78,7 +78,8 @@ export function UsersTableCore({
     columns,
     onSortingChange,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
+    // Remove getSortedRowModel since sorting is handled at parent level
+    // getSortedRowModel: getSortedRowModel(),
     enableColumnResizing: false,
     columnResizeMode: "onChange",
     state: {
@@ -86,10 +87,8 @@ export function UsersTableCore({
     },
   })
 
-  // Pagination calculations
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-
+  // Since sorting is handled at parent level, we don't need to slice here
+  // Just use the users data as-is since it's already paginated and sorted
   return (
     <Table>
       <TableHeader className="bg-muted text-muted-foreground">
@@ -121,7 +120,7 @@ export function UsersTableCore({
             </TableCell>
           </TableRow>
         )}
-        {table.getSortedRowModel().rows.slice(startIndex, endIndex).map((row) => (
+        {table.getRowModel().rows.map((row) => (
           <TableRow key={row.id} className="hover:bg-muted/50">
             {row.getVisibleCells().map((cell) => (
               <TableCell 

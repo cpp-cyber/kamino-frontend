@@ -1,11 +1,8 @@
 "use client"
 
-// TODO: Add an artifical delay before reloading to let LDAP changes take place?
-// Better yet, actually async or sync wait for API response
-
 import * as React from "react"
 import { GetUsersResponse, User } from "@/lib/types"
-import { getAllUsers, deleteUser, disableUser, bulkAddUsersToGroup, bulkRemoveUsersFromGroup } from "@/lib/api"
+import { getAllUsers, deleteUser, disableUser, bulkAddUsersToGroup, bulkRemoveUsersFromGroup, bulkDeleteUsers } from "@/lib/api"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { Button } from "@/components/ui/button"
 import { ErrorDisplay } from "@/components/ui/error-display"
@@ -61,6 +58,44 @@ export function UsersTable({ onUserAction, onRefresh }: UsersTableProps) {
     showEnabledUsers,
     showDisabledUsers
   })
+
+  // Apply sorting to filtered users before pagination
+  const sortedUsers = React.useMemo(() => {
+    if (sorting.length === 0) return filteredUsers
+    
+    const sortedData = [...filteredUsers]
+    const sort = sorting[0]
+    
+    sortedData.sort((a, b) => {
+      let aValue: any
+      let bValue: any
+      
+      if (sort.id === 'created_at') {
+        aValue = new Date(a.created_at)
+        bValue = new Date(b.created_at)
+      } else if (sort.id === 'name') {
+        aValue = a.name.toLowerCase()
+        bValue = b.name.toLowerCase()
+      } else if (sort.id === 'enabled') {
+        aValue = a.enabled
+        bValue = b.enabled
+      } else if (sort.id === 'is_admin') {
+        aValue = a.is_admin
+        bValue = b.is_admin
+      } else if (sort.id === 'groups') {
+        aValue = a.groups.length
+        bValue = b.groups.length
+      } else {
+        return 0
+      }
+      
+      if (aValue < bValue) return sort.desc ? 1 : -1
+      if (aValue > bValue) return sort.desc ? -1 : 1
+      return 0
+    })
+    
+    return sortedData
+  }, [filteredUsers, sorting])
 
   // Clear selection when search changes or page changes
   React.useEffect(() => {
@@ -184,9 +219,8 @@ export function UsersTable({ onUserAction, onRefresh }: UsersTableProps) {
 
   const handleDeleteConfirm = async () => {
     try {
-      // Only delete non-admin users
-      const promises = selectedNonAdminUsers.map(user => deleteUser(user.name))
-      await Promise.all(promises)
+      const usernamesToDelete = selectedNonAdminUsers.map(user => user.name)
+      await bulkDeleteUsers(usernamesToDelete)
       
       toast.success(`Deleted ${selectedNonAdminUsers.length} users`)
       setSelectedUsers(new Set())
@@ -242,11 +276,11 @@ export function UsersTable({ onUserAction, onRefresh }: UsersTableProps) {
   }
 
   // Pagination calculations
-  const totalItems = filteredUsers.length
+  const totalItems = sortedUsers.length
   const totalPages = Math.ceil(totalItems / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
-  const currentUsers = filteredUsers.slice(startIndex, endIndex)
+  const currentUsers = sortedUsers.slice(startIndex, endIndex)
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)

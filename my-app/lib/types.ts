@@ -120,6 +120,7 @@ export interface ProxmoxResourcesResponse {
 
 export interface DashboardStats {
   users: number
+  groups: number
   published_templates: number
   deployed_pods: number
   vms: number
@@ -133,4 +134,15 @@ export interface DashboardResponse {
 export interface GetGroupsResponse {
   groups: Group[]
   count: number
+}
+
+export interface ClonePodRequest {
+  template: string
+  usernames: string[]
+  groups: string[]
+}
+
+export interface CreateUsersRequest {
+  username: string
+  password: string
 }

@@ -42,17 +42,14 @@ export function VMTableCore({
     columns,
     onSortingChange,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    enableColumnResizing: false,
+    // Remove getSortedRowModel since sorting is handled at parent level
+    // getSortedRowModel: getSortedRowModel(),
+    enableColumnResizing: true,
     columnResizeMode: "onChange",
     state: {
       sorting,
     },
   })
-
-  // Pagination calculations
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
 
   return (
     <Table style={{ tableLayout: 'fixed', width: '100%' }}>
@@ -86,7 +83,7 @@ export function VMTableCore({
             </TableCell>
           </TableRow>
         )}
-        {table.getSortedRowModel().rows.slice(startIndex, endIndex).map((row) => (
+        {table.getRowModel().rows.map((row) => (
           <TableRow key={row.id}>
             {row.getVisibleCells().map((cell) => (
               <TableCell 

@@ -9,8 +9,11 @@ import { getDashboardData } from "@/lib/api"
 import { useApiState } from "@/hooks/use-api-state"
 import { ClusterResources } from "@/app/admin/dashboard/cluster-resources"
 import { NodeResources } from "@/app/admin/dashboard/node-resources"
+import { DashboardQuickActions } from "@/components/dashboard/dashboard-quick-actions"
+import { Button } from "@/components/ui/button"
+import { RefreshCw } from "lucide-react"
 
-export default function AdminPage() {
+export default function AdminDashboardPage() {
   // Fetch unified dashboard data
   const { data: dashboardData, loading, error, refetch } = useApiState({
     fetchFn: getDashboardData,
@@ -21,7 +24,23 @@ export default function AdminPage() {
     <AuthGuard adminOnly>
       <PageLayout>
         <div className="@container/main flex flex-1 flex-col gap-2">
-          <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+          {/* Page Header */}
+          <div className="py-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
+                <p className="text-muted-foreground">
+                  Monitor system status, manage resources, and perform quick administrative tasks
+                </p>
+              </div>
+              <Button variant="outline" size="sm" onClick={refetch} disabled={loading}>
+                <RefreshCw className={`size-4 ${loading ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+            </div>
+          </div>
+          
+          <div className="flex flex-col gap-4 pb-4 md:gap-6 md:pb-6">
             {/* Header Stats Section */}
             {loading || error ? (
               <HeaderStatsState 
@@ -32,6 +51,13 @@ export default function AdminPage() {
             ) : dashboardData ? (
               <HeaderStats stats={dashboardData.stats} />
             ) : null}
+
+            {/* Quick Actions Section */}
+            {!loading && !error && (
+              <DashboardQuickActions />
+            )}
+
+
 
             {/* Resources Section */}
             {loading || error ? (

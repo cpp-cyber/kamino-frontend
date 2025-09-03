@@ -118,10 +118,10 @@ export function SectionCards({ pods, onDelete }: SectionCardsProps) {
                   <div className="flex flex-col p-4 py-0 gap-2">
                     <div className={`grid ${gridCols} gap-2 auto-rows-max`}>
                       {vms.length > 0 ? (
-                        vms.map((vm) => (
+                        vms.filter(vm => !vm.name.toLowerCase().includes('pfsense')).map((vm) => (
                           <Link 
                             key={vm.vmid} 
-                            href="https://cheese.com" 
+                            href={`https://gonk.sdc.cpp:8006/#v1:0:=qemu%2F${vm.vmid}:4:::::::`} 
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="block"
@@ -157,7 +157,7 @@ export function SectionCards({ pods, onDelete }: SectionCardsProps) {
                 </Card>
                 
                 {/* Description */}
-                <ScrollArea className="min-h-[300px] max-h-[425px] w-full border rounded-xl p-4 shadow order-2 lg:order-1">
+                <ScrollArea className="h-105 w-full border rounded-xl p-4 shadow order-2 lg:order-1">
                   <MarkdownRenderer 
                     content={pod.template?.description ? pod.template.description : 'No description available'} 
                     variant="compact"

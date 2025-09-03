@@ -14,7 +14,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { deletePod, startVM, shutdownVM, rebootVM } from "@/lib/api"
+import { adminDeletePods, startVM, shutdownVM, rebootVM } from "@/lib/api"
 import { DeployedPod } from "@/lib/types"
 
 const breadcrumbs = [{ label: "Deployed Pods", href: "/admin/pods/deployed" }]
@@ -54,14 +54,13 @@ export default function AdminPage() {
     try {
       if (selectedPods.length > 0) {
         // Bulk delete
-        for (const pod of selectedPods) {
-          await deletePod(pod.name)
-        }
-        toast.success(`${selectedPods.length} pods have been queued for deletion and will be removed shortly.`)
+        const podNames = selectedPods.map(pod => pod.name)
+        await adminDeletePods(podNames)
+        toast.success(`${selectedPods.length} pods have been deleted.`)
         setSelectedPods([])
       } else {
         // Single delete
-        await deletePod(selectedPod.name)
+        await adminDeletePods([selectedPod.name])
         toast.success(`Pod "${selectedPod.name}" has been queued for deletion and will be removed shortly.`)
       }
       setAlertOpen(false)

@@ -8,20 +8,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogTrigger,
-  DialogClose,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { DeployedPod } from "@/lib/types"
 import { Boxes, Plus, MonitorX, Rocket } from "lucide-react"
+import { DeployPodDialog } from "@/components/shared/deploy-pod-dialog"
 
 interface HeaderStatsProps {
   pods: DeployedPod[]
@@ -31,6 +21,11 @@ export function HeaderStats({ pods }: HeaderStatsProps) {
   const totalVMsCount = pods.reduce((acc, pod) => acc + (pod.vms || []).length, 0)
   const runningVMsCount = pods.reduce((acc, pod) => 
     acc + (pod.vms || []).filter(vm => vm.status === 'running').length, 0)
+
+  const handlePodDeployed = () => {
+    // Refresh will be handled by parent component
+    window.location.reload()
+  }
 
   return (
     <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs grid-cols-2 lg:grid-cols-4 pb-2">
@@ -69,49 +64,19 @@ export function HeaderStats({ pods }: HeaderStatsProps) {
           </CardAction>
         </CardHeader>
       </Card>
-      <Dialog>
-          <DialogTrigger asChild>
-            {/* TODO: Implement bulk cloning */}
-            {/* Gradient Button with Kamino Colors */}
-            <Button 
-              className="h-full w-full bg-gradient-to-r from-kamino-green to-kamino-yellow font-medium hover:brightness-90 cursor-pointer shadow !text-white rounded-xl"
-              type="button"
-              >
-              <Plus />
-              Clone Pods
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <form onSubmit={() => {}} className="flex flex-col space-y-6">
-              <DialogHeader>
-                <DialogTitle>Clone Pods</DialogTitle>
-                <DialogDescription>
-                  Bulk clone pods for users and groups
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4">
-                <div className="grid gap-3">
-                  <Input 
-                    id="name-1" 
-                    name="name" 
-                    placeholder="Group Name" 
-                    value=""
-                    onChange={() => {}}
-                    required
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button variant="outline" type="button">Cancel</Button>
-                </DialogClose>
-                <Button type="submit" >
-                  Create
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
+      
+      <DeployPodDialog 
+        onPodDeployed={handlePodDeployed}
+        trigger={
+          <Button 
+            className="h-full bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-md rounded-xl hover:shadow-lg transition-all duration-200 flex flex-col items-center justify-center gap-2"
+            type="button"
+          >
+            <Rocket />
+            Deploy Pods
+          </Button>
+        }
+      />
     </div>
   )
 }

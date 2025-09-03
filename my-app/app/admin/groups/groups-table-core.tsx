@@ -40,7 +40,8 @@ export function GroupsTableCore({
     columns,
     onSortingChange,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
+    // Remove getSortedRowModel since sorting is handled at parent level
+    // getSortedRowModel: getSortedRowModel(),
     enableColumnResizing: false,
     columnResizeMode: "onChange",
     state: {
@@ -79,7 +80,7 @@ export function GroupsTableCore({
             </TableCell>
           </TableRow>
         )}
-        {table.getSortedRowModel().rows.map((row) => (
+        {table.getRowModel().rows.map((row) => (
           <TableRow key={row.id}>
             {row.getVisibleCells().map((cell) => (
               <TableCell 

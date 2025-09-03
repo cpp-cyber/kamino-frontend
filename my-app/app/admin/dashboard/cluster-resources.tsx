@@ -24,7 +24,7 @@ export function ClusterResources({ resources }: ClusterResourcesProps) {
           </div>
           <div className="relative w-full h-32 bg-muted rounded-lg overflow-hidden">
             <div 
-              className="absolute bottom-0 w-full bg-blue-500 transition-all duration-300 ease-in-out rounded-b-lg animate-[grow-up_1s_ease-out]"
+              className="absolute bottom-0 w-full bg-gradient-to-t from-foreground/80 to-foreground/60 transition-all duration-300 ease-in-out rounded-b-lg animate-[grow-up_1s_ease-out]"
               style={{ 
                 height: `${Math.min(resources.cluster.total.cpu_usage * 100, 100)}%`,
                 '--target-height': `${Math.min(resources.cluster.total.cpu_usage * 100, 100)}%`
@@ -42,7 +42,7 @@ export function ClusterResources({ resources }: ClusterResourcesProps) {
           </div>
           <div className="relative w-full h-32 bg-muted rounded-lg overflow-hidden">
             <div 
-              className="absolute bottom-0 w-full bg-green-500 transition-all duration-300 ease-in-out rounded-b-lg animate-[grow-up_1s_ease-out]"
+              className="absolute bottom-0 w-full bg-gradient-to-t from-foreground/70 to-foreground/50 transition-all duration-300 ease-in-out rounded-b-lg animate-[grow-up_1s_ease-out]"
               style={{ 
                 height: `${Math.min(calculateUtilization(resources.cluster.total.memory_used, resources.cluster.total.memory_total), 100)}%`,
                 '--target-height': `${Math.min(calculateUtilization(resources.cluster.total.memory_used, resources.cluster.total.memory_total), 100)}%`
@@ -65,7 +65,7 @@ export function ClusterResources({ resources }: ClusterResourcesProps) {
           </div>
           <div className="relative w-full h-32 bg-muted rounded-lg overflow-hidden">
             <div 
-              className="absolute bottom-0 w-full bg-orange-500 transition-all duration-300 ease-in-out rounded-b-lg animate-[grow-up_1s_ease-out]"
+              className="absolute bottom-0 w-full bg-gradient-to-t from-foreground/60 to-foreground/40 transition-all duration-300 ease-in-out rounded-b-lg animate-[grow-up_1s_ease-out]"
               style={{ 
                 height: `${Math.min(calculateUtilization(resources.cluster.total.storage_used, resources.cluster.total.storage_total), 100)}%`,
                 '--target-height': `${Math.min(calculateUtilization(resources.cluster.total.storage_used, resources.cluster.total.storage_total), 100)}%`
