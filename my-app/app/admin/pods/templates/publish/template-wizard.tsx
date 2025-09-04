@@ -24,7 +24,7 @@ export function TemplatePublishWizard() {
   const [description, setDescription] = useState("")
   const [vmCount, setVmCount] = useState(1)
   const [imageFiles, setImageFiles] = useState<File[]>([])
-  const [isVisible, setIsVisible] = useState(false)
+  const [isTemplateVisible, setIsTemplateVisible] = useState(false)
 
   // Check if user has unsaved data
   const hasUnsavedData = useCallback(() => {
@@ -89,7 +89,7 @@ export function TemplatePublishWizard() {
     setDescription("")
     setVmCount(1)
     setImageFiles([])
-    setIsVisible(false)
+    setIsTemplateVisible(false)
     setCurrentStep(1)
     setCompletedSteps([])
     setIsSuccess(false)
@@ -124,7 +124,7 @@ export function TemplatePublishWizard() {
         name: selectedTemplate,
         description: description,
         image_path: imagePath,
-        visible: isVisible,
+        template_visible: isTemplateVisible,
         vm_count: vmCount,
       }
 
@@ -153,7 +153,7 @@ export function TemplatePublishWizard() {
     setDescription("")
     setVmCount(1)
     setImageFiles([])
-    setIsVisible(false)
+    setIsTemplateVisible(false)
   }
 
   // Don't show stepper on success
@@ -209,8 +209,8 @@ export function TemplatePublishWizard() {
                 description={description}
                 vmCount={vmCount}
                 imageFiles={imageFiles}
-                isVisible={isVisible}
-                onVisibilityChange={setIsVisible}
+                isTemplateVisible={isTemplateVisible}
+                onVisibilityChange={setIsTemplateVisible}
                 onSubmit={handleSubmit}
                 onBack={goToPreviousStep}
                 isSubmitting={isSubmitting}

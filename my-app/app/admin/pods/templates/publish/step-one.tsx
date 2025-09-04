@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/select"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { ErrorDisplay } from "@/components/ui/error-display"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { AlertTriangle } from "lucide-react"
 import { getUnpublishedTemplates } from "@/lib/api"
 import { UnpublishedPodTemplate } from "@/lib/types"
 import { Separator } from "@/components/ui/separator"
@@ -101,6 +103,18 @@ export function StepOne({ selectedTemplate, onTemplateSelect, onNext }: StepOneP
             </p>
           )}
         </div>
+
+        {selectedTemplate && (
+          <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Notice</AlertTitle>
+            <AlertDescription>
+              Publishing this template will convert all VMs in the pool to templates. 
+              Once converted, it will be very difficult to make edits to the environment. 
+              Please ensure you have completed all necessary configurations before proceeding.
+            </AlertDescription>
+          </Alert>
+        )}
 
         <div className="flex justify-end">
           <Button 

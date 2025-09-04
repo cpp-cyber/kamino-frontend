@@ -16,7 +16,7 @@ import { usePodExpansion } from "./use-pod-expansion"
 interface DeployedPodsTableProps {
   onDelete: (pod: DeployedPod) => void
   onBulkDelete: (pods: DeployedPod[]) => void
-  onVMAction: (vmid: number, node: string, action: 'start' | 'stop') => void
+  onVMAction: (vmid: number, node: string, action: 'start' | 'shutdown' | 'reboot') => void
   onRefresh?: () => Promise<void> | void
 }
 
@@ -164,8 +164,6 @@ export function DeployedPodsTable({ onDelete, onBulkDelete, onVMAction, onRefres
           onSearchChange={setSearchTerm}
           itemsPerPage={itemsPerPage}
           onItemsPerPageChange={setItemsPerPage}
-          selectedPodsCount={selectedPods.size}
-          onBulkDelete={handleBulkDelete}
           onRefresh={handleRefresh}
           isRefreshing={isRefreshing}
         />
@@ -179,6 +177,7 @@ export function DeployedPodsTable({ onDelete, onBulkDelete, onVMAction, onRefres
           onDelete={handleDeleteClick}
           onVMAction={onVMAction}
           onSelectionChange={setSelectedPods}
+          onBulkDelete={handleBulkDelete}
         />
       </div>
 

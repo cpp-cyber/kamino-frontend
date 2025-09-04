@@ -112,13 +112,14 @@ export function PodTemplateTable({ onTemplateAction }: PodTemplateTableProps) {
               <TableHead className="px-4">Name</TableHead>
               <TableHead>Deployments</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Published</TableHead>
               <TableHead className="text-end px-4">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredPodTemplates.length === 0 && (
               <TableRow key="empty-state">
-                <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                   {searchTerm ? 'No Pod Templates found matching your search.' : 'No Pod Templates found.'}
                 </TableCell>
               </TableRow>
@@ -128,7 +129,14 @@ export function PodTemplateTable({ onTemplateAction }: PodTemplateTableProps) {
                 <TableCell className="font-medium px-4">{podTemplate.name}</TableCell>
                 <TableCell>{podTemplate.deployments}</TableCell>
                 <TableCell>
-                  <PodTemplateStatusBadge status={podTemplate.visible === true ? 'public' : 'hidden'} />
+                  <PodTemplateStatusBadge status={podTemplate.template_visible === true ? 'public' : 'hidden'} />
+                </TableCell>
+                <TableCell>
+                    {podTemplate.created_at ? new Date(podTemplate.created_at).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric' 
+                  }) : 'N/A'}
                 </TableCell>
                 <TableCell  className="text-end px-6">
                   <DropdownMenu>
@@ -142,14 +150,14 @@ export function PodTemplateTable({ onTemplateAction }: PodTemplateTableProps) {
                         onClick={() => onTemplateAction(podTemplate.name, 'toggle')}
                         className="cursor-pointer"
                       >
-                        {podTemplate.visible === true ? (
+                        {podTemplate.template_visible === true ? (
                           <EyeOff className="mr-2" />
                         ) : (
                           <Eye className="mr-2" />
                         )}
-                        {podTemplate.visible === true ? 'Hide' : 'Show'}
+                        {podTemplate.template_visible === true ? 'Hide' : 'Show'}
                       </DropdownMenuItem>
-                      <DropdownMenuSeparator className="mt-3" />
+                      <DropdownMenuSeparator />
                       <DropdownMenuItem
                         onClick={() => onTemplateAction(podTemplate.name, 'delete')}
                         className="cursor-pointer text-destructive focus:text-destructive"
