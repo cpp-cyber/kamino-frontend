@@ -274,3 +274,12 @@ export function filterPasswordInput(input: string): string {
   }
   return input
 }
+
+// Table utility functions
+export const createSortingToggleHandler = (column: any) => {
+  return () => column.toggleSorting(column.getIsSorted() === "asc")
+}
+
+export const getSortDirection = (column: any): false | "asc" | "desc" => {
+  return column.getIsSorted()
+}

@@ -8,7 +8,7 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { Button } from "@/components/ui/button"
 import { HeaderStats } from "./header-stats"
 import { VMTableToolbar } from "./vm-table-toolbar"
-import { VMTableCore } from "./vm-table-core"
+import { VMsTableCoreWrapper } from "./vm-table-core"
 import { VMTablePagination } from "./vm-table-pagination"
 import { useVMFilters } from "./use-vm-filters"
 
@@ -173,11 +173,12 @@ export function VMsTable({ onVMAction }: VMsTableProps) {
           availableNodes={availableNodes}
           onRefresh={loadVMs}
         />
-        <VMTableCore
+        <VMsTableCoreWrapper
           vms={paginatedVMs}
           sorting={sorting}
           onSortingChange={setSorting}
           onVMAction={onVMAction}
+          searchTerm={searchTerm}
         />
       </div>
 

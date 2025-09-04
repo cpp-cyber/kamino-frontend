@@ -147,6 +147,7 @@ export function VMTableToolbar({
         </DropdownMenu>
         <Button onClick={onRefresh} variant="outline" className="ml-auto">
           <RefreshCcw className="h-4 w-4" />
+          <span className="hidden lg:inline">Refresh</span>
         </Button>
       </div>
     </div>

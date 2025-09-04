@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { ErrorDisplay } from "@/components/ui/error-display"
 import { HeaderStats } from "./header-stats"
 import { UsersTableToolbar } from "./users-table-toolbar"
-import { UsersTableCore } from "./users-table-core"
+import { UsersTableCoreWrapper } from "./users-table-core"
 import { UsersTablePagination } from "./users-table-pagination"
 import { useUserFilters } from "./use-user-filters"
 import { GroupSelectionDialog } from "@/app/admin/users/group-selection-dialog"
@@ -332,7 +332,7 @@ export function UsersTable({ onUserAction, onRefresh }: UsersTableProps) {
           onRefresh={handleRefresh}
           isRefreshing={isRefreshing}
         />
-        <UsersTableCore
+        <UsersTableCoreWrapper
           users={currentUsers}
           currentPage={currentPage}
           itemsPerPage={itemsPerPage}
@@ -347,6 +347,7 @@ export function UsersTable({ onUserAction, onRefresh }: UsersTableProps) {
           onBulkRemoveFromGroup={handleBulkRemoveFromGroup}
           onBulkDisable={handleBulkDisable}
           onBulkDelete={handleBulkDelete}
+          searchTerm={searchTerm}
         />
       </div>
 

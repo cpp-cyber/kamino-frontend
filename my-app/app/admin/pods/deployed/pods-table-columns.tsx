@@ -1,7 +1,8 @@
 import React from 'react'
-import { ChevronDownIcon, ChevronRightIcon, Trash2Icon, MoreVertical, EyeOff } from "lucide-react"
+import { ChevronDownIcon, ChevronRightIcon, Trash2Icon, MoreVertical, EyeOff, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
+import { SortingIcon } from "@/components/table-components"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,6 +22,7 @@ import { DeployedPod, VirtualMachine } from "@/lib/types"
 import { formatUptime } from "@/lib/utils"
 import { VMTable } from "./vm-table"
 import Link from "next/link"
+import { SortingState } from "@tanstack/react-table"
 
 interface PodsTableCoreProps {
   pods: DeployedPod[]
@@ -33,6 +35,8 @@ interface PodsTableCoreProps {
   selectedPods: Set<string>
   onSelectionChange: (selectedPods: Set<string>) => void
   onBulkDelete: () => void
+  sorting: SortingState
+  onSortingChange: (sorting: SortingState) => void
 }
 
 export function PodsTableCore({
@@ -45,7 +49,9 @@ export function PodsTableCore({
   onVMAction,
   selectedPods,
   onSelectionChange,
-  onBulkDelete
+  onBulkDelete,
+  sorting,
+  onSortingChange
 }: PodsTableCoreProps) {
   const isAllSelected = pods.length > 0 && selectedPods.size === pods.length
   const isSomeSelected = selectedPods.size > 0 && selectedPods.size < pods.length
@@ -72,6 +78,26 @@ export function PodsTableCore({
     }
   }, [isAllSelected, pods, onSelectionChange])
 
+  const handleSortingChange = (columnId: string) => {
+    const currentSort = sorting.find(s => s.id === columnId)
+    if (!currentSort) {
+      // Not currently sorted, sort ascending
+      onSortingChange([{ id: columnId, desc: false }])
+    } else if (!currentSort.desc) {
+      // Currently sorted ascending, sort descending
+      onSortingChange([{ id: columnId, desc: true }])
+    } else {
+      // Currently sorted descending, remove sort
+      onSortingChange([])
+    }
+  }
+
+    const getSortDirection = (columnId: string): false | "asc" | "desc" => {
+    const currentSort = sorting.find(s => s.id === columnId)
+    if (!currentSort) return false
+    return currentSort.desc ? 'desc' : 'asc'
+  }
+
   const getLongestUptime = (vms: VirtualMachine[]) => {
     const runningVMs = vms.filter(vm => vm.status === 'running')
     if (runningVMs.length === 0) return null
@@ -87,7 +113,7 @@ export function PodsTableCore({
     <Table>
       <TableHeader className="bg-muted text-muted-foreground">
         <TableRow>
-          <TableHead className="w-[20px]">
+          <TableHead className="w-[45px] p-4">
             <Button 
               variant="ghost" 
               size="sm" 
@@ -102,21 +128,49 @@ export function PodsTableCore({
               )}
             </Button>
           </TableHead>
-          <TableHead className="w-[20px]">
+          <TableHead className="w-[45px]">
             <Checkbox
               checked={isSomeSelected ? "indeterminate" : isAllSelected}
               onCheckedChange={handleSelectAll}
               aria-label="Select all pods"
             />
           </TableHead>
-          <TableHead className="min-w-[200px]">Pod Name</TableHead>
-          <TableHead className="min-w-[80px]">Running</TableHead>
-          <TableHead className="min-w-[80px]">Stopped</TableHead>
-          <TableHead className="min-w-[150px]">Longest Uptime</TableHead>
-          <TableHead className="w-[100px]">
+          <TableHead className="min-w-[200px]">
+            <div className="flex items-center justify-between pr-2 group">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleSortingChange('name')}
+                className="-ml-3 flex-1 justify-start hover:bg-muted transition-colors"
+              >
+                <span className="font-medium">Pod Name</span>
+              </Button>
+              <SortingIcon sortDirection={getSortDirection('name')} />
+            </div>
+          </TableHead>
+          <TableHead className="min-w-[80px]">
+            <span className="font-medium">Running</span>
+          </TableHead>
+          <TableHead className="min-w-[80px]">
+            <span className="font-medium">Stopped</span>
+          </TableHead>
+          <TableHead className="min-w-[150px]">
+            <div className="flex items-center justify-between pr-2 group">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleSortingChange('longest_uptime')}
+                className="-ml-3 flex-1 justify-start hover:bg-muted transition-colors"
+              >
+                <span className="font-medium">Longest Uptime</span>
+              </Button>
+              <SortingIcon sortDirection={getSortDirection('longest_uptime')} />
+            </div>
+          </TableHead>
+          <TableHead className="w-[20px]">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
+                <Button variant="ghost">
                   <MoreVertical className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -156,7 +210,7 @@ export function PodsTableCore({
               className="cursor-pointer hover:bg-muted/50"
               onClick={() => onToggleRow(pod.name)}
             >
-              <TableCell className="w-[50px]">
+              <TableCell className="px-4">
                 <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
                     {expandedRows.has(pod.name) ? (
                       <ChevronDownIcon className="h-4 w-4" />
@@ -165,7 +219,7 @@ export function PodsTableCore({
                     )}
                   </Button>
                 </TableCell>
-                <TableCell className="w-[50px]" onClick={(e) => e.stopPropagation()}>
+                <TableCell onClick={(e) => e.stopPropagation()}>
                   <Checkbox
                     checked={selectedPods.has(pod.name)}
                     onCheckedChange={(checked) => handleSelectPod(pod.name, checked as boolean)}
@@ -204,7 +258,7 @@ export function PodsTableCore({
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
+                      <Button variant="ghost">
                         <MoreVertical className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>

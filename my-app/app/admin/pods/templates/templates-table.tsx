@@ -109,11 +109,21 @@ export function PodTemplateTable({ onTemplateAction }: PodTemplateTableProps) {
         <Table>
           <TableHeader className="bg-muted text-muted-foreground">
             <TableRow>
-              <TableHead className="px-4">Name</TableHead>
-              <TableHead>Deployments</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Published</TableHead>
-              <TableHead className="text-end px-4">Actions</TableHead>
+              <TableHead className="px-4 py-3">
+                <span className="font-medium">Name</span>
+              </TableHead>
+              <TableHead className="py-3">
+                <span className="font-medium">Deployments</span>
+              </TableHead>
+              <TableHead className="py-3">
+                <span className="font-medium">Status</span>
+              </TableHead>
+              <TableHead className="py-3">
+                <span className="font-medium">Published</span>
+              </TableHead>
+              <TableHead className="text-end px-4 py-3">
+                <span className="font-medium">Actions</span>
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

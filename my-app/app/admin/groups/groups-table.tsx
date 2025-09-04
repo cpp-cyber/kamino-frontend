@@ -7,7 +7,7 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { Button } from "@/components/ui/button"
 import { HeaderStats } from "./header-stats"
 import { GroupsTableToolbar } from "./groups-table-toolbar"
-import { GroupsTableCore } from "./groups-table-core"
+import { GroupsTableCoreWrapper } from "./groups-table-core"
 import { GroupsTablePagination } from "./groups-table-pagination"
 import { SortingState } from "@tanstack/react-table"
 
@@ -176,7 +176,7 @@ export function GroupsTable({ onGroupAction, onBulkDeleteRequest }: GroupsTableP
           onRefresh={loadGroups}
           totalItems={totalItems}
         />
-        <GroupsTableCore
+        <GroupsTableCoreWrapper
           groups={paginatedGroups}
           sorting={sorting}
           onSortingChange={setSorting}

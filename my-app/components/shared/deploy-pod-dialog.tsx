@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import {
@@ -18,6 +18,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
+import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { getAllPodTemplates, getAllUsers, getGroups, clonePodTemplates } from "@/lib/api"
 import { PodTemplate, User, Group } from "@/lib/types"
 import { Rocket, ChevronLeft, ChevronRight, Check } from "lucide-react"
@@ -82,6 +83,7 @@ export function DeployPodDialog({ onPodDeployed, trigger }: DeployPodDialogProps
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [userSearch, setUserSearch] = useState("")
   const [groupSearch, setGroupSearch] = useState("")
+  const hasLoadedDataRef = useRef(false)
 
   // Filter users and groups based on search
   const filteredUsers = users.filter(user => 
@@ -99,21 +101,32 @@ export function DeployPodDialog({ onPodDeployed, trigger }: DeployPodDialogProps
 
   // Load data when dialog opens
   useEffect(() => {
-    if (isDialogOpen && !isLoading) {
+    if (isDialogOpen && !hasLoadedDataRef.current) {
+      console.log('Loading data for deploy pod dialog...')
+      hasLoadedDataRef.current = true
       setIsLoading(true)
       Promise.all([
         getAllPodTemplates(),
         getAllUsers(),
         getGroups()
       ]).then(([templatesRes, usersRes, groupsRes]) => {
+        console.log('Data loaded successfully:', {
+          templates: templatesRes.length,
+          users: usersRes.users.length,
+          groups: groupsRes.groups.length
+        })
         setTemplates(templatesRes)
         setUsers(usersRes.users)
         setGroups(groupsRes.groups)
-      }).catch(console.error).finally(() => {
+      }).catch((error) => {
+        console.error('Failed to load data:', error)
+        toast.error('Failed to load templates and user data')
+        hasLoadedDataRef.current = false // Reset on error so user can retry
+      }).finally(() => {
         setIsLoading(false)
       })
     }
-  }, [isDialogOpen, isLoading])
+  }, [isDialogOpen])
 
   const handleUserToggle = (username: string) => {
     setSelectedUsers(prev => 
@@ -166,6 +179,7 @@ export function DeployPodDialog({ onPodDeployed, trigger }: DeployPodDialogProps
     setSelectedGroups([])
     setUserSearch("")
     setGroupSearch("")
+    hasLoadedDataRef.current = false // Reset data loading flag
   }
 
   const handleNext = (e?: React.MouseEvent) => {
@@ -566,7 +580,11 @@ export function DeployPodDialog({ onPodDeployed, trigger }: DeployPodDialogProps
         
         <form onSubmit={handleSubmit} className="flex-1 flex flex-col overflow-hidden">
           <div className="flex-1 overflow-auto px-4">
-            {renderStepContent()}
+            {isLoading && templates.length === 0 ? (
+              <LoadingSpinner message="Loading templates and data..." />
+            ) : (
+              renderStepContent()
+            )}
           </div>
           
           <DialogFooter className="mt-6 pt-4 border-t flex justify-between">
