@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { DeployedPod } from "@/lib/types"
-import { Boxes, Plus, MonitorX, Rocket } from "lucide-react"
+import { Boxes, MonitorX, Rocket } from "lucide-react"
 import { DeployPodDialog } from "@/components/shared/deploy-pod-dialog"
 
 interface HeaderStatsProps {

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { GetUsersResponse, User } from "@/lib/types"
-import { getAllUsers, deleteUser, disableUser, bulkAddUsersToGroup, bulkRemoveUsersFromGroup, bulkDeleteUsers } from "@/lib/api"
+import { getAllUsers, disableUser, bulkAddUsersToGroup, bulkRemoveUsersFromGroup, bulkDeleteUsers } from "@/lib/api"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { Button } from "@/components/ui/button"
 import { ErrorDisplay } from "@/components/ui/error-display"
@@ -67,8 +67,8 @@ export function UsersTable({ onUserAction, onRefresh }: UsersTableProps) {
     const sort = sorting[0]
     
     sortedData.sort((a, b) => {
-      let aValue: any
-      let bValue: any
+      let aValue: string | number | boolean | Date
+      let bValue: string | number | boolean | Date
       
       if (sort.id === 'created_at') {
         aValue = new Date(a.created_at)

@@ -124,25 +124,35 @@ export default function AdminPage() {
         </div>
       </PageLayout>
 
-      {/* Delete Confirmation Dialog */}
+      {/* Delete Confirmation Dialog (single or bulk) */}
       <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {selectedPods.length > 0 
-                ? `Are you sure you want to delete ${selectedPods.length} selected pods?`
-                : `Are you sure you want to delete "${selectedPod?.name}"?`
-              }
+              {selectedPods.length > 1
+                ? `Are you sure you want to delete these ${selectedPods.length} pods?`
+                : `Are you sure you want to delete "${selectedPod?.name}"?`}
             </AlertDialogTitle>
           </AlertDialogHeader>
+          {selectedPods.length > 1 && (
+            <div className="max-h-40 overflow-y-auto mb-2 text-sm text-muted-foreground">
+              {selectedPods.map(pod => (
+                <div key={pod.name} className="truncate">{pod.name}</div>
+              ))}
+            </div>
+          )}
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleConfirmDelete} 
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
               disabled={isDeleting}
               className="bg-destructive hover:bg-destructive/90"
             >
-              {isDeleting ? "Deleting..." : "Delete"}
+              {isDeleting
+                ? "Deleting..."
+                : selectedPods.length > 0
+                  ? `Delete (${selectedPods.length})`
+                  : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

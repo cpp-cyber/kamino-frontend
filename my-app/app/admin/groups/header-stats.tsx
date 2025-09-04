@@ -4,7 +4,6 @@ import { Card, CardAction, CardDescription, CardHeader, CardTitle } from "@/comp
 import { GetGroupsResponse } from "@/lib/types"
 import { IconUsersGroup } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
 import { CreateGroupDialog } from "@/components/shared/create-group-dialog"
 
 interface HeaderStatsProps {

@@ -13,23 +13,25 @@ import { SortingState } from "@tanstack/react-table"
 
 interface GroupsTableProps {
   onGroupAction: (groupName: string, action: 'rename' | 'delete') => void
+  onBulkDeleteRequest?: (groupNames: string[]) => void
 }
 
-export function GroupsTable({ onGroupAction }: GroupsTableProps) {
+export function GroupsTable({ onGroupAction, onBulkDeleteRequest }: GroupsTableProps) {
   const [groupsData, setGroupsData] = React.useState<GetGroupsResponse>({ groups: [], count: 0 })
   const [filteredGroups, setFilteredGroups] = React.useState<Group[]>([])
   const [searchTerm, setSearchTerm] = React.useState("")
   const [isLoading, setIsLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
-  
   // Pagination state
   const [currentPage, setCurrentPage] = React.useState(1)
   const [itemsPerPage, setItemsPerPage] = React.useState(10)
-  
   // Sorting state with default sort by created time (newest first)
   const [sorting, setSorting] = React.useState<SortingState>([
     { id: "created_at", desc: true }
   ])
+  // Multi-select state
+  const [selectedGroups, setSelectedGroups] = React.useState<string[]>([])
+  const [isBulkDeleting, setIsBulkDeleting] = React.useState(false)
 
   React.useEffect(() => {
     loadGroups()
@@ -42,6 +44,7 @@ export function GroupsTable({ onGroupAction }: GroupsTableProps) {
       const data = await getGroups()
       setGroupsData(data)
       setFilteredGroups(data.groups)
+      setSelectedGroups([])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load groups')
     } finally {
@@ -54,19 +57,17 @@ export function GroupsTable({ onGroupAction }: GroupsTableProps) {
       group.name.toLowerCase().includes(searchTerm.toLowerCase())
     )
     setFilteredGroups(filtered)
+    setSelectedGroups([])
   }, [searchTerm, groupsData])
 
   // Apply sorting to filtered groups before pagination
   const sortedGroups = React.useMemo(() => {
     if (sorting.length === 0) return filteredGroups
-    
     const sortedData = [...filteredGroups]
     const sort = sorting[0]
-    
     sortedData.sort((a, b) => {
-      let aValue: any
-      let bValue: any
-      
+      let aValue: string | number | boolean | Date
+      let bValue: string | number | boolean | Date
       if (sort.id === 'created_at') {
         aValue = a.created_at ? new Date(a.created_at) : new Date(0)
         bValue = b.created_at ? new Date(b.created_at) : new Date(0)
@@ -82,12 +83,10 @@ export function GroupsTable({ onGroupAction }: GroupsTableProps) {
       } else {
         return 0
       }
-      
       if (aValue < bValue) return sort.desc ? 1 : -1
       if (aValue > bValue) return sort.desc ? -1 : 1
       return 0
     })
-    
     return sortedData
   }, [filteredGroups, sorting])
 
@@ -103,14 +102,52 @@ export function GroupsTable({ onGroupAction }: GroupsTableProps) {
   const endIndex = startIndex + itemsPerPage
   const paginatedGroups = sortedGroups.slice(startIndex, endIndex)
 
+  // Selection logic
+  const allSelectableGroups = React.useMemo(() => paginatedGroups.filter(g => g.can_modify).map(g => g.name), [paginatedGroups])
+  const handleSelectGroup = (groupName: string, checked: boolean) => {
+    setSelectedGroups(prev => {
+      if (checked) {
+        return [...prev, groupName]
+      } else {
+        return prev.filter(name => name !== groupName)
+      }
+    })
+  }
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedGroups(prev => Array.from(new Set([...prev, ...allSelectableGroups])))
+    } else {
+      setSelectedGroups(prev => prev.filter(name => !allSelectableGroups.includes(name)))
+    }
+  }
+  const handleBulkAction = async (action: 'delete') => {
+    if (action === 'delete' && selectedGroups.length > 0) {
+      if (onBulkDeleteRequest) {
+        onBulkDeleteRequest(selectedGroups)
+        return
+      }
+      // fallback: legacy bulk delete (should not be used)
+      setIsBulkDeleting(true)
+      try {
+        await getGroups() // Optionally refresh before delete
+        await import("@/lib/api").then(api => api.deleteGroups(selectedGroups))
+        setSelectedGroups([])
+        await loadGroups()
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to delete selected groups')
+      } finally {
+        setIsBulkDeleting(false)
+      }
+    }
+  }
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
   }
 
-  if (isLoading) {
+  if (isLoading || isBulkDeleting) {
     return (
       <div className="flex items-center justify-center h-64">
-        <LoadingSpinner message="Loading groups..." />
+        <LoadingSpinner message={isBulkDeleting ? "Deleting selected groups..." : "Loading groups..."} />
       </div>
     )
   }
@@ -129,7 +166,6 @@ export function GroupsTable({ onGroupAction }: GroupsTableProps) {
   return (
     <div className="space-y-4">
       <HeaderStats groupsData={groupsData} onGroupCreated={loadGroups} />
-      
       {/* Table */}
       <div className="rounded-md border">
         <GroupsTableToolbar
@@ -146,9 +182,12 @@ export function GroupsTable({ onGroupAction }: GroupsTableProps) {
           onSortingChange={setSorting}
           onGroupAction={onGroupAction}
           searchTerm={searchTerm}
+          selectedGroups={selectedGroups}
+          onSelectGroup={handleSelectGroup}
+          onSelectAll={handleSelectAll}
+          onBulkAction={handleBulkAction}
         />
       </div>
-
       {/* Pagination */}
       <GroupsTablePagination
         currentPage={currentPage}

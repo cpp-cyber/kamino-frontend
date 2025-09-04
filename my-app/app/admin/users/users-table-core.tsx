@@ -10,7 +10,6 @@ import {
 import {
   flexRender,
   getCoreRowModel,
-  getSortedRowModel,
   SortingState,
   useReactTable,
   OnChangeFn,
@@ -37,8 +36,6 @@ interface UsersTableCoreProps {
 
 export function UsersTableCore({
   users,
-  currentPage,
-  itemsPerPage,
   sorting,
   onSortingChange,
   onUserAction,
@@ -78,8 +75,6 @@ export function UsersTableCore({
     columns,
     onSortingChange,
     getCoreRowModel: getCoreRowModel(),
-    // Remove getSortedRowModel since sorting is handled at parent level
-    // getSortedRowModel: getSortedRowModel(),
     enableColumnResizing: false,
     columnResizeMode: "onChange",
     state: {

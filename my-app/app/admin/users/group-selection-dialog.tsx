@@ -98,7 +98,7 @@ export function GroupSelectionDialog({
             <span className="font-medium">Selected users: {selectedUsersCount}</span>
             <br />
             <span className="text-xs text-muted-foreground">
-              Protected groups containing "kamino" or "admin" are not shown.
+              Protected groups containing &quot;kamino&quot; or &quot;admin&quot; are not shown.
             </span>
           </DialogDescription>
         </DialogHeader>

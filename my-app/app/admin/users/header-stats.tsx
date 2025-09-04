@@ -5,7 +5,6 @@ import { GetUsersResponse } from "@/lib/types"
 import { User, Shield, UserRoundX } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { CreateUserDialog } from "@/components/shared/create-user-dialog"
-import { BulkCreateUserDialog } from "@/components/shared/bulk-create-user-dialog"
 
 interface HeaderStatsProps {
   usersData: GetUsersResponse
@@ -60,7 +59,7 @@ export function HeaderStats({ usersData, onUserCreated }: HeaderStatsProps) {
               type="button"
             >
               <User />
-              Create User(s)
+              Create Users
             </Button>
           }
         />

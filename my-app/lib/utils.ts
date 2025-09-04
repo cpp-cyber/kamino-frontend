@@ -120,3 +120,157 @@ export function parseGroupNamesFromText(text: string): string[] {
     .map(line => line.trim())
     .filter(line => line.length > 0)
 }
+
+// Group name validation based on LDAP naming restrictions (RFC 2253)
+export interface GroupNameValidationResult {
+  isValid: boolean
+  errors: string[]
+}
+
+export function validateGroupName(name: string): GroupNameValidationResult {
+  const errors: string[] = []
+  
+  // Check if empty
+  if (!name || name.trim().length === 0) {
+    errors.push("Group name is required")
+    return { isValid: false, errors }
+  }
+  
+  const trimmedName = name.trim()
+  
+  // Check maximum length (63 bytes/characters)
+  if (new TextEncoder().encode(trimmedName).length > 63) {
+    errors.push("Group name must not exceed 63 bytes")
+  }
+  
+  // Check for allowed characters only: letters, numbers, hyphens, and underscores
+  if (!/^[a-zA-Z0-9_-]+$/.test(trimmedName)) {
+    errors.push("Group name can only contain letters, numbers, hyphens, and underscores")
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    errors
+  }
+}
+
+// Validate multiple group names and return results for each
+export function validateGroupNames(names: string[]): { name: string; validation: GroupNameValidationResult }[] {
+  return names.map(name => ({
+    name,
+    validation: validateGroupName(name)
+  }))
+}
+
+// Filter out invalid characters as user types
+export function filterGroupNameInput(input: string): string {
+  // Only allow letters, numbers, hyphens, and underscores
+  let filtered = input.replace(/[^a-zA-Z0-9_-]/g, '')
+  
+  // Limit to 63 bytes
+  const encoder = new TextEncoder()
+  while (encoder.encode(filtered).length > 63 && filtered.length > 0) {
+    filtered = filtered.slice(0, -1)
+  }
+  
+  return filtered
+}
+
+// Username validation based on legacy client support requirements
+export interface UsernameValidationResult {
+  isValid: boolean
+  errors: string[]
+}
+
+export function validateUsername(username: string): UsernameValidationResult {
+  const errors: string[] = []
+  
+  // Check if empty
+  if (!username || username.trim().length === 0) {
+    errors.push("Username is required")
+    return { isValid: false, errors }
+  }
+  
+  const trimmedUsername = username.trim()
+  
+  // Check maximum length (20 characters)
+  if (trimmedUsername.length > 20) {
+    errors.push("Username must not exceed 20 characters")
+  }
+  
+  // Check for alphanumeric only (letters and numbers)
+  if (!/^[a-zA-Z0-9]+$/.test(trimmedUsername)) {
+    errors.push("Username can only contain letters and numbers")
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    errors
+  }
+}
+
+// Validate multiple usernames and return results for each
+export function validateUsernames(usernames: string[]): { username: string; validation: UsernameValidationResult }[] {
+  return usernames.map(username => ({
+    username,
+    validation: validateUsername(username)
+  }))
+}
+
+// Filter out invalid characters as user types for usernames
+export function filterUsernameInput(input: string): string {
+  // Only allow alphanumeric characters (letters and numbers)
+  let filtered = input.replace(/[^a-zA-Z0-9]/g, '')
+  
+  // Limit to 20 characters
+  if (filtered.length > 20) {
+    filtered = filtered.slice(0, 20)
+  }
+  
+  return filtered
+}
+
+// Password validation
+export interface PasswordValidationResult {
+  isValid: boolean
+  errors: string[]
+}
+
+export function validatePassword(password: string): PasswordValidationResult {
+  const errors: string[] = []
+  
+  // Check if empty
+  if (!password || password.length === 0) {
+    errors.push("Password is required")
+    return { isValid: false, errors }
+  }
+  
+  // Check maximum length (128 characters)
+  if (password.length > 128) {
+    errors.push("Password must not exceed 128 characters")
+  }
+  
+  // Check for at least one letter
+  if (!/[a-zA-Z]/.test(password)) {
+    errors.push("Password must contain at least one letter")
+  }
+  
+  // Check for at least one number
+  if (!/[0-9]/.test(password)) {
+    errors.push("Password must contain at least one number")
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    errors
+  }
+}
+
+// Filter password input to enforce character limit
+export function filterPasswordInput(input: string): string {
+  // Limit to 128 characters
+  if (input.length > 128) {
+    return input.slice(0, 128)
+  }
+  return input
+}

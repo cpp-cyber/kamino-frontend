@@ -3,7 +3,9 @@ export interface PodTemplate {
   description?: string
   image?: string
   image_path?: string
-  visible?: boolean
+  template_visible?: boolean
+  pod_visible?: boolean
+  vms_visible?: boolean
   vm_count: number
   deployments?: number 
   created_at?: string

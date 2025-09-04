@@ -58,8 +58,8 @@ export function VMsTable({ onVMAction }: VMsTableProps) {
     const sort = sorting[0]
     
     sortedData.sort((a, b) => {
-      let aValue: any
-      let bValue: any
+      let aValue: string | number | boolean
+      let bValue: string | number | boolean
       
       if (sort.id === 'vmid') {
         aValue = a.vmid
@@ -175,8 +175,6 @@ export function VMsTable({ onVMAction }: VMsTableProps) {
         />
         <VMTableCore
           vms={paginatedVMs}
-          currentPage={currentPage}
-          itemsPerPage={itemsPerPage}
           sorting={sorting}
           onSortingChange={setSorting}
           onVMAction={onVMAction}

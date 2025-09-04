@@ -24,16 +24,24 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
 import { Group } from "@/lib/types"
+import { validateGroupName, filterGroupNameInput, GroupNameValidationResult } from "@/lib/utils"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { AlertCircle } from "lucide-react"
 
 const breadcrumbs = [{ label: "Groups", href: "/admin/groups" }]
 
 export default function AdminGroupsPage() {
   const [alertOpen, setAlertOpen] = useState(false)
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false)
+  const [bulkDeleteGroups, setBulkDeleteGroups] = useState<string[]>([])
   const [renameDialogOpen, setRenameDialogOpen] = useState(false)
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null)
   const [newGroupName, setNewGroupName] = useState("")
+  const [renameValidation, setRenameValidation] = useState<GroupNameValidationResult>({ isValid: true, errors: [] })
   const [isRenaming, setIsRenaming] = useState(false)
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
 
   const handleRefresh = async () => {
@@ -42,16 +50,28 @@ export default function AdminGroupsPage() {
     await new Promise(resolve => setTimeout(resolve, 500))
   }
 
+  const handleRenameInputChange = (value: string) => {
+    const filtered = filterGroupNameInput(value)
+    setNewGroupName(filtered)
+    setRenameValidation(validateGroupName(filtered))
+  }
+
   const handleGroupAction = (groupName: string, action: 'rename' | 'delete') => {
     const group = { name: groupName } as Group
     setSelectedGroup(group)
-    
     if (action === 'delete') {
       setAlertOpen(true)
     } else if (action === 'rename') {
       setNewGroupName(groupName)
+      setRenameValidation(validateGroupName(groupName))
       setRenameDialogOpen(true)
     }
+  }
+
+  // Bulk delete handler called from GroupsTable
+  const handleBulkDeleteRequest = (groupNames: string[]) => {
+    setBulkDeleteGroups(groupNames)
+    setBulkDeleteDialogOpen(true)
   }
 
   const handleConfirmDelete = async () => {
@@ -70,8 +90,30 @@ export default function AdminGroupsPage() {
     }
   }
 
+  const handleConfirmBulkDelete = async () => {
+    if (!bulkDeleteGroups.length) return
+    setIsBulkDeleting(true)
+    try {
+      await deleteGroups(bulkDeleteGroups)
+      toast.success(`${bulkDeleteGroups.length} group(s) deleted successfully.`)
+      setBulkDeleteDialogOpen(false)
+      setBulkDeleteGroups([])
+      handleRefresh()
+    } catch (error) {
+      toast.error(`Failed to delete groups: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    } finally {
+      setIsBulkDeleting(false)
+    }
+  }
+
   const handleConfirmRename = async () => {
     if (!selectedGroup || !newGroupName.trim()) return
+    
+    const validation = validateGroupName(newGroupName)
+    if (!validation.isValid) {
+      toast.error(validation.errors[0])
+      return
+    }
     
     setIsRenaming(true)
     try {
@@ -80,6 +122,7 @@ export default function AdminGroupsPage() {
       setRenameDialogOpen(false)
       setSelectedGroup(null)
       setNewGroupName("")
+      setRenameValidation({ isValid: true, errors: [] })
       // Trigger a refresh of the groups table
       handleRefresh()
     } catch (error) {
@@ -102,6 +145,7 @@ export default function AdminGroupsPage() {
             </div>
             <GroupsTable
               onGroupAction={handleGroupAction}
+              onBulkDeleteRequest={handleBulkDeleteRequest}
               key={refreshKey}
             />
           </div>
@@ -128,6 +172,32 @@ export default function AdminGroupsPage() {
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Bulk Delete Confirmation Dialog */}
+      <AlertDialog open={bulkDeleteDialogOpen} onOpenChange={setBulkDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Are you sure you want to delete these {bulkDeleteGroups.length} groups?
+            </AlertDialogTitle>
+          </AlertDialogHeader>
+          <div className="max-h-40 overflow-y-auto mb-2 text-sm text-muted-foreground">
+            {bulkDeleteGroups.map(name => (
+              <div key={name} className="truncate">{name}</div>
+            ))}
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isBulkDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmBulkDelete}
+              className="bg-destructive hover:bg-destructive/90"
+              disabled={isBulkDeleting}
+            >
+              {isBulkDeleting ? "Deleting..." : `Delete (${bulkDeleteGroups.length})`}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Rename Dialog */}
       <Dialog open={renameDialogOpen} onOpenChange={setRenameDialogOpen}>
         <DialogContent>
@@ -136,13 +206,26 @@ export default function AdminGroupsPage() {
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
+              <Label htmlFor="groupName">New Group Name</Label>
               <Input
                 id="groupName"
                 value={newGroupName}
-                onChange={(e) => setNewGroupName(e.target.value)}
+                onChange={(e) => handleRenameInputChange(e.target.value)}
                 placeholder="Enter new group name"
                 disabled={isRenaming}
+                className={!renameValidation.isValid ? "border-destructive" : ""}
               />
+              {!renameValidation.isValid && (
+                <Alert variant="destructive" className="py-2">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription className="text-sm">
+                    {renameValidation.errors[0]}
+                  </AlertDescription>
+                </Alert>
+              )}
+              <div className="text-xs text-muted-foreground">
+                Max 63 characters. Only letters, numbers, hyphens, and underscores allowed.
+              </div>
             </div>
           </div>
           <DialogFooter>
@@ -155,7 +238,7 @@ export default function AdminGroupsPage() {
             </Button>
             <Button
               onClick={handleConfirmRename}
-              disabled={isRenaming || !newGroupName.trim()}
+              disabled={isRenaming || !newGroupName.trim() || !renameValidation.isValid}
             >
               {isRenaming ? "Renaming..." : "Rename"}
             </Button>

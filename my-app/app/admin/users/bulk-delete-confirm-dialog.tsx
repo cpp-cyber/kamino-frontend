@@ -6,7 +6,6 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -36,34 +35,31 @@ export function BulkDeleteConfirmDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Users</AlertDialogTitle>
-          <AlertDialogDescription>
-            Are you sure you want to delete {selectedUsersCount} user{selectedUsersCount === 1 ? '' : 's'}?
-          </AlertDialogDescription>
+          <AlertDialogTitle>
+            {selectedUsersCount === 1
+              ? `Are you sure you want to delete "${usernames[0]}"?`
+              : `Are you sure you want to delete these ${selectedUsersCount} users?`}
+          </AlertDialogTitle>
         </AlertDialogHeader>
-        
-        <div className="py-4">
-          <div className="mb-4">
-            <strong>Users to be deleted:</strong>
-            <ul className="list-disc list-inside mt-2 max-h-32 overflow-y-auto">
-              {usernames.map((username) => (
-                <li key={username} className="text-sm">{username}</li>
-              ))}
-            </ul>
+        {selectedUsersCount > 1 && (
+          <div className="max-h-40 overflow-y-auto mb-2 text-sm text-muted-foreground">
+            {usernames.map((username) => (
+              <div key={username} className="truncate">{username}</div>
+            ))}
           </div>
-          
-          <div className="text-destructive font-medium">
-            This action cannot be undone.
-          </div>
+        )}
+        <div className="text-destructive font-medium mb-2">
+          This action cannot be undone.
         </div>
-        
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction 
+          <AlertDialogAction
             onClick={handleConfirm}
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            className="bg-destructive hover:bg-destructive/90"
           >
-            Delete {selectedUsersCount} User{selectedUsersCount === 1 ? '' : 's'}
+            {selectedUsersCount === 1
+              ? "Delete"
+              : `Delete (${selectedUsersCount})`}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

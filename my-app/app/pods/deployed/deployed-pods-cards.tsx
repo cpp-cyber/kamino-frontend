@@ -117,41 +117,41 @@ export function SectionCards({ pods, onDelete }: SectionCardsProps) {
                 <Card className="w-full lg:w-2/3 order-1 lg:order-2 min-h-fit">
                   <div className="flex flex-col p-4 py-0 gap-2">
                     <div className={`grid ${gridCols} gap-2 auto-rows-max`}>
-                      {vms.length > 0 ? (
-                        vms.filter(vm => !vm.name.toLowerCase().includes('pfsense')).map((vm) => (
+                        {vms.length > 0 ? (
+                        vms.map((vm) => (
                           <Link 
-                            key={vm.vmid} 
-                            href={`https://gonk.sdc.cpp:8006/#v1:0:=qemu%2F${vm.vmid}:4:::::::`} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="block"
+                          key={vm.vmid} 
+                          href={`https://gonk.sdc.cpp:8006/#v1:0:=qemu%2F${vm.vmid}:4:::::::`} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="block"
                           >
-                            <div className="flex items-center justify-between px-4 py-2 rounded-xl border min-h-[60px] transition-all duration-200 hover:bg-accent hover:scale-[1.02] hover:shadow-md cursor-pointer">
-                              <div className="flex items-center gap-2">
-                                <IconCircleFilled 
-                                  className={`h-4 w-4 flex-shrink-0 ${
-                                    vm.status === 'running' ? 'text-green-700' : 
-                                    vm.status === 'stopped' ? 'text-red-700' : 
-                                    'text-yellow-700'
-                                  }`} 
-                                />
-                                <p className="text-sm font-semibold">{vm.name}</p>
-                              </div>
-                              <p className="text-xs text-muted-foreground">
-                                {vm.status === 'running' ? (
-                                  <LiveUptime initialUptime={vm.uptime} />
-                                ) : (
-                                  vm.status
-                                )}
-                              </p>
+                          <div className="flex items-center justify-between px-4 py-2 rounded-xl border min-h-[60px] transition-all duration-200 hover:bg-accent hover:scale-[1.02] hover:shadow-md cursor-pointer">
+                            <div className="flex items-center gap-2">
+                            <IconCircleFilled 
+                              className={`h-4 w-4 flex-shrink-0 ${
+                              vm.status === 'running' ? 'text-green-700' : 
+                              vm.status === 'stopped' ? 'text-red-700' : 
+                              'text-yellow-700'
+                              }`} 
+                            />
+                            <p className="text-sm font-semibold">{vm.name}</p>
                             </div>
+                            <p className="text-xs text-muted-foreground">
+                            {vm.status === 'running' ? (
+                              <LiveUptime initialUptime={vm.uptime} />
+                            ) : (
+                              vm.status
+                            )}
+                            </p>
+                          </div>
                           </Link>
                         ))
-                      ) : (
+                        ) : (
                         <div className="flex items-center justify-center px-4 py-8 rounded-xl border col-span-full">
                           <p className="text-sm text-muted-foreground">No virtual machines found</p>
                         </div>
-                      )}
+                        )}
                     </div>
                   </div>
                 </Card>

@@ -129,7 +129,7 @@ export function PodTemplateTable({ onTemplateAction }: PodTemplateTableProps) {
                 <TableCell className="font-medium px-4">{podTemplate.name}</TableCell>
                 <TableCell>{podTemplate.deployments}</TableCell>
                 <TableCell>
-                  <PodTemplateStatusBadge status={podTemplate.visible === true ? 'public' : 'hidden'} />
+                  <PodTemplateStatusBadge status={podTemplate.template_visible === true ? 'public' : 'hidden'} />
                 </TableCell>
                 <TableCell>
                     {podTemplate.created_at ? new Date(podTemplate.created_at).toLocaleDateString('en-US', { 
@@ -150,12 +150,12 @@ export function PodTemplateTable({ onTemplateAction }: PodTemplateTableProps) {
                         onClick={() => onTemplateAction(podTemplate.name, 'toggle')}
                         className="cursor-pointer"
                       >
-                        {podTemplate.visible === true ? (
+                        {podTemplate.template_visible === true ? (
                           <EyeOff className="mr-2" />
                         ) : (
                           <Eye className="mr-2" />
                         )}
-                        {podTemplate.visible === true ? 'Hide' : 'Show'}
+                        {podTemplate.template_visible === true ? 'Hide' : 'Show'}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem

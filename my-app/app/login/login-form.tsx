@@ -116,7 +116,7 @@ export function LoginForm({
           {isLoading ? "Logging in..." : "Login"}
         </Button>
         <div className="text-center text-sm">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Link 
             href="/register" 
             className="text-kamino-green hover:text-kamino-green/80 font-medium underline-offset-4 hover:underline"

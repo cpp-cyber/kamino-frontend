@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { Group } from '@/lib/types'
 import { getGroups } from '@/lib/api'
 import {
@@ -45,15 +45,7 @@ export function GroupSelectionDialog({
   const [availableGroups, setAvailableGroups] = useState<Group[]>([])
   const [loading, setLoading] = useState(false)
 
-  // Load available groups when dialog opens
-  useEffect(() => {
-    if (open) {
-      loadGroups()
-      setSelectedGroup("") // Reset selection
-    }
-  }, [open])
-
-  const loadGroups = async () => {
+  const loadGroups = useCallback(async () => {
     try {
       setLoading(true)
       const response = await getGroups()
@@ -74,7 +66,15 @@ export function GroupSelectionDialog({
     } finally {
       setLoading(false)
     }
-  }
+  }, [isRemoveOperation])
+
+  // Load available groups when dialog opens
+  useEffect(() => {
+    if (open) {
+      loadGroups()
+      setSelectedGroup("") // Reset selection
+    }
+  }, [open, loadGroups])
 
   const handleConfirm = () => {
     if (!selectedGroup) {

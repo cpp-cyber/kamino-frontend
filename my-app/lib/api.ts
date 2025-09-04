@@ -12,7 +12,6 @@ import {
   UnpublishedPodTemplate,
   GetUsersResponse,
   DashboardResponse,
-  ClonePodRequest,
   CreateUsersRequest,
 } from './types'
 
@@ -173,7 +172,7 @@ export async function getPodTemplates(): Promise<PodTemplate[]> {
 
 // Clone/deploy a pod template
 export async function deployPod(templateName: string): Promise<void> {
-  const response = await fetch(`/api/v1/templates/clone`, {
+  const response = await fetch(`/api/v1/template/clone`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -187,13 +186,13 @@ export async function deployPod(templateName: string): Promise<void> {
 }
 
 // Delete user's pod
-export async function deletePod(podNames: string[]): Promise<void> {
-  const response = await fetch(`/api/v1/pods/delete`, {
+export async function deletePod(podNames: string): Promise<void> {
+  const response = await fetch(`/api/v1/pod/delete`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ "pods": podNames })
+    body: JSON.stringify({ "pod": podNames })
   })
   
   if (!response.ok) {
@@ -347,7 +346,7 @@ export async function createGroups(groupNames: string[]): Promise<void> {
 
 // Add users to groups (bulk operation)
 export async function addUsersToGroups(usernames: string[], groupName: string): Promise<void> {
-  const response = await fetch(`/api/v1/admin/groups/members/add`, {
+  const response = await fetch(`/api/v1/admin/group/members/add`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -366,7 +365,7 @@ export async function addUsersToGroups(usernames: string[], groupName: string): 
 
 // Remove users from groups (bulk operation)
 export async function removeUsersFromGroups(usernames: string[], groupName: string): Promise<void> {
-  const response = await fetch(`/api/v1/admin/groups/members/remove`, {
+  const response = await fetch(`/api/v1/admin/group/members/remove`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -387,7 +386,7 @@ export async function removeUsersFromGroups(usernames: string[], groupName: stri
 export async function renameGroup(oldName: string, newName: string): Promise<void> {
   console.log(`Renaming group from "${oldName}" to "${newName}"`)
 
-  const response = await fetch(`/api/v1/admin/groups/rename`, {
+  const response = await fetch(`/api/v1/admin/group/rename`, {
     method: 'POST',
     credentials: 'include',
     headers: {
@@ -531,14 +530,14 @@ export async function getUnpublishedTemplates(): Promise<UnpublishedPodTemplate[
 }
 
 // Publish template
-export async function publishTemplate(templates: PodTemplate[]): Promise<void> {
+export async function publishTemplate(template: PodTemplate): Promise<void> {
   const response = await fetch(`/api/v1/admin/template/publish`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     credentials: 'include',
-    body: JSON.stringify({ "templates": templates })
+    body: JSON.stringify({ "template": template })
   })
 
   if (!response.ok) {
@@ -547,30 +546,30 @@ export async function publishTemplate(templates: PodTemplate[]): Promise<void> {
 }
 
 // Delete templates (accepts array for bulk deletion)
-export async function deleteTemplates(templateNames: string[]): Promise<void> {
-  const response = await fetch(`/api/v1/admin/templates/delete`, {
+export async function deleteTemplate(templateName: string): Promise<void> {
+  const response = await fetch(`/api/v1/admin/template/delete`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     credentials: 'include',
-    body: JSON.stringify({ "templates": templateNames })
+    body: JSON.stringify({ "template": templateName })
   })
 
   if (!response.ok) {
-    throw new Error(`Failed to delete templates: ${response.status} ${response.statusText}`)
+    throw new Error(`Failed to delete template: ${response.status} ${response.statusText}`)
   }
 }
 
 // Toggle template visibility (accepts array for bulk operation)
-export async function toggleTemplateVisibility(templateNames: string[]): Promise<void> {
-  const response = await fetch(`/api/v1/admin/templates/visibility`, {
+export async function toggleTemplateVisibility(templateName: string): Promise<void> {
+  const response = await fetch(`/api/v1/admin/template/visibility`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     credentials: 'include',
-    body: JSON.stringify({ "templates": templateNames })
+    body: JSON.stringify({ "template": templateName })
   })
 
   if (!response.ok) {
@@ -594,7 +593,7 @@ export async function uploadTemplateImage(file: File): Promise<string> {
   const formData = new FormData()
   formData.append('image', file)
 
-  const response = await fetch('/api/v1/admin/templates/image/upload', {
+  const response = await fetch('/api/v1/admin/template/image/upload', {
     method: 'POST',
     credentials: 'include',
     body: formData

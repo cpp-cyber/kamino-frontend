@@ -10,7 +10,6 @@ import {
 import {
   flexRender,
   getCoreRowModel,
-  getSortedRowModel,
   SortingState,
   useReactTable,
   OnChangeFn,
@@ -20,8 +19,6 @@ import { createVMTableColumns } from "./vm-table-columns"
 
 interface VMTableCoreProps {
   vms: VirtualMachine[]
-  currentPage: number
-  itemsPerPage: number
   sorting: SortingState
   onSortingChange: OnChangeFn<SortingState>
   onVMAction: (vmid: number, node: string, action: 'start' | 'shutdown' | 'reboot') => void
@@ -29,8 +26,6 @@ interface VMTableCoreProps {
 
 export function VMTableCore({
   vms,
-  currentPage,
-  itemsPerPage,
   sorting,
   onSortingChange,
   onVMAction
@@ -42,8 +37,6 @@ export function VMTableCore({
     columns,
     onSortingChange,
     getCoreRowModel: getCoreRowModel(),
-    // Remove getSortedRowModel since sorting is handled at parent level
-    // getSortedRowModel: getSortedRowModel(),
     enableColumnResizing: true,
     columnResizeMode: "onChange",
     state: {

@@ -11,7 +11,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -19,7 +18,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
-import { getPodTemplates, getAllUsers, getGroups, clonePodTemplates } from "@/lib/api"
+import { getAllPodTemplates, getAllUsers, getGroups, clonePodTemplates } from "@/lib/api"
 import { PodTemplate, User, Group } from "@/lib/types"
 import { Rocket, ChevronLeft, ChevronRight, Check } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -70,11 +69,6 @@ function Step({ stepNumber, isActive, isCompleted, isClickable, onClick, isLast 
   )
 }
 
-interface DeployPodDialogProps {
-  onPodDeployed?: () => void
-  trigger?: React.ReactNode
-}
-
 export function DeployPodDialog({ onPodDeployed, trigger }: DeployPodDialogProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
@@ -108,7 +102,7 @@ export function DeployPodDialog({ onPodDeployed, trigger }: DeployPodDialogProps
     if (isDialogOpen && !isLoading) {
       setIsLoading(true)
       Promise.all([
-        getPodTemplates(),
+        getAllPodTemplates(),
         getAllUsers(),
         getGroups()
       ]).then(([templatesRes, usersRes, groupsRes]) => {
@@ -119,7 +113,7 @@ export function DeployPodDialog({ onPodDeployed, trigger }: DeployPodDialogProps
         setIsLoading(false)
       })
     }
-  }, [isDialogOpen])
+  }, [isDialogOpen, isLoading])
 
   const handleUserToggle = (username: string) => {
     setSelectedUsers(prev => 
@@ -344,7 +338,7 @@ export function DeployPodDialog({ onPodDeployed, trigger }: DeployPodDialogProps
             <div>
               <h3 className="text-lg font-semibold mb-2">Select Groups (Optional)</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Choose groups to deploy to, or skip this step if you've already selected specific users.
+                Choose groups to deploy to, or skip this step if you&apos;ve already selected specific users.
                 {selectedUsers.length === 0 && (
                   <span className="text-orange-600 font-medium"> Note: You must select at least one group since no users were selected.</span>
                 )}
@@ -430,7 +424,6 @@ export function DeployPodDialog({ onPodDeployed, trigger }: DeployPodDialogProps
                   <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                   <div>
                     <p className="font-medium">{selectedTemplate}</p>
-                    <p className="text-sm text-muted-foreground">Ready to deploy</p>
                   </div>
                 </div>
               </div>

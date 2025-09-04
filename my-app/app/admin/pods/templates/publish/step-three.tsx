@@ -18,8 +18,8 @@ interface StepThreeProps {
   description: string
   vmCount: number
   imageFiles: File[]
-  isVisible: boolean
-  onVisibilityChange: (visible: boolean) => void
+  isTemplateVisible: boolean
+  onVisibilityChange: (templateVisible: boolean) => void
   onSubmit: () => void
   onBack: () => void
   isSubmitting: boolean
@@ -30,7 +30,7 @@ export function StepThree({
   description,
   vmCount,
   imageFiles,
-  isVisible,
+  isTemplateVisible,
   onVisibilityChange,
   onSubmit, 
   onBack,
@@ -150,17 +150,17 @@ export function StepThree({
           <h4 className="font-medium text-sm">Visibility</h4>
           <div className="flex items-center justify-between p-4 border rounded-lg">
             <div className="flex items-center space-x-3">
-              {isVisible ? (
+              {isTemplateVisible ? (
                 <Eye className="h-5 w-5 text-green-600" />
               ) : (
                 <EyeOff className="h-5 w-5 text-muted-foreground" />
               )}
               <div>
                 <Label htmlFor={id} className="text-sm font-medium cursor-pointer">
-                  {isVisible ? "Visible to Users" : "Hidden from Users"}
+                  {isTemplateVisible ? "Visible to Users" : "Hidden from Users"}
                 </Label>
                 <p className="text-sm text-muted-foreground">
-                  {isVisible 
+                  {isTemplateVisible 
                     ? "This template will be available for users to deploy" 
                     : "This template will be published as hidden"
                   }
@@ -169,7 +169,7 @@ export function StepThree({
             </div>
             <Switch
               id={id}
-              checked={isVisible}
+              checked={isTemplateVisible}
               onCheckedChange={onVisibilityChange}
               aria-label="Toggle template visibility"
             />
@@ -186,7 +186,7 @@ export function StepThree({
           </div>
           <p className="text-sm text-muted-foreground">
             Your template configuration is complete and ready to be published. 
-            Once published, the template will be {isVisible ? "immediately available to users" : "saved but hidden from users"}.
+            Once published, the template will be {isTemplateVisible ? "immediately available to users" : "saved but hidden from users"}.
           </p>
         </div> */}
 

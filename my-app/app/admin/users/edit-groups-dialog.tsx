@@ -143,17 +143,15 @@ export function EditGroupsDialog({
     <Dialog open={open} onOpenChange={handleDialogOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Edit Groups</DialogTitle>
+          <DialogTitle>{user?.name}</DialogTitle>
           <DialogDescription>
-            Manage group memberships for user: {user?.name}
-            <br />
             <span className="text-xs text-muted-foreground">
-              Pre-assigned groups containing "kamino" or "admin" cannot be removed.
+              Pre-assigned groups containing &quot;kamino&quot; or &quot;admin&quot; cannot be removed.
             </span>
           </DialogDescription>
         </DialogHeader>
         
-        <div className="py-4">
+        <div className="py-2">
           <Tags className="w-full">
             <TagsTrigger>
               {selectedGroups.map((groupName) => {

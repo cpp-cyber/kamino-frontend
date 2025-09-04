@@ -35,7 +35,7 @@ export default function Page() {
   const handleConfirmDelete = () => {
     setAlertOpen(false)
     if (selectedPod) {
-      deletePod([selectedPod.name])
+      deletePod(selectedPod.name)
       console.log(`Destroying pod: ${selectedPod.name}`)
       // Show toast notification
       toast.success(`Pod "${selectedPod.name}" has been queued for deletion and will be removed shortly.`)

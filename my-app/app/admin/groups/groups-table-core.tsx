@@ -10,7 +10,6 @@ import {
 import {
   flexRender,
   getCoreRowModel,
-  getSortedRowModel,
   SortingState,
   useReactTable,
   OnChangeFn,
@@ -24,6 +23,10 @@ interface GroupsTableCoreProps {
   onSortingChange: OnChangeFn<SortingState>
   onGroupAction: (groupName: string, action: 'rename' | 'delete') => void
   searchTerm: string
+  selectedGroups: string[]
+  onSelectGroup: (groupName: string, checked: boolean) => void
+  onSelectAll: (checked: boolean) => void
+  onBulkAction: (action: 'delete') => void
 }
 
 export function GroupsTableCore({
@@ -31,17 +34,31 @@ export function GroupsTableCore({
   sorting,
   onSortingChange,
   onGroupAction,
-  searchTerm
+  searchTerm,
+  selectedGroups,
+  onSelectGroup,
+  onSelectAll,
+  onBulkAction
 }: GroupsTableCoreProps) {
-  const columns = React.useMemo(() => createGroupsTableColumns(onGroupAction), [onGroupAction])
+  // Only groups that can be selected (can_modify)
+  const allSelectableGroups = React.useMemo(() => groups.filter(g => g.can_modify).map(g => g.name), [groups])
+  const columns = React.useMemo(() =>
+    createGroupsTableColumns(
+      onGroupAction,
+      selectedGroups,
+      onSelectGroup,
+      onSelectAll,
+      allSelectableGroups,
+      onBulkAction
+    ),
+    [onGroupAction, selectedGroups, onSelectGroup, onSelectAll, allSelectableGroups, onBulkAction]
+  )
 
   const table = useReactTable({
     data: groups,
     columns,
     onSortingChange,
     getCoreRowModel: getCoreRowModel(),
-    // Remove getSortedRowModel since sorting is handled at parent level
-    // getSortedRowModel: getSortedRowModel(),
     enableColumnResizing: false,
     columnResizeMode: "onChange",
     state: {
