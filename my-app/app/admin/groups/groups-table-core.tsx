@@ -1,26 +1,12 @@
 import React from 'react'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  flexRender,
-  getCoreRowModel,
-  SortingState,
-  useReactTable,
-  OnChangeFn,
-} from "@tanstack/react-table"
+import { SortingState } from "@tanstack/react-table"
 import { Group } from "@/lib/types"
-import { createGroupsTableColumns } from "./groups-table-columns"
+import { GroupsTableCore } from "./groups-table-columns"
 
-interface GroupsTableCoreProps {
+interface GroupsTableCoreWrapperProps {
   groups: Group[]
   sorting: SortingState
-  onSortingChange: OnChangeFn<SortingState>
+  onSortingChange: (sorting: SortingState) => void
   onGroupAction: (groupName: string, action: 'rename' | 'delete') => void
   searchTerm: string
   selectedGroups: string[]
@@ -29,7 +15,7 @@ interface GroupsTableCoreProps {
   onBulkAction: (action: 'delete') => void
 }
 
-export function GroupsTableCore({
+export function GroupsTableCoreWrapper({
   groups,
   sorting,
   onSortingChange,
@@ -39,77 +25,18 @@ export function GroupsTableCore({
   onSelectGroup,
   onSelectAll,
   onBulkAction
-}: GroupsTableCoreProps) {
-  // Only groups that can be selected (can_modify)
-  const allSelectableGroups = React.useMemo(() => groups.filter(g => g.can_modify).map(g => g.name), [groups])
-  const columns = React.useMemo(() =>
-    createGroupsTableColumns(
-      onGroupAction,
-      selectedGroups,
-      onSelectGroup,
-      onSelectAll,
-      allSelectableGroups,
-      onBulkAction
-    ),
-    [onGroupAction, selectedGroups, onSelectGroup, onSelectAll, allSelectableGroups, onBulkAction]
-  )
-
-  const table = useReactTable({
-    data: groups,
-    columns,
-    onSortingChange,
-    getCoreRowModel: getCoreRowModel(),
-    enableColumnResizing: false,
-    columnResizeMode: "onChange",
-    state: {
-      sorting,
-    },
-  })
-
+}: GroupsTableCoreWrapperProps) {
   return (
-    <Table>
-      <TableHeader className="bg-muted text-muted-foreground">
-        {table.getHeaderGroups().map((headerGroup) => (
-          <TableRow key={headerGroup.id}>
-            {headerGroup.headers.map((header) => {
-              return (
-                <TableHead 
-                  key={header.id}
-                  className="px-0"
-                >
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                </TableHead>
-              )
-            })}
-          </TableRow>
-        ))}
-      </TableHeader>
-      <TableBody>
-        {groups.length === 0 && (
-          <TableRow key="empty-state">
-            <TableCell colSpan={columns.length} className="text-center py-8 text-muted-foreground">
-              {searchTerm ? 'No Groups found matching your search.' : 'No Groups found.'}
-            </TableCell>
-          </TableRow>
-        )}
-        {table.getRowModel().rows.map((row) => (
-          <TableRow key={row.id}>
-            {row.getVisibleCells().map((cell) => (
-              <TableCell 
-                key={cell.id}
-                className="px-0"
-              >
-                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-              </TableCell>
-            ))}
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+    <GroupsTableCore
+      groups={groups}
+      searchTerm={searchTerm}
+      onGroupAction={onGroupAction}
+      selectedGroups={selectedGroups}
+      onSelectGroup={onSelectGroup}
+      onSelectAll={onSelectAll}
+      onBulkAction={onBulkAction}
+      sorting={sorting}
+      onSortingChange={onSortingChange}
+    />
   )
 }

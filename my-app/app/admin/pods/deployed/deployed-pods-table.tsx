@@ -12,6 +12,7 @@ import { PodsTableCore } from "./pods-table-columns"
 import { PodsTablePagination } from "./pods-table-pagination"
 import { usePodFilters } from "./use-pod-filters"
 import { usePodExpansion } from "./use-pod-expansion"
+import { SortingState } from "@tanstack/react-table"
 
 interface DeployedPodsTableProps {
   onDelete: (pod: DeployedPod) => void
@@ -30,6 +31,14 @@ export function DeployedPodsTable({ onDelete, onBulkDelete, onVMAction, onRefres
   // Pagination state
   const [currentPage, setCurrentPage] = React.useState(1)
   const [itemsPerPage, setItemsPerPage] = React.useState(10)
+
+  // Sorting state
+  const [sorting, setSorting] = React.useState<SortingState>([
+    {
+      id: "name",
+      desc: false
+    }
+  ])
 
   // Apply filters
   const filteredPods = usePodFilters({ pods, searchTerm })
@@ -84,10 +93,10 @@ export function DeployedPodsTable({ onDelete, onBulkDelete, onVMAction, onRefres
     }
   }
 
-  // Reset to first page when search or items per page changes
+  // Reset to first page when search, items per page, or sorting changes
   React.useEffect(() => {
     setCurrentPage(1)
-  }, [searchTerm, itemsPerPage])
+  }, [searchTerm, itemsPerPage, sorting])
 
   // Clear selection when filtered pods change
   React.useEffect(() => {
@@ -114,12 +123,48 @@ export function DeployedPodsTable({ onDelete, onBulkDelete, onVMAction, onRefres
     clearSelection() // Clear selection after bulk delete
   }
 
+  // Apply sorting to filtered pods before pagination
+  const sortedPods = React.useMemo(() => {
+    if (sorting.length === 0) return filteredPods
+
+    const sortedData = [...filteredPods]
+    const sort = sorting[0]
+    
+    sortedData.sort((a, b) => {
+      let aValue: any
+      let bValue: any
+
+      if (sort.id === 'name') {
+        aValue = a.name.toLowerCase()
+        bValue = b.name.toLowerCase()
+      } else if (sort.id === 'longest_uptime') {
+        // Get longest uptime for each pod
+        const aLongestUptime = a.vms.reduce((longest, vm) => {
+          return (vm.uptime || 0) > (longest || 0) ? vm.uptime || 0 : longest || 0
+        }, 0)
+        const bLongestUptime = b.vms.reduce((longest, vm) => {
+          return (vm.uptime || 0) > (longest || 0) ? vm.uptime || 0 : longest || 0
+        }, 0)
+        aValue = aLongestUptime
+        bValue = bLongestUptime
+      } else {
+        return 0
+      }
+
+      if (aValue < bValue) return sort.desc ? 1 : -1
+      if (aValue > bValue) return sort.desc ? -1 : 1
+      return 0
+    })
+
+    return sortedData
+  }, [filteredPods, sorting])
+
   // Pagination calculations
-  const totalItems = filteredPods.length
+  const totalItems = sortedPods.length
   const totalPages = Math.ceil(totalItems / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
-  const currentPods = filteredPods.slice(startIndex, endIndex)
+  const currentPods = sortedPods.slice(startIndex, endIndex)
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
@@ -178,6 +223,8 @@ export function DeployedPodsTable({ onDelete, onBulkDelete, onVMAction, onRefres
           onVMAction={onVMAction}
           onSelectionChange={setSelectedPods}
           onBulkDelete={handleBulkDelete}
+          sorting={sorting}
+          onSortingChange={setSorting}
         />
       </div>
 
