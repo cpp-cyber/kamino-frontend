@@ -131,8 +131,8 @@ export function DeployedPodsTable({ onDelete, onBulkDelete, onVMAction, onRefres
     const sort = sorting[0]
     
     sortedData.sort((a, b) => {
-      let aValue: any
-      let bValue: any
+      let aValue: string | number
+      let bValue: string | number
 
       if (sort.id === 'name') {
         aValue = a.name.toLowerCase()

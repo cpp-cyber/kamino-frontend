@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { Column } from "@tanstack/react-table"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -276,10 +277,10 @@ export function filterPasswordInput(input: string): string {
 }
 
 // Table utility functions
-export const createSortingToggleHandler = (column: any) => {
+export const createSortingToggleHandler = (column: Column<unknown, unknown>) => {
   return () => column.toggleSorting(column.getIsSorted() === "asc")
 }
 
-export const getSortDirection = (column: any): false | "asc" | "desc" => {
+export const getSortDirection = (column: Column<unknown, unknown>): false | "asc" | "desc" => {
   return column.getIsSorted()
 }

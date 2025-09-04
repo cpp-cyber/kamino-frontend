@@ -1,5 +1,5 @@
 import React from 'react'
-import { ChevronDownIcon, ChevronRightIcon, Trash2Icon, MoreVertical, EyeOff, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
+import { ChevronDownIcon, ChevronRightIcon, Trash2Icon, MoreVertical, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { SortingIcon } from "@/components/table-components"
