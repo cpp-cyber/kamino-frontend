@@ -214,7 +214,6 @@ export function TemplatePublishWizard() {
               <StepThree
                 selectedTemplate={selectedTemplate}
                 description={description}
-                authors={authors}
                 vmCount={vmCount}
                 imageFiles={imageFiles}
                 isTemplateVisible={isTemplateVisible}

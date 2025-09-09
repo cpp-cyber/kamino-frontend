@@ -10,9 +10,7 @@ import {
   bulkRemoveUsersFromGroup,
   createGroups,
   deleteGroups,
-  renameGroup,
-  addUsersToGroups,
-  removeUsersFromGroups
+  renameGroup
 } from "./api"
 import { CreateUsersRequest } from "./types"
 

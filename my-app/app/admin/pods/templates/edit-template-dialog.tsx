@@ -94,7 +94,7 @@ export function EditTemplateDialog({
       if (imageFiles.length > 0) {
         try {
           imagePath = await uploadTemplateImage(imageFiles[0])
-        } catch (uploadError) {
+        } catch {
           toast.error('Failed to upload image. Please try again.')
           return
         }
@@ -134,7 +134,7 @@ export function EditTemplateDialog({
         <DialogHeader>
           <DialogTitle>Edit Template</DialogTitle>
           <DialogDescription>
-            Update the template configuration for "{template?.name}"
+            Update the template configuration for &ldquo;{template?.name}&rdquo;
           </DialogDescription>
         </DialogHeader>
         

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { toast } from "sonner"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -86,7 +85,7 @@ export function PodDeployDialog({ isOpen, onClose, selectedPod }: PodDeployDialo
             setDeployProgress(false)
           }, 2000)
         },
-        (error) => {
+        () => {
           // Error: Show error dialog and hide progress
           setDeployProgress(false)
           setShowErrorDialog(true)

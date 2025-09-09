@@ -16,7 +16,6 @@ import Image from "next/image"
 interface StepThreeProps {
   selectedTemplate: string
   description: string
-  authors: string
   vmCount: number
   imageFiles: File[]
   isTemplateVisible: boolean
@@ -29,7 +28,6 @@ interface StepThreeProps {
 export function StepThree({ 
   selectedTemplate,
   description,
-  authors,
   vmCount,
   imageFiles,
   isTemplateVisible,
