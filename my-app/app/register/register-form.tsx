@@ -172,7 +172,6 @@ export function RegisterForm({
             type="text" 
             value={formData.username}
             onChange={(e) => handleUsernameChange(e.target.value)}
-            placeholder="Enter your username"
             required 
             className={`focus:border-kamino-green focus:ring-kamino-green ${!usernameValidation.isValid ? "border-destructive" : ""}`}
           />
@@ -196,7 +195,6 @@ export function RegisterForm({
             type="password" 
             value={formData.password}
             onChange={handleChange}
-            placeholder="Enter your password"
             required 
             className={`focus:border-kamino-green focus:ring-kamino-green ${!passwordValidation.isValid ? "border-destructive" : ""}`}
           />
@@ -220,7 +218,6 @@ export function RegisterForm({
             type="password" 
             value={formData.confirmPassword}
             onChange={handleChange}
-            placeholder="Confirm your password"
             required 
             className="focus:border-kamino-green focus:ring-kamino-green"
           />

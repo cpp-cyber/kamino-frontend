@@ -24,7 +24,7 @@ import { Progress } from "@/components/ui/progress"
 import { CalendarIcon, Rocket, Server as ServerIcon, Rocket as RocketIcon } from "lucide-react"
 import Image from "next/image"
 import { VisuallyHidden } from "radix-ui"
-import { deployPod } from "@/lib/api"
+import { handleUserPodDeployment } from "@/lib/admin-operations"
 import { PodTemplate } from "@/lib/types"
 
 interface PodDeployDialogProps {
@@ -39,7 +39,7 @@ function PodDeployProgress() {
 
   useEffect(() => {
     const start = Date.now()
-    const duration = 30000 // 30 seconds
+    const duration = 180000 // 3 minutes (180 seconds) - increased for cloning operations
     let animationFrame: number
 
     const updateProgress = () => {
@@ -77,34 +77,26 @@ export function PodDeployDialog({ isOpen, onClose, selectedPod }: PodDeployDialo
     onClose()
     setDeployProgress(true)
     
-    // Show initial toast
-    toast.info(`Deploying "${selectedPod.name.replaceAll('_', ' ')}"...`, {
-      duration: 2000,
-    })
-    
     try {
-      await deployPod(selectedPod.name)
-      console.log(`Successfully deployed pod: ${selectedPod.name}`)
-      
-      // Show success toast
-      toast.success(`Successfully deployed "${selectedPod.name.replaceAll('_', ' ')}"!`, {
-        description: "You will be redirected to your deployed pods shortly.",
-        duration: 4000,
-      })
-      
-      setTimeout(() => {
-        setDeployProgress(false)
-      }, 2000)
+      await handleUserPodDeployment(
+        selectedPod.name,
+        () => {
+          // Success: Just hide progress after a short delay
+          setTimeout(() => {
+            setDeployProgress(false)
+          }, 2000)
+        },
+        (error) => {
+          // Error: Show error dialog and hide progress
+          setDeployProgress(false)
+          setShowErrorDialog(true)
+        }
+      )
     } catch (error) {
-      console.error('Failed to deploy pod:', error)
+      // Fallback error handling
+      console.error('Deployment failed:', error)
       setDeployProgress(false)
       setShowErrorDialog(true)
-      
-      // Show error toast as well
-      toast.error(`Failed to deploy "${selectedPod.name.replaceAll('_', ' ')}"`, {
-        description: "Please check the error details for more information.",
-        duration: 5000,
-      })
     }
   }
 
@@ -128,20 +120,14 @@ export function PodDeployDialog({ isOpen, onClose, selectedPod }: PodDeployDialo
                 {/* Square image */}
                 <div className="flex-shrink-0">
                   <div className="w-48 h-48 rounded-lg border bg-muted overflow-hidden shadow-xl">
-                    {selectedPod.image_path ? (
                     <Image 
-                      src={`/api/v1/template/image/${selectedPod.image_path}`}
+                      src={selectedPod.image_path ? `/api/v1/template/image/${selectedPod.image_path}` : '/kaminoLogo.svg'}
                       alt={selectedPod.name}
                       className="w-full h-full object-cover"
                       unoptimized
                       width={192}
                       height={192}
                     />
-                    ) : (
-                    <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
-                      No Image
-                    </div>
-                    )}
                   </div>
                 </div>
                 

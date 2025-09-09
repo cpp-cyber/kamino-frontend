@@ -5,7 +5,10 @@ import { toast } from "sonner"
 import { AuthGuard } from "@/components/auth-guard"
 import { PageLayout } from "@/app/admin/admin-page-layout"
 import { GroupsTable } from "@/app/admin/groups/groups-table"
-import { deleteGroups, renameGroup } from "@/lib/api"
+import {
+  handleDeleteGroups,
+  handleRenameGroup
+} from "@/lib/admin-operations"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -78,15 +81,18 @@ export default function AdminGroupsPage() {
     try {
       if (selectedGroup) {
         // Single delete
-        await deleteGroups([selectedGroup.name])
-        toast.success(`Group "${selectedGroup.name}" has been deleted successfully.`)
+        await handleDeleteGroups(
+          [selectedGroup.name],
+          () => {
+            setAlertOpen(false)
+            setSelectedGroup(null)
+            handleRefresh()
+          }
+        )
       }
-      setAlertOpen(false)
-      setSelectedGroup(null)
-      // Trigger a refresh of the groups table
-      handleRefresh()
     } catch (error) {
-      toast.error(`Failed to delete group: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      // Error handling is done in the centralized function
+      console.error('Failed to delete group:', error)
     }
   }
 
@@ -94,13 +100,17 @@ export default function AdminGroupsPage() {
     if (!bulkDeleteGroups.length) return
     setIsBulkDeleting(true)
     try {
-      await deleteGroups(bulkDeleteGroups)
-      toast.success(`${bulkDeleteGroups.length} group(s) deleted successfully.`)
-      setBulkDeleteDialogOpen(false)
-      setBulkDeleteGroups([])
-      handleRefresh()
+      await handleDeleteGroups(
+        bulkDeleteGroups,
+        () => {
+          setBulkDeleteDialogOpen(false)
+          setBulkDeleteGroups([])
+          handleRefresh()
+        }
+      )
     } catch (error) {
-      toast.error(`Failed to delete groups: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      // Error handling is done in the centralized function
+      console.error('Failed to delete groups:', error)
     } finally {
       setIsBulkDeleting(false)
     }
@@ -117,16 +127,20 @@ export default function AdminGroupsPage() {
     
     setIsRenaming(true)
     try {
-      await renameGroup(selectedGroup.name, newGroupName.trim())
-      toast.success(`Group renamed from "${selectedGroup.name}" to "${newGroupName.trim()}" successfully.`)
-      setRenameDialogOpen(false)
-      setSelectedGroup(null)
-      setNewGroupName("")
-      setRenameValidation({ isValid: true, errors: [] })
-      // Trigger a refresh of the groups table
-      handleRefresh()
+      await handleRenameGroup(
+        selectedGroup.name,
+        newGroupName.trim(),
+        () => {
+          setRenameDialogOpen(false)
+          setSelectedGroup(null)
+          setNewGroupName("")
+          setRenameValidation({ isValid: true, errors: [] })
+          handleRefresh()
+        }
+      )
     } catch (error) {
-      toast.error(`Failed to rename group: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      // Error handling is done in the centralized function
+      console.error('Failed to rename group:', error)
     } finally {
       setIsRenaming(false)
     }

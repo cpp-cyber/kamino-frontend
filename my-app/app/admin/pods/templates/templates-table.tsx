@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { SearchIcon, MoreVertical, EyeOff, Trash2, RefreshCcw, Eye } from "lucide-react"
+import { SearchIcon, MoreVertical, EyeOff, Trash2, RefreshCcw, Eye, Edit } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -23,21 +23,27 @@ import { PodTemplate } from "@/lib/types"
 import { getAllPodTemplates } from "@/lib/api"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { PodTemplateStatusBadge } from "@/components/status-badges"
+import { EditTemplateDialog } from "./edit-template-dialog"
 
 interface PodTemplateTableProps {
   onTemplateAction: (templateName: string, action: 'toggle' | 'delete') => void
+  refreshKey?: number
 }
 
-export function PodTemplateTable({ onTemplateAction }: PodTemplateTableProps) {
+export function PodTemplateTable({ onTemplateAction, refreshKey }: PodTemplateTableProps) {
   const [podTemplates, setPodTemplates] = React.useState<PodTemplate[]>([])
   const [filteredPodTemplates, setFilteredPodTemplates] = React.useState<PodTemplate[]>([])
   const [searchTerm, setSearchTerm] = React.useState("")
   const [isLoading, setIsLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
+  
+  // Edit dialog state
+  const [editDialogOpen, setEditDialogOpen] = React.useState(false)
+  const [selectedTemplate, setSelectedTemplate] = React.useState<PodTemplate | null>(null)
 
   React.useEffect(() => {
     loadPodTemplates()
-  }, [])
+  }, [refreshKey])
 
   const loadPodTemplates = async () => {
     try {
@@ -51,6 +57,15 @@ export function PodTemplateTable({ onTemplateAction }: PodTemplateTableProps) {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleEditTemplate = (template: PodTemplate) => {
+    setSelectedTemplate(template)
+    setEditDialogOpen(true)
+  }
+
+  const handleEditSuccess = () => {
+    loadPodTemplates()
   }
 
   React.useEffect(() => {
@@ -103,6 +118,7 @@ export function PodTemplateTable({ onTemplateAction }: PodTemplateTableProps) {
             )}
             <Button onClick={loadPodTemplates} variant="outline">
               <RefreshCcw className="h-4 w-4" />
+              <span className="hidden lg:inline">Refresh</span>
             </Button>
           </div>
         </div>
@@ -157,6 +173,13 @@ export function PodTemplateTable({ onTemplateAction }: PodTemplateTableProps) {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem
+                        onClick={() => handleEditTemplate(podTemplate)}
+                        className="cursor-pointer"
+                      >
+                        <Edit className="mr-2" />
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
                         onClick={() => onTemplateAction(podTemplate.name, 'toggle')}
                         className="cursor-pointer"
                       >
@@ -183,6 +206,14 @@ export function PodTemplateTable({ onTemplateAction }: PodTemplateTableProps) {
           </TableBody>
         </Table>
       </div>
+
+      {/* Edit Template Dialog */}
+      <EditTemplateDialog
+        template={selectedTemplate}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        onSuccess={handleEditSuccess}
+      />
 
     </div>
   )

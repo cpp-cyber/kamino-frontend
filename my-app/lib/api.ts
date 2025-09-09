@@ -172,16 +172,24 @@ export async function getPodTemplates(): Promise<PodTemplate[]> {
 
 // Clone/deploy a pod template
 export async function deployPod(templateName: string): Promise<void> {
-  const response = await fetch(`/api/v1/template/clone`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ "template": templateName })
-  })
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), 300000) // 5 minutes timeout for cloning
   
-  if (!response.ok) {
-    throw new Error(`Failed to deploy pod: ${response.status} ${response.statusText}`)
+  try {
+    const response = await fetch(`/api/v1/template/clone`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ "template": templateName }),
+      signal: controller.signal
+    })
+    
+    if (!response.ok) {
+      throw new Error(`Failed to deploy pod: ${response.status} ${response.statusText}`)
+    }
+  } finally {
+    clearTimeout(timeoutId)
   }
 }
 
@@ -545,6 +553,22 @@ export async function publishTemplate(template: PodTemplate): Promise<void> {
   }
 }
 
+// Edit template
+export async function editTemplate(template: PodTemplate): Promise<void> {
+  const response = await fetch(`/api/v1/admin/template/edit`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify({ "template": template })
+  })
+
+  if (!response.ok) {
+    throw new Error(`Failed to edit template: ${response.status} ${response.statusText}`)
+  }
+}
+
 // Delete templates (accepts array for bulk deletion)
 export async function deleteTemplate(templateName: string): Promise<void> {
   const response = await fetch(`/api/v1/admin/template/delete`, {
@@ -610,21 +634,29 @@ export async function uploadTemplateImage(file: File): Promise<string> {
 
 // Clone pod templates to users/groups (accepts array for bulk cloning)
 export async function clonePodTemplates(template: string, usernames: string[], groups: string[]): Promise<void> {
-  const response = await fetch('/api/v1/admin/templates/clone', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-    body: JSON.stringify({
-      "template": template,
-      "usernames": usernames,
-      "groups": groups
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), 300000) // 5 minutes timeout for bulk cloning
+  
+  try {
+    const response = await fetch('/api/v1/admin/templates/clone', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        "template": template,
+        "usernames": usernames,
+        "groups": groups
+      }),
+      signal: controller.signal
     })
-  })
 
-  if (!response.ok) {
-    throw new Error(`Failed to clone pod templates: ${response.status} ${response.statusText}`)
+    if (!response.ok) {
+      throw new Error(`Failed to clone pod templates: ${response.status} ${response.statusText}`)
+    }
+  } finally {
+    clearTimeout(timeoutId)
   }
 }
 

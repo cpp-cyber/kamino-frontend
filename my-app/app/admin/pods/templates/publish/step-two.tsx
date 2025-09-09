@@ -13,6 +13,8 @@ interface StepTwoProps {
   selectedTemplate: string
   description: string
   onDescriptionChange: (description: string) => void
+  authors: string
+  onAuthorsChange: (authors: string) => void
   vmCount: number
   onVmCountChange: (count: number) => void
   imageFiles: File[]
@@ -24,6 +26,8 @@ interface StepTwoProps {
 export function StepTwo({ 
   description, 
   onDescriptionChange,
+  authors,
+  onAuthorsChange,
   vmCount,
   onVmCountChange,
   imageFiles,
@@ -81,6 +85,21 @@ export function StepTwo({
           )}
           <p className="text-sm text-muted-foreground">
             Supports Markdown formatting including **bold**, *italic*, `code`, links, lists, and line breaks.
+          </p>
+        </div>
+
+        {/* Authors */}
+        <div className="space-y-2">
+          <Label htmlFor="authors">Authors</Label>
+          <Input
+            id="authors"
+            placeholder="Enter template authors (e.g., John Doe, Jane Smith)"
+            value={authors}
+            onChange={(e) => onAuthorsChange(e.target.value)}
+            maxLength={255}
+          />
+          <p className="text-sm text-muted-foreground">
+            Specify the authors or creators of this template (max 255 characters).
           </p>
         </div>
 

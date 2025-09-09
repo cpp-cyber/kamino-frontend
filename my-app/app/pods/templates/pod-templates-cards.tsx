@@ -42,7 +42,7 @@ function TemplateCard({ template, onDeploy }: { template: PodTemplate; onDeploy:
         <div className="absolute inset-0 flex">
           <div className="w-full h-full relative overflow-hidden">
             <Image 
-              src={`/api/v1/template/image/${template.image_path}`}
+              src={template.image_path ? `/api/v1/template/image/${template.image_path}` : '/kaminoLogo.svg'}
               alt={template.name}
               fill
               unoptimized
@@ -60,7 +60,7 @@ function TemplateCard({ template, onDeploy }: { template: PodTemplate; onDeploy:
         <h3 className="mb-1 text-2xl font-bold">{template.name.replaceAll('_', ' ')}</h3>
         
         {/* Pod Description */}
-        <div className="mb-4 text-base text-muted-foreground leading-relaxed h-[120px] overflow-hidden">
+        <div className="mb-3 text-base text-muted-foreground leading-relaxed h-[110px] overflow-hidden">
           <div className="h-full relative">
             <MarkdownRenderer
               content={template.description || 'No description available'}
@@ -70,6 +70,14 @@ function TemplateCard({ template, onDeploy }: { template: PodTemplate; onDeploy:
             <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-card to-transparent pointer-events-none" />
           </div>
         </div>
+
+        {/* Authors */}
+        {template.authors && (
+          <div className="mb-3 text-sm">
+            <span className="text-muted-foreground">Authors: </span>
+            <span className="text-foreground font-medium">{template.authors}</span>
+          </div>
+        )}
 
         {/* Pod Stats */}
         <div className="mt-auto pt-1">

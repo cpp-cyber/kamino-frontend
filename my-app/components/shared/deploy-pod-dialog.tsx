@@ -19,7 +19,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
-import { getAllPodTemplates, getAllUsers, getGroups, clonePodTemplates } from "@/lib/api"
+import { getAllPodTemplates, getAllUsers, getGroups } from "@/lib/api"
+import { handleAdminPodDeployment } from "@/lib/admin-operations"
 import { PodTemplate, User, Group } from "@/lib/types"
 import { Rocket, ChevronLeft, ChevronRight, Check } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -239,20 +240,28 @@ export function DeployPodDialog({ onPodDeployed, trigger }: DeployPodDialogProps
 
     console.log('Proceeding with deployment...')
     setIsSubmitting(true)
+    
     try {
-      await clonePodTemplates(selectedTemplate, selectedUsers, selectedGroups)
-      
-      const targetCount = selectedUsers.length + selectedGroups.length
-      toast.success(`Successfully deployed "${selectedTemplate}" to ${targetCount} target${targetCount === 1 ? '' : 's'}`)
-      
-      resetForm()
-      setIsDialogOpen(false)
-      if (onPodDeployed) {
-        onPodDeployed()
-      }
+      await handleAdminPodDeployment(
+        selectedTemplate,
+        selectedUsers,
+        selectedGroups,
+        () => {
+          // Success: Reset form and close dialog
+          resetForm()
+          setIsDialogOpen(false)
+          if (onPodDeployed) {
+            onPodDeployed()
+          }
+        },
+        (error) => {
+          // Error handling is done in the centralized function
+          console.error('Admin deployment failed:', error)
+        }
+      )
     } catch (error) {
+      // Fallback error handling
       console.error('Failed to deploy pod:', error)
-      toast.error('Failed to deploy pod')
     } finally {
       setIsSubmitting(false)
     }
@@ -282,6 +291,33 @@ export function DeployPodDialog({ onPodDeployed, trigger }: DeployPodDialogProps
                   ))}
                 </SelectContent>
               </Select>
+              
+              {/* Template Details */}
+              {selectedTemplate && (() => {
+                const template = templates.find(t => t.name === selectedTemplate)
+                return template && (
+                  <div className="mt-4 p-4 bg-muted/50 rounded-lg border space-y-2">
+                    <h4 className="font-medium text-sm">Template Details</h4>
+                    {template.description && (
+                      <p className="text-sm text-muted-foreground">
+                        {template.description}
+                      </p>
+                    )}
+                    {template.authors && (
+                      <p className="text-sm">
+                        <span className="text-muted-foreground">Authors: </span>
+                        <span className="font-medium">{template.authors}</span>
+                      </p>
+                    )}
+                    {template.vm_count && (
+                      <p className="text-sm">
+                        <span className="text-muted-foreground">VM Count: </span>
+                        <span className="font-medium">{template.vm_count}</span>
+                      </p>
+                    )}
+                  </div>
+                )
+              })()}
             </div>
           </div>
         )
@@ -436,8 +472,16 @@ export function DeployPodDialog({ onPodDeployed, trigger }: DeployPodDialogProps
                 </h4>
                 <div className="flex items-center space-x-3 p-4 bg-background border rounded-lg">
                   <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <div>
+                  <div className="flex-1">
                     <p className="font-medium">{selectedTemplate}</p>
+                    {(() => {
+                      const template = templates.find(t => t.name === selectedTemplate)
+                      return template?.authors && (
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Authors: {template.authors}
+                        </p>
+                      )
+                    })()}
                   </div>
                 </div>
               </div>

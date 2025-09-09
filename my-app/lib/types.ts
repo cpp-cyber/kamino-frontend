@@ -1,6 +1,7 @@
 export interface PodTemplate {
   name: string
   description?: string
+  authors?: string
   image?: string
   image_path?: string
   template_visible?: boolean

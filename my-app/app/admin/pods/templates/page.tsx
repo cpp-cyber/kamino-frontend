@@ -37,6 +37,9 @@ export default function AdminPodTemplatePage() {
   const [alertOpen, setAlertOpen] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<{ name: string } | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
+
+  const triggerRefresh = () => setRefreshKey(prev => prev + 1)
 
   const handleTemplateAction = async (templateName: string, action: 'toggle' | 'delete') => {
     // If toggling visibility, call API immediately and avoid confirmation dialog.
@@ -45,6 +48,7 @@ export default function AdminPodTemplatePage() {
       try {
         await templateVisibility(templateName)
         toast.success(`Template "${templateName}" has been toggled`)
+        triggerRefresh() // Refresh the table
       } catch (error) {
         toast.error(`Failed to toggle template: ${error instanceof Error ? error.message : 'Unknown error'}`)
       } finally {
@@ -68,6 +72,7 @@ export default function AdminPodTemplatePage() {
       toast.success(`Template "${selectedTemplate.name}" has been deleted`)
       setAlertOpen(false)
       setSelectedTemplate(null)
+      triggerRefresh() // Refresh the table
     } catch (error) {
       toast.error(`Failed to delete template: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
@@ -88,7 +93,7 @@ export default function AdminPodTemplatePage() {
                 Manage all pod templates on Proxmox
               </p>
             </div>
-            <PodTemplateTable onTemplateAction={handleTemplateAction} />
+            <PodTemplateTable onTemplateAction={handleTemplateAction} refreshKey={refreshKey} />
           </div>
         </div>
       </PageLayout>

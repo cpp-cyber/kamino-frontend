@@ -19,6 +19,7 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { createGroups } from "@/lib/api"
+import { handleCreateGroups } from "@/lib/admin-operations"
 import { parseGroupNamesFromText, validateGroupName, validateGroupNames, filterGroupNameInput, GroupNameValidationResult } from "@/lib/utils"
 import { Users, UserPlus, Hash, AlertCircle } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -75,10 +76,13 @@ export function CreateGroupDialog({ onGroupCreated, trigger }: CreateGroupDialog
       return false
     }
 
-    await createGroups([groupName.trim()])
-    toast.success(`Group "${groupName.trim()}" has been created successfully`)
-    setGroupName("")
-    setGroupNameValidation({ isValid: true, errors: [] })
+    await handleCreateGroups(
+      [groupName.trim()],
+      () => {
+        setGroupName("")
+        setGroupNameValidation({ isValid: true, errors: [] })
+      }
+    )
     return true
   }
 
@@ -104,10 +108,13 @@ export function CreateGroupDialog({ onGroupCreated, trigger }: CreateGroupDialog
       return false
     }
     
-    await createGroups(groups)
-    toast.success(`${groups.length} group(s) have been created successfully`)
-    setGroupsText("")
-    setBulkValidation([])
+    await handleCreateGroups(
+      groups,
+      () => {
+        setGroupsText("")
+        setBulkValidation([])
+      }
+    )
     return true
   }
 
@@ -136,11 +143,14 @@ export function CreateGroupDialog({ onGroupCreated, trigger }: CreateGroupDialog
       return false
     }
     
-    await createGroups(groups)
-    toast.success(`${groups.length} group(s) have been created successfully with prefix "${prefix.trim()}"`)
-    setPrefix("")
-    setPrefixValidation({ isValid: true, errors: [] })
-    setGroupCount("5")
+    await handleCreateGroups(
+      groups,
+      () => {
+        setPrefix("")
+        setPrefixValidation({ isValid: true, errors: [] })
+        setGroupCount("5")
+      }
+    )
     return true
   }
 

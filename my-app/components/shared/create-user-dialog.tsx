@@ -18,6 +18,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { createUsers } from "@/lib/api"
+import { handleCreateUsers } from "@/lib/admin-operations"
 import { CreateUsersRequest } from "@/lib/types"
 import { validateUsername, validateUsernames, filterUsernameInput, UsernameValidationResult, validatePassword, filterPasswordInput, PasswordValidationResult } from "@/lib/utils"
 import { UserPlus, Users, AlertCircle } from "lucide-react"
@@ -118,12 +119,15 @@ export function CreateUserDialog({ onUserCreated, trigger }: CreateUserDialogPro
       return false
     }
 
-    await createUsers([{ username: username.trim(), password: password.trim() }])
-    toast.success(`User "${username.trim()}" has been created successfully`)
-    setUsername("")
-    setPassword("")
-    setUsernameValidation({ isValid: true, errors: [] })
-    setPasswordValidation({ isValid: true, errors: [] })
+    await handleCreateUsers(
+      [{ username: username.trim(), password: password.trim() }],
+      () => {
+        setUsername("")
+        setPassword("")
+        setUsernameValidation({ isValid: true, errors: [] })
+        setPasswordValidation({ isValid: true, errors: [] })
+      }
+    )
     return true
   }
 
@@ -140,7 +144,7 @@ export function CreateUserDialog({ onUserCreated, trigger }: CreateUserDialogPro
       toast.error(error instanceof Error ? error.message : "Invalid CSV format")
       return false
     }
-    
+
     if (users.length === 0) {
       toast.error("No valid users found")
       return false
@@ -157,10 +161,13 @@ export function CreateUserDialog({ onUserCreated, trigger }: CreateUserDialogPro
       return false
     }
     
-    await createUsers(users)
-    toast.success(`${users.length} user(s) have been created successfully`)
-    setUsersCsv("")
-    setBulkValidation([])
+    await handleCreateUsers(
+      users,
+      () => {
+        setUsersCsv("")
+        setBulkValidation([])
+      }
+    )
     return true
   }
 

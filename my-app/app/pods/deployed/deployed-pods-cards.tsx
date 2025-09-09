@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button"
 import {
   Card,
 } from "@/components/ui/card"
-import { CalendarIcon, Trash } from "lucide-react"
+import { CalendarIcon, Trash, User } from "lucide-react"
 import Image from "next/image"
 import { DeployedPod } from "@/lib/types"
 import { formatUptime } from "@/lib/utils"
@@ -114,10 +114,11 @@ export function SectionCards({ pods, onDelete }: SectionCardsProps) {
               <div className="flex flex-col lg:flex-row gap-4 pb-4 flex-1">
                 
                 {/* VMs */}
-                <Card className="w-full lg:w-2/3 order-1 lg:order-2 min-h-fit">
-                  <div className="flex flex-col p-4 py-0 gap-2">
+                <div className="w-full lg:w-2/3 order-1 lg:order-2">
+                  <h2 className="text-lg font-semibold mb-2">Virtual Machines</h2>
+                  <div className="flex flex-col py-0 gap-2">
                     <div className={`grid ${gridCols} gap-2 auto-rows-max`}>
-                        {vms.length > 0 ? (
+                      {vms.length > 0 ? (
                         vms.map((vm) => (
                           <Link 
                           key={vm.vmid} 
@@ -154,25 +155,35 @@ export function SectionCards({ pods, onDelete }: SectionCardsProps) {
                         )}
                     </div>
                   </div>
-                </Card>
+                </div>
                 
                 {/* Description */}
-                <ScrollArea className="h-105 w-full border rounded-xl p-4 shadow order-2 lg:order-1">
+                <div className="w-full order-2 lg:order-1">
+                  <h2 className="text-lg font-semibold mb-2">Description</h2>
+                  <ScrollArea className="h-105 border rounded-xl p-4 shadow">
                   <MarkdownRenderer 
                     content={pod.template?.description ? pod.template.description : 'No description available'} 
                     variant="compact"
                   />
-                </ScrollArea>
+                  </ScrollArea>
+                </div>
               </div>
 
               {/* Footer section */}
-              {/* <div className="mt-auto">
-                <Separator className="mb-4" />
-                <CardFooter className="flex space-x-2 text-muted-foreground -ml-4">
-                  <p>Author:</p>
-                  <Badge className="shadow">{pod.template?.name || "Unknown"}</Badge>
-                </CardFooter>
-              </div> */}
+              <div className="mt-auto">
+                <div className="border-t pt-4">
+                  <div className="flex items-center space-x-2 text-muted-foreground text-sm">
+                    <User className="size-5" />
+                    {pod.template?.authors ? (
+                      <span className="text-foreground font-medium">
+                        {pod.template.authors}
+                      </span>
+                    ) : (
+                      <span className="italic">No authors specified</span>
+                    )}
+                  </div>
+                </div>
+              </div>
             </Card>
           </div>
         )

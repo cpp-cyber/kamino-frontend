@@ -149,7 +149,7 @@ export default function Page() {
                       >
                         <div className="bg-sidebar-accent-foreground/10 text-sidebar-primary-foreground flex size-16 items-center justify-center rounded-lg overflow-hidden shadow-lg shrink-0">
                           <Image
-                            src={`/api/v1/template/image/${template.image_path}`}
+                            src={template.image_path ? `/api/v1/template/image/${template.image_path}` : '/kaminoLogo.svg'}
                             alt={template.name}
                             width={64}
                             height={64}

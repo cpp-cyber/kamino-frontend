@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { GetUsersResponse, User } from "@/lib/types"
-import { getAllUsers, disableUser, bulkAddUsersToGroup, bulkRemoveUsersFromGroup, bulkDeleteUsers } from "@/lib/api"
+import { getAllUsers } from "@/lib/api"
 import { LoadingSpinner } from "@/components/ui/loading-spinner"
 import { Button } from "@/components/ui/button"
 import { ErrorDisplay } from "@/components/ui/error-display"
@@ -16,6 +16,11 @@ import { BulkDeleteConfirmDialog } from "@/app/admin/users/bulk-delete-confirm-d
 import { BulkDisableConfirmDialog } from "@/app/admin/users/bulk-disable-confirm-dialog"
 import { toast } from "sonner"
 import { SortingState } from "@tanstack/react-table"
+import { 
+  handleDeleteUsers,
+  handleToggleUsers,
+  handleUserGroupOperation
+} from "@/lib/admin-operations"
 
 interface UsersTableProps {
   onUserAction: (user: User, action: 'enable' | 'disable' | 'editGroups' | 'delete') => void
@@ -168,16 +173,18 @@ export function UsersTable({ onUserAction, onRefresh }: UsersTableProps) {
         return
       }
 
-      // Use bulk API endpoint to add users to group
       const usernamesToUpdate = usersToUpdate.map(user => user.name)
-      await bulkAddUsersToGroup(usernamesToUpdate, groupName)
-      
-      toast.success(`Added ${usersToUpdate.length} users to group "${groupName}"`)
-      setSelectedUsers(new Set())
-      await handleRefresh()
+      await handleUserGroupOperation(
+        usernamesToUpdate,
+        groupName,
+        'add',
+        async () => {
+          setSelectedUsers(new Set())
+          await handleRefresh()
+        }
+      )
     } catch (error) {
       console.error('Failed to add users to group:', error)
-      toast.error('Failed to add users to group')
     }
   }
 
@@ -191,43 +198,49 @@ export function UsersTable({ onUserAction, onRefresh }: UsersTableProps) {
         return
       }
 
-      // Use bulk API endpoint to remove users from group
       const usernamesToUpdate = usersToUpdate.map(user => user.name)
-      await bulkRemoveUsersFromGroup(usernamesToUpdate, groupName)
-      
-      toast.success(`Removed ${usersToUpdate.length} users from group "${groupName}"`)
-      setSelectedUsers(new Set())
-      await handleRefresh()
+      await handleUserGroupOperation(
+        usernamesToUpdate,
+        groupName,
+        'remove',
+        async () => {
+          setSelectedUsers(new Set())
+          await handleRefresh()
+        }
+      )
     } catch (error) {
       console.error('Failed to remove users from group:', error)
-      toast.error('Failed to remove users from group')
     }
   }
 
   const handleDisableConfirm = async () => {
     try {
       const usernamesToDisable = selectedNonAdminUsers.map(user => user.name)
-      await Promise.all(usernamesToDisable.map(username => disableUser(username)))
-      toast.success(`Disabled ${selectedNonAdminUsers.length} users`)
-      setSelectedUsers(new Set())
-      await handleRefresh()
+      await handleToggleUsers(
+        usernamesToDisable,
+        'disable',
+        async () => {
+          setSelectedUsers(new Set())
+          await handleRefresh()
+        }
+      )
     } catch (error) {
       console.error('Failed to disable users:', error)
-      toast.error('Failed to disable users')
     }
   }
 
   const handleDeleteConfirm = async () => {
     try {
       const usernamesToDelete = selectedNonAdminUsers.map(user => user.name)
-      await bulkDeleteUsers(usernamesToDelete)
-      
-      toast.success(`Deleted ${selectedNonAdminUsers.length} users`)
-      setSelectedUsers(new Set())
-      await handleRefresh()
+      await handleDeleteUsers(
+        usernamesToDelete,
+        async () => {
+          setSelectedUsers(new Set())
+          await handleRefresh()
+        }
+      )
     } catch (error) {
       console.error('Failed to delete users:', error)
-      toast.error('Failed to delete users')
     }
   }
 

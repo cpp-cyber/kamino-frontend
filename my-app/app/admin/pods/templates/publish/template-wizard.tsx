@@ -22,6 +22,7 @@ export function TemplatePublishWizard() {
   // Form data
   const [selectedTemplate, setSelectedTemplate] = useState("")
   const [description, setDescription] = useState("")
+  const [authors, setAuthors] = useState("")
   const [vmCount, setVmCount] = useState(1)
   const [imageFiles, setImageFiles] = useState<File[]>([])
   const [isTemplateVisible, setIsTemplateVisible] = useState(false)
@@ -31,11 +32,12 @@ export function TemplatePublishWizard() {
     return !isSuccess && (
       selectedTemplate !== "" || 
       description !== "" || 
+      authors !== "" ||
       vmCount !== 1 || 
       imageFiles.length > 0 ||
       currentStep > 1
     )
-  }, [isSuccess, selectedTemplate, description, vmCount, imageFiles.length, currentStep])
+  }, [isSuccess, selectedTemplate, description, authors, vmCount, imageFiles.length, currentStep])
 
   // Add beforeunload event listener to warn about unsaved changes
   useEffect(() => {
@@ -87,6 +89,7 @@ export function TemplatePublishWizard() {
   const resetForm = () => {
     setSelectedTemplate("")
     setDescription("")
+    setAuthors("")
     setVmCount(1)
     setImageFiles([])
     setIsTemplateVisible(false)
@@ -123,6 +126,7 @@ export function TemplatePublishWizard() {
       const podTemplate: PodTemplate = {
         name: selectedTemplate,
         description: description,
+        authors: authors.trim() || "",
         image_path: imagePath,
         template_visible: isTemplateVisible,
         vm_count: vmCount,
@@ -151,6 +155,7 @@ export function TemplatePublishWizard() {
     setSelectedTemplate(template)
     // Reset other form data when changing template
     setDescription("")
+    setAuthors("")
     setVmCount(1)
     setImageFiles([])
     setIsTemplateVisible(false)
@@ -194,6 +199,8 @@ export function TemplatePublishWizard() {
                 selectedTemplate={selectedTemplate}
                 description={description}
                 onDescriptionChange={setDescription}
+                authors={authors}
+                onAuthorsChange={setAuthors}
                 vmCount={vmCount}
                 onVmCountChange={setVmCount}
                 imageFiles={imageFiles}
@@ -207,6 +214,7 @@ export function TemplatePublishWizard() {
               <StepThree
                 selectedTemplate={selectedTemplate}
                 description={description}
+                authors={authors}
                 vmCount={vmCount}
                 imageFiles={imageFiles}
                 isTemplateVisible={isTemplateVisible}
