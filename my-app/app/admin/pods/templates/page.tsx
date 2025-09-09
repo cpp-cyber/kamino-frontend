@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react"
 import { useState } from "react"
 import { toast } from "sonner"
 import { AuthGuard } from "@/components/auth-guard"
@@ -15,67 +16,68 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { deleteTemplate, toggleTemplateVisibility } from "@/lib/api"
 
 const breadcrumbs = [{ label: "Pod Templates", href: "/admin/pods/templates" }]
 
 // Placeholder API functions (to be implemented later)
-const hidePodTemplate = async (templateName: string) => {
-  // TODO: Implement actual API call
-  // await api.hidePodTemplate(templateName)
-  console.log(`Hide template: ${templateName}`)
+const templateVisibility = async (templateName: string) => {
+  await toggleTemplateVisibility(templateName)
+  console.log(`Toggled template: ${templateName}`)
   return Promise.resolve()
 }
 
 const deletePodTemplate = async (templateName: string) => {
-  // TODO: Implement actual API call
-  // await api.deletePodTemplate(templateName)
+  await deleteTemplate(templateName)
   console.log(`Delete template: ${templateName}`)
   return Promise.resolve()
 }
 
 export default function AdminPodTemplatePage() {
   const [alertOpen, setAlertOpen] = useState(false)
-  const [selectedTemplate, setSelectedTemplate] = useState<{ name: string, action: 'hide' | 'delete' } | null>(null)
+  const [selectedTemplate, setSelectedTemplate] = useState<{ name: string } | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
 
-  const handleTemplateAction = async (templateName: string, action: 'hide' | 'delete') => {
-    setSelectedTemplate({ name: templateName, action })
+  const triggerRefresh = () => setRefreshKey(prev => prev + 1)
+
+  const handleTemplateAction = async (templateName: string, action: 'toggle' | 'delete') => {
+    // If toggling visibility, call API immediately and avoid confirmation dialog.
+    if (action === 'toggle') {
+      setIsProcessing(true)
+      try {
+        await templateVisibility(templateName)
+        toast.success(`Template "${templateName}" has been toggled`)
+        triggerRefresh() // Refresh the table
+      } catch (error) {
+        toast.error(`Failed to toggle template: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      } finally {
+        setIsProcessing(false)
+      }
+      return
+    }
+
+    // For destructive actions (delete), show confirmation dialog.
+    setSelectedTemplate({ name: templateName })
     setAlertOpen(true)
   }
 
   const handleConfirmTemplateAction = async () => {
     if (!selectedTemplate) return
-    
+
+    // Dialog is only used for deletes now
     setIsProcessing(true)
     try {
-      if (selectedTemplate.action === 'hide') {
-        await hidePodTemplate(selectedTemplate.name)
-        toast.success(`Template "${selectedTemplate.name}" has been hidden`)
-      } else {
-        await deletePodTemplate(selectedTemplate.name)
-        toast.success(`Template "${selectedTemplate.name}" has been deleted`)
-      }
+      await deletePodTemplate(selectedTemplate.name)
+      toast.success(`Template "${selectedTemplate.name}" has been deleted`)
       setAlertOpen(false)
       setSelectedTemplate(null)
-      // Note: The table will refresh automatically or you might want to trigger a refresh
+      triggerRefresh() // Refresh the table
     } catch (error) {
-      toast.error(`Failed to ${selectedTemplate.action} template: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      toast.error(`Failed to delete template: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
       setIsProcessing(false)
     }
-  }
-
-  const getActionText = () => {
-    if (!selectedTemplate) return ''
-    return selectedTemplate.action === 'hide' ? 'hide' : 'permanently delete'
-  }
-
-  const getActionDescription = () => {
-    if (!selectedTemplate) return ''
-    if (selectedTemplate.action === 'hide') {
-      return 'This template will be hidden from the available templates list. You can unhide it later from the admin settings.'
-    }
-    return 'This action cannot be undone. This will permanently delete the template and remove all associated data.'
   }
 
   return (
@@ -91,33 +93,30 @@ export default function AdminPodTemplatePage() {
                 Manage all pod templates on Proxmox
               </p>
             </div>
-            <PodTemplateTable onTemplateAction={handleTemplateAction} />
+            <PodTemplateTable onTemplateAction={handleTemplateAction} refreshKey={refreshKey} />
           </div>
         </div>
       </PageLayout>
 
-      {/* Template Action Confirmation Dialog */}
+      {/* Template Deletion Confirmation Dialog */}
       <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              Are you sure you want to {getActionText()} &quot;{selectedTemplate?.name}&quot;?
+              Are you sure you want to delete &quot;{selectedTemplate?.name}&quot;?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {getActionDescription()}
+              This will delete all template personalizations (NOT Proxmox data)
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isProcessing}>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleConfirmTemplateAction} 
+            <AlertDialogAction
+              onClick={handleConfirmTemplateAction}
               disabled={isProcessing}
-              className={selectedTemplate?.action === 'delete' ? "bg-destructive hover:bg-destructive/90" : ""}
+              className="bg-destructive hover:bg-destructive/90"
             >
-              {isProcessing ? 
-                `${selectedTemplate?.action === 'hide' ? 'Hiding' : 'Deleting'}...` : 
-                `${selectedTemplate?.action === 'hide' ? 'Hide' : 'Delete'}`
-              }
+              {isProcessing ? 'Deleting...' : 'Delete'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -1,26 +1,36 @@
 import { Button } from "@/components/ui/button"
 import {
   Card,
-  CardAction,
-  CardFooter,
-  CardHeader,
-  CardTitle
 } from "@/components/ui/card"
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { TrashIcon } from "lucide-react"
+import { CalendarIcon, Trash, User } from "lucide-react"
 import Image from "next/image"
 import { DeployedPod } from "@/lib/types"
-import { StatusBadge } from "@/components/status-badges"
-import { formatBytes, formatUptime } from "@/lib/utils"
+import { formatUptime } from "@/lib/utils"
 import Link from "next/link"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { MarkdownRenderer } from "@/components/ui/markdown-renderer"
+import { IconCircleFilled } from "@tabler/icons-react"
+import { useState, useEffect } from "react"
+
+// Live uptime component that updates every second
+function LiveUptime({ initialUptime }: { initialUptime: number }) {
+  // Calculate the start time once when component mounts
+  const [startTime] = useState(() => Date.now() - (initialUptime * 1000))
+  const [currentUptime, setCurrentUptime] = useState(initialUptime)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Calculate current uptime based on the fixed start time
+      const newUptime = Math.floor((Date.now() - startTime) / 1000)
+      setCurrentUptime(newUptime)
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [startTime])
+
+  return <span>{formatUptime(currentUptime)}</span>
+}
+
 
 type SectionCardsProps = {
   pods: DeployedPod[]
@@ -37,115 +47,147 @@ export function SectionCards({ pods, onDelete }: SectionCardsProps) {
   }
 
   return (
-    <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 grid-cols-1 py-4">
-      {pods.map((pod, index) => (
-        <Card key={pod.name || index} className="@container/card my-4">
-          <CardHeader>
-            <CardTitle className="text-2xl font-semibold tabular-nums flex items-center gap-3 @[250px]/card:text-2xl">
-              <div className="bg-sidebar-accent-foreground/10 text-sidebar-primary-foreground flex aspect-square size-16 items-center justify-center rounded-lg overflow-hidden shadow-lg">
-                {/* <Image
-                  src={pod.icon || "https://i.imgur.com/C4l2RaF.jpeg"}
-                  alt={`${pod.name} Logo`}
-                  width={64}
-                  height={64}
-                  className="size-16 object-cover rounded-lg"
-                /> */}
-                <Image src="/kaminoLogo.svg" alt="Kamino Logo" width={56} height={56} className="size-14" />
+    <div className="space-y-6">
+      {pods.map((pod, index) => {
+        const vms = pod.vms || []
+        // Determine grid columns based on VM count
+        const gridCols = vms.length >= 6 ? "grid-cols-2" : "grid-cols-1"
+        
+        return (
+          <div key={pod.name || index}>
+            {/* Main Card */}
+            <Card className="px-6 min-h-[700px] flex flex-col">
+
+              {/* Header row */}
+              <div className="relative flex gap-4 -mt-2">
+                
+                {/* Image */}
+                <div className="flex-shrink-0 pt-2.5">
+                  <div className="w-48 h-48 rounded-lg border bg-muted overflow-hidden shadow">
+                    <Image 
+                      src={pod.template?.image_path ? `/api/v1/template/image/${pod.template.image_path}` : "/kaminoLogo.svg"}
+                      alt="Kamino Logo"
+                      className="w-full h-full object-cover"
+                      width={192}
+                      height={192}
+                      unoptimized
+                    />
+                  </div>
+                </div>
+
+                {/* Info */}
+                <div className="flex flex-col justify-center">
+                  
+                  {/* Delete Pod Button */}
+                    <Button 
+                    variant="destructive" 
+                    className="absolute top-0 right-0 mt-2 w-fit px-3"
+                    size="icon"
+                    onClick={() => onDelete(pod)}
+                    >
+                    <Trash className="size-5" />
+                    <span className="hidden sm:inline">Delete Pod</span>
+                  </Button>
+
+                  {/* Date and Title */}
+                  <div className="flex flex-col justify-center">
+                    <p className="flex items-center text-xs text-muted-foreground mb-2">
+                      <CalendarIcon className="mr-1.5 h-4 w-4" />
+                      {pod.template?.created_at ? new Date(pod.template.created_at).toLocaleDateString(undefined, {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      }) : new Date().toLocaleDateString(undefined, {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </p>
+                    <h1 className="text-4xl font-semibold leading-tight text-wrap">
+                      {pod.template?.name ? pod.template?.name : pod.name}
+                    </h1>
+                  </div>
+                </div>
               </div>
-              {pod.name}
-            </CardTitle>
-            <CardAction>
-              <Button 
-                variant="destructive" 
-                size="icon" 
-                className="size-10"
-                onClick={() => onDelete(pod)}
-              >
-                <TrashIcon/>
-              </Button>
-            </CardAction>
-          </CardHeader>
-          <CardFooter className="flex-col items-start gap-1.5 text-sm">
-            {/* <div className="mb-4 -mt-4 px-1.5">
-              { pod.description || "No description provided" }
-            </div> */}
-            <Table>
-                <TableHeader className="[&_*]:text-muted-foreground">
-                  <TableRow>
-                    <TableHead className="px-4">Name</TableHead>
-                    <TableHead>CPU</TableHead>
-                    <TableHead>Memory</TableHead>
-                    <TableHead>Disk</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Uptime</TableHead>
-                  </TableRow>
-                </TableHeader>
-              <TableBody>
-                {(pod.vms || []).length > 0 ? (
-                  (pod.vms || []).map((vm) => (
-                    <TableRow key={vm.vmid}>
-                      <TableCell className="font-medium">
-                        <Button variant="link" size="sm" className="-ml-1">
-                            <Link 
-                              href={`https://gonk.sdc.cpp:8006/#v1:0:=qemu%2F${vm.vmid}:4::::::::`} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                            >
-                            {vm.name}
+              
+              {/* Main content */}
+              <div className="flex flex-col lg:flex-row gap-4 pb-4 flex-1">
+                
+                {/* VMs */}
+                <div className="w-full lg:w-2/3 order-1 lg:order-2">
+                  <h2 className="text-lg font-semibold mb-2">Virtual Machines</h2>
+                  <div className="flex flex-col py-0 gap-2">
+                    <div className={`grid ${gridCols} gap-2 auto-rows-max`}>
+                      {vms.length > 0 ? (
+                        vms.map((vm) => (
+                          <Link 
+                          key={vm.vmid} 
+                          href={`https://gonk.sdc.cpp:8006/#v1:0:=qemu%2F${vm.vmid}:4:::::::`} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="block"
+                          >
+                          <div className="flex items-center justify-between px-4 py-2 rounded-xl border min-h-[60px] transition-all duration-200 hover:bg-accent hover:scale-[1.02] hover:shadow-md cursor-pointer">
+                            <div className="flex items-center gap-2">
+                            <IconCircleFilled 
+                              className={`h-4 w-4 flex-shrink-0 ${
+                              vm.status === 'running' ? 'text-green-700' : 
+                              vm.status === 'stopped' ? 'text-red-700' : 
+                              'text-yellow-700'
+                              }`} 
+                            />
+                            <p className="text-sm font-semibold">{vm.name}</p>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                            {vm.status === 'running' ? (
+                              <LiveUptime initialUptime={vm.uptime} />
+                            ) : (
+                              vm.status
+                            )}
+                            </p>
+                          </div>
                           </Link>
-                        </Button>
-                      </TableCell>
-                      <TableCell>
-                        {vm.maxcpu > 0 ? 
-                          `${((vm.cpu || 0) * 100).toFixed(1)}% (${vm.maxcpu} cores)` : 
-                          'N/A'
-                        }
-                      </TableCell>
-                      <TableCell>
-                        {vm.maxmem > 0 ? 
-                          `${formatBytes((vm.mem || 0))} / ${formatBytes(vm.maxmem)} (${(((vm.mem || 0) / vm.maxmem) * 100).toFixed(1)}%)` : 
-                          'N/A'
-                        }
-                      </TableCell>
-                      <TableCell>
-                        {formatBytes(vm.maxdisk)}
-                      </TableCell>
-                      <TableCell>
-                        <StatusBadge status={vm.status} />
-                      </TableCell>
-                      <TableCell>{formatUptime(vm.uptime)}</TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground py-4">
-                      No virtual machines found in this pod
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-              <TableCaption className="text-xs">
-                Click on the name of a VM to open it in Proxmox
-              </TableCaption>
-            </Table>
-            {/* <hr className="w-full border-t text-muted-foreground mt-2 pt-2" />
-            <div className="text-xs text-muted-foreground w-full inline-flex justify-between">
-              <div className="text-start">
-                Author: N/A
+                        ))
+                        ) : (
+                        <div className="flex items-center justify-center px-4 py-8 rounded-xl border col-span-full">
+                          <p className="text-sm text-muted-foreground">No virtual machines found</p>
+                        </div>
+                        )}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Description */}
+                <div className="w-full order-2 lg:order-1">
+                  <h2 className="text-lg font-semibold mb-2">Description</h2>
+                  <ScrollArea className="h-105 border rounded-xl p-4 shadow">
+                  <MarkdownRenderer 
+                    content={pod.template?.description ? pod.template.description : 'No description available'} 
+                    variant="compact"
+                  />
+                  </ScrollArea>
+                </div>
               </div>
-              <div className="text-end">
-                Deployed: {new Date(pod.deployed_at).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}
+
+              {/* Footer section */}
+              <div className="mt-auto">
+                <div className="border-t pt-4">
+                  <div className="flex items-center space-x-2 text-muted-foreground text-sm">
+                    <User className="size-5" />
+                    {pod.template?.authors ? (
+                      <span className="text-foreground font-medium">
+                        {pod.template.authors}
+                      </span>
+                    ) : (
+                      <span className="italic">No authors specified</span>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div> */}
-          </CardFooter>
-        </Card>
-      ))}
+            </Card>
+          </div>
+        )
+      })}
     </div>
   )
 }

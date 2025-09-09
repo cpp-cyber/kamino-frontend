@@ -5,19 +5,18 @@ import { PageLayout } from "@/app/admin/admin-page-layout"
 import { HeaderStats } from "@/app/admin/dashboard/header-stats"
 import { HeaderStatsState } from "@/app/admin/dashboard/header-stats-state"
 import { ResourcesState } from "@/app/admin/dashboard/resources-state"
-import { getProxmoxResources } from "@/lib/api"
+import { getDashboardData } from "@/lib/api"
 import { useApiState } from "@/hooks/use-api-state"
-import { useDashboardStats } from "@/hooks/use-dashboard-stats"
 import { ClusterResources } from "@/app/admin/dashboard/cluster-resources"
 import { NodeResources } from "@/app/admin/dashboard/node-resources"
+import { DashboardQuickActions } from "@/components/dashboard/dashboard-quick-actions"
+import { Button } from "@/components/ui/button"
+import { RefreshCw } from "lucide-react"
 
-export default function AdminPage() {
-  // Fetch dashboard stats (pod templates, deployed pods, VMs)
-  const { stats, loading: statsLoading, error: statsError, refetch: refetchStats } = useDashboardStats()
-  
-  // Fetch Proxmox resources (cluster and node data)
-  const { data: resources, loading: resourcesLoading, error: resourcesError, refetch: refetchResources } = useApiState({
-    fetchFn: getProxmoxResources,
+export default function AdminDashboardPage() {
+  // Fetch unified dashboard data
+  const { data: dashboardData, loading, error, refetch } = useApiState({
+    fetchFn: getDashboardData,
     deps: []
   })
 
@@ -25,29 +24,52 @@ export default function AdminPage() {
     <AuthGuard adminOnly>
       <PageLayout>
         <div className="@container/main flex flex-1 flex-col gap-2">
-          <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+          {/* Page Header */}
+          <div className="py-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
+                <p className="text-muted-foreground">
+                  Monitor system status, manage resources, and perform quick administrative tasks
+                </p>
+              </div>
+              <Button variant="outline" size="sm" onClick={refetch} disabled={loading}>
+                <RefreshCw className={`size-4 ${loading ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+            </div>
+          </div>
+          
+          <div className="flex flex-col gap-4 pb-4 md:gap-6 md:pb-6">
             {/* Header Stats Section */}
-            {statsLoading || statsError ? (
+            {loading || error ? (
               <HeaderStatsState 
-                loading={statsLoading} 
-                error={statsError} 
-                refetch={refetchStats} 
+                loading={loading} 
+                error={error} 
+                refetch={refetch} 
               />
-            ) : (
-              <HeaderStats stats={stats} />
+            ) : dashboardData ? (
+              <HeaderStats stats={dashboardData.stats} />
+            ) : null}
+
+            {/* Quick Actions Section */}
+            {!loading && !error && (
+              <DashboardQuickActions />
             )}
 
+
+
             {/* Resources Section */}
-            {resourcesLoading || resourcesError ? (
+            {loading || error ? (
               <ResourcesState 
-                loading={resourcesLoading} 
-                error={resourcesError} 
-                refetch={refetchResources} 
+                loading={loading} 
+                error={error} 
+                refetch={refetch} 
               />
-            ) : resources ? (
+            ) : dashboardData ? (
               <>
-                <ClusterResources resources={resources} />
-                <NodeResources resources={resources} />
+                <ClusterResources resources={{ cluster: dashboardData.stats.cluster }} />
+                <NodeResources resources={{ cluster: dashboardData.stats.cluster }} />
               </>
             ) : null}
           </div>

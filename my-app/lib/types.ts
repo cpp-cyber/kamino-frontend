@@ -1,11 +1,19 @@
 export interface PodTemplate {
   name: string
-  vms: VirtualMachine[]
   description?: string
-  icon?: string
+  authors?: string
+  image?: string
+  image_path?: string
+  template_visible?: boolean
+  pod_visible?: boolean
+  vms_visible?: boolean
+  vm_count: number
+  deployments?: number 
   created_at?: string
-  deployments?: number
-  status?: string
+}
+
+export interface UnpublishedPodTemplate {
+  name: string
 }
 
 export interface PodTemplateResponse {
@@ -18,6 +26,7 @@ export interface DeployedPod {
   description?: string
   icon?: string
   deployed_at?: string
+  template?: PodTemplate
 }
 
 export interface DeployedPodResponse {
@@ -25,22 +34,18 @@ export interface DeployedPodResponse {
 }
 
 export interface User {
-  id?: string
-  username: string
-  groups: string[]
+  name: string
+  created_at: string
+  enabled: boolean
+  is_admin: boolean
+  groups: Group[]
+}
+
+export interface Group {
+  name: string
+  can_modify?: boolean
   created_at?: string
-  last_login?: string | null
-  isAdmin: boolean
-  // Actual field names from the API response
-  createdDate?: string
-  lastLogin?: string
-  // Additional potential field names from Active Directory
-  whenCreated?: string
-  lastLogon?: string
-  when_created?: string
-  last_logon?: string
-  createdAt?: string
-  created?: string
+  user_count?: number
 }
 
 export interface UserLogin {
@@ -84,30 +89,63 @@ export interface VirtualMachine {
 }
 
 export interface VirtualMachinesResponse {
-  virtual_machines: VirtualMachine[]
-  virtual_machine_count: number
-  running_count: number
+  vms: VirtualMachine[]
 }
 
-// Proxmox Resources types for nodes monitoring
-export interface ProxmoxNode {
-  node_name: string
+export interface GetUsersResponse {
+  users: User[]
+  count: number
+  admin_count: number
+  disabled_count: number
+}
+
+export interface Resources {
   cpu_usage: number
-  memory_total: number
   memory_used: number
-  storage_total: number
+  memory_total: number
   storage_used: number
+  storage_total: number
 }
 
-export interface ProxmoxCluster {
-  total_cpu_usage: number
-  total_memory_total: number
-  total_memory_used: number
-  total_storage_total: number
-  total_storage_used: number
+export interface Node {
+  name: string
+  resources: Resources
+}
+
+export interface Cluster {
+  total: Resources
+  nodes: Node[]
 }
 
 export interface ProxmoxResourcesResponse {
-  nodes: ProxmoxNode[]
-  cluster: ProxmoxCluster
+  cluster: Cluster
+}
+
+export interface DashboardStats {
+  users: number
+  groups: number
+  published_templates: number
+  deployed_pods: number
+  vms: number
+  cluster: Cluster
+}
+
+export interface DashboardResponse {
+  stats: DashboardStats
+}
+
+export interface GetGroupsResponse {
+  groups: Group[]
+  count: number
+}
+
+export interface ClonePodRequest {
+  template: string
+  usernames: string[]
+  groups: string[]
+}
+
+export interface CreateUsersRequest {
+  username: string
+  password: string
 }

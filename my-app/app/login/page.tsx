@@ -1,6 +1,6 @@
 "use client"
 
-import { LoginForm } from "@/components/login-form"
+import { LoginForm } from "@/app/login/login-form"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"

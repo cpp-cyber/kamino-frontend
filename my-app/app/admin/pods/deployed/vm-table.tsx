@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { PlayIcon, SquareIcon } from "lucide-react"
+import { PlayIcon, SquareIcon, MoreVertical, RotateCcw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { StatusBadge } from "@/components/status-badges"
 import {
@@ -12,13 +12,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator
+} from "@/components/ui/dropdown-menu"
 import { VirtualMachine } from "@/lib/types"
 import { formatUptime } from "@/lib/utils"
 import Link from "next/link"
 
 interface VMTableProps {
   vms: VirtualMachine[]
-  onVMAction: (vmid: number, node: string, action: 'start' | 'stop') => void
+  onVMAction: (vmid: number, node: string, action: 'start' | 'shutdown' | 'reboot') => void
 }
 
 export function VMTable({ vms, onVMAction }: VMTableProps) {
@@ -57,22 +64,39 @@ export function VMTable({ vms, onVMAction }: VMTableProps) {
                 </TableCell>
                 <TableCell className="font-mono text-sm">{formatUptime(vm.uptime)}</TableCell>
                 <TableCell className="text-right px-6">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onVMAction(vm.vmid, vm.node, vm.status === 'running' ? 'stop' : 'start')}
-                    className={`h-8 w-8 px-6 ${
-                      vm.status === 'running'
-                        ? "text-destructive hover:text-destructive hover:bg-destructive/10"
-                        : "text-green-600 hover:text-green-600 hover:bg-green-600/10"
-                    }`}
-                  >
-                    {vm.status === 'running' ? (
-                      <SquareIcon className="h-4 w-4" />
-                    ) : (
-                      <PlayIcon className="h-4 w-4" />
-                    )}
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="h-8 w-8 p-0">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={() => onVMAction(vm.vmid, vm.node, 'start')}
+                        disabled={vm.status === 'running'}
+                        className="cursor-pointer"
+                      >
+                        <PlayIcon className="mr-2 h-4 w-4 text-green-600" />
+                        Start
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => onVMAction(vm.vmid, vm.node, 'shutdown')}
+                        disabled={vm.status !== 'running'}
+                        className="cursor-pointer"
+                      >
+                        <SquareIcon className="mr-2 h-4 w-4 text-destructive" />
+                        Shutdown
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={() => onVMAction(vm.vmid, vm.node, 'reboot')}
+                        className="cursor-pointer"
+                      >
+                        <RotateCcw className="mr-2 h-4 w-4 text-blue-600" />
+                        Reboot
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </TableCell>
               </TableRow>
             ))}

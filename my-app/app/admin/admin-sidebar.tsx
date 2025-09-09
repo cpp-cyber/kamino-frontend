@@ -16,7 +16,8 @@ import {
   SidebarMenuItem,
   SidebarFooter,
 } from "@/components/ui/sidebar"
-import { Camera, Copy, CopyPlusIcon, LayoutDashboard, Rocket, Server, User } from "lucide-react"
+import { Camera, Copy, CopyPlusIcon, Edit, LayoutDashboard, Rocket, Server, User } from "lucide-react"
+import { IconUsersGroup } from "@tabler/icons-react"
 
 const data = {
   navMain: [
@@ -43,22 +44,52 @@ const data = {
           icon: User
         },
         {
+          title: "Groups",
+          url: "/admin/groups",
+          isActive: false,
+          icon: IconUsersGroup
+        },
+        {
           title: "Deployed Pods",
           url: "/admin/pods/deployed",
           isActive: false,
           icon: Rocket
         },
-        {
-          title: "Pod Templates",
-          url: "/admin/pods/templates",
-          isActive: false,
-          icon: Copy
-        },
+        // {
+        //   title: "Pod Templates",
+        //   url: "/admin/pods/templates",
+        //   isActive: false,
+        //   icon: Copy
+        // },
         {
           title: "Virtual Machines",
           url: "/admin/vms",
           isActive: false,
           icon: Server
+        }
+      ],
+    },
+    {
+      title: "Templates",
+      url: "#",
+      items: [
+        {
+          title: "All Templates",
+          url: "/admin/pods/templates",
+          isActive: false,
+          icon: Copy
+        },
+        {
+          title: "Publish Templates",
+          url: "/admin/pods/templates/publish",
+          isActive: false,
+          icon: Edit
+        },
+        {
+          title: "Create Templates",
+          url: "/admin/pods/templates/create",
+          isActive: false,
+          icon: CopyPlusIcon
         }
       ],
     },

@@ -155,7 +155,6 @@ export default function Footer4Col() {
                   <li key={text}>
                     <a
                       className="flex items-center justify-center gap-1.5 sm:justify-start"
-                      href="#"
                     >
                       <Icon className="text-primary size-5 shrink-0 shadow-sm" />
                       {isAddress ? (

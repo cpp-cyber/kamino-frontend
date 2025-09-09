@@ -1,5 +1,5 @@
 import React from 'react'
-import { SearchIcon, Trash2Icon, RefreshCcw } from "lucide-react"
+import { SearchIcon, RefreshCcw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -15,8 +15,6 @@ interface PodsTableToolbarProps {
   onSearchChange: (value: string) => void
   itemsPerPage: number
   onItemsPerPageChange: (value: number) => void
-  selectedPodsCount: number
-  onBulkDelete: () => void
   onRefresh: () => void
   isRefreshing: boolean
 }
@@ -26,8 +24,6 @@ export function PodsTableToolbar({
   onSearchChange,
   itemsPerPage,
   onItemsPerPageChange,
-  selectedPodsCount,
-  onBulkDelete,
   onRefresh,
   isRefreshing
 }: PodsTableToolbarProps) {
@@ -59,20 +55,13 @@ export function PodsTableToolbar({
           </SelectContent>
         </Select>
         <div className="flex items-center space-x-2 ml-auto">
-          <Button
-            variant="destructive"
-            onClick={onBulkDelete}
-            disabled={selectedPodsCount === 0}
-          >
-            <Trash2Icon className="h-4 w-4" />
-            <span>({selectedPodsCount})</span>
-          </Button>
           <Button 
             onClick={onRefresh} 
             variant="outline"
             disabled={isRefreshing}
           >
             <RefreshCcw className="h-4 w-4" />
+            <span className="hidden lg:inline">Refresh</span>
           </Button>
         </div>
       </div>

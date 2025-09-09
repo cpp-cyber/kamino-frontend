@@ -218,11 +218,11 @@ export default function TopNav() {
         <div className="flex items-center gap-2">
           {authState.isAdmin && (
             <>
-              <Button variant="ghost" asChild className="flex items-center gap-2 px-3 py-2 h-auto">
-                <a href="/admin/dashboard" className="flex items-center gap-2">
-                  <Settings className="size-4 text-muted-foreground" />
-                  <span className="text-sm bg-linear-65 from-kamino-green to-kamino-yellow bg-clip-text text-transparent font-medium">Admin</span>
-                </a>
+              <Button variant="ghost" asChild className="flex items-center gap-2 px-3 py-2 h-auto bg-gradient-to-r from-kamino-green to-kamino-yellow font-medium hover:brightness-90 cursor-pointer shadow-md text-white hover:text-white">
+                <Link href="/admin/dashboard" passHref>
+                  <Settings />
+                  Admin
+                </Link>
               </Button>
               <Separator orientation="vertical" className="max-h-6"/>
             </>
