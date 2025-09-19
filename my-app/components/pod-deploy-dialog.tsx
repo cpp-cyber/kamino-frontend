@@ -16,15 +16,23 @@ import {
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { MarkdownRenderer } from "@/components/ui/markdown-renderer"
 import { Progress } from "@/components/ui/progress"
-import { CalendarIcon, Rocket, Server as ServerIcon, Rocket as RocketIcon } from "lucide-react"
+import { CalendarIcon, Rocket, Server as ServerIcon, Rocket as RocketIcon, User } from "lucide-react"
 import Image from "next/image"
 import { VisuallyHidden } from "radix-ui"
 import { handleUserPodDeployment } from "@/lib/admin-operations"
 import { PodTemplate } from "@/lib/types"
+import { formatPodName } from "@/lib/utils"
+import { Separator } from "./ui/separator"
 
 interface PodDeployDialogProps {
   isOpen: boolean
@@ -110,12 +118,12 @@ export function PodDeployDialog({ isOpen, onClose, selectedPod }: PodDeployDialo
         <VisuallyHidden.Root>
           <DialogTitle>Deploy Pod Template</DialogTitle>
         </VisuallyHidden.Root>
-        <DialogContent className="max-w-full md:min-w-2xl p-6 bg-card !duration-0 data-[state=closed]:animate-none data-[state=open]:animate-none" showCloseButton={false}>
+        <DialogContent className="max-w-full md:min-w-2xl max-h-[100vh] p-6 bg-card !duration-0 data-[state=closed]:animate-none data-[state=open]:animate-none overflow-hidden flex flex-col">
         {selectedPod && (
-          <div>
-            <div className="space-y-6">
+          <div className="flex flex-col h-full overflow-hidden">
+            <div className="flex-1 overflow-y-auto space-y-6 pr-2">
             {/* Top section with image, date, and title */}
-              <div className="flex gap-4 pb-2">
+              <div className="flex gap-4">
                 {/* Square image */}
                 <div className="flex-shrink-0">
                   <div className="w-48 h-48 rounded-lg border bg-muted overflow-hidden shadow-xl">
@@ -130,33 +138,66 @@ export function PodDeployDialog({ isOpen, onClose, selectedPod }: PodDeployDialo
                   </div>
                 </div>
                 
-                {/* Date and title */}
+                {/* Date, title, & authors */}
                 <div className="flex-1 flex flex-col justify-center">
                   {selectedPod.created_at && (
                     <p className="flex items-center text-xs text-muted-foreground">
-                    <CalendarIcon className="mr-1.5 h-4 w-4" />
-                    {new Date(selectedPod.created_at).toLocaleDateString(undefined, {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    })}
+                      <CalendarIcon className="mr-1.5 h-4 w-4" />
+                      {new Date(selectedPod.created_at).toLocaleDateString(undefined, {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
                     </p>
                   )}
-                  <h1 className="text-4xl font-semibold leading-tight text-wrap">
-                    {selectedPod.name.replaceAll('_', ' ')}
+                  <h1 className="text-4xl font-semibold leading-tight text-wrap py-2">
+                    {formatPodName(selectedPod.name)}
                   </h1>
+                  {selectedPod.authors && (
+                    <div className="flex items-center text-sm">
+                      <User className="text-muted-foreground mr-1.5 size-4" />
+                      <span className="text-muted-foreground">{selectedPod.authors}</span>
+                    </div>
+                  )}
                 </div>
               </div>
                               
-              {/* Scrollable description */}
-              <div className="space-y-2 ">
-                <ScrollArea className="h-[350px] w-full border rounded-xl shadow p-2">
-                  <MarkdownRenderer 
-                    content={selectedPod.description || 'No description available'} 
-                    variant="compact"
-                  />
-                </ScrollArea>
-              </div>
+              {/* Description Accordion */}
+              <Accordion type="multiple" defaultValue={["description"]} className="space-y-4">
+                <AccordionItem value="description" className="border-b-0">
+                  <AccordionTrigger className="justify-start gap-3 py-2 text-xl font-semibold text-foreground hover:no-underline rounded-b-none border-b pb-4 [&>svg]:-order-1 items-center">
+                    Description
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="h-fit mt-4 bg-gradient-to-br from-primary/5 border rounded-xl shadow">
+                      <div className="p-4">
+                        {selectedPod.description ? (
+                          selectedPod.description.length > 1000 ? (
+                            <ScrollArea className="h-96 w-full rounded-md">
+                              <div className="prose prose-sm max-w-none dark:prose-invert">
+                                <MarkdownRenderer 
+                                  content={selectedPod.description} 
+                                  variant="compact"
+                                />
+                              </div>
+                            </ScrollArea>
+                          ) : (
+                            <div className="prose prose-sm max-w-none dark:prose-invert">
+                              <MarkdownRenderer 
+                                content={selectedPod.description} 
+                              />
+                            </div>
+                          )
+                        ) : (
+                          <div className="flex items-center justify-center py-8 text-muted-foreground">
+                            <span className="italic">No description available</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
               
               {/* Pod Stats */}
               <div className="mt-auto mb-5">
@@ -176,8 +217,8 @@ export function PodDeployDialog({ isOpen, onClose, selectedPod }: PodDeployDialo
                   </div>
 
                   {/* Separator */}
-                  <div className="h-6 w-[2px] bg-border" />
-                  
+                  <Separator orientation="vertical" className="min-h-6" />
+
                   {/* Deployments */}
                   <div className="flex-1 flex justify-center">
                     <div className="flex flex-col items-center text-center">
@@ -194,17 +235,16 @@ export function PodDeployDialog({ isOpen, onClose, selectedPod }: PodDeployDialo
               </div>
             </div>
               
-            {/* Bottom buttons */}
-            <div className="flex justify-end gap-2">
-              <Button 
-                onClick={handleConfirmDeploy}
-                size="sm"
-                className="w-full h-10 text-sm bg-gradient-to-r from-kamino-green to-kamino-yellow font-medium hover:brightness-90 cursor-pointer !text-white"
-              >
-                <Rocket />
-                Deploy
-              </Button>
-            </div>
+            {/* Bottom buttons - fixed at bottom */}
+            <Separator className="mb-4" />
+            <Button 
+              onClick={handleConfirmDeploy}
+              size="sm"
+              className="w-full h-10 text-sm bg-gradient-to-r from-kamino-green to-kamino-yellow font-medium hover:brightness-90 cursor-pointer !text-white"
+            >
+              <Rocket />
+              Deploy
+            </Button>
           </div>
           )}
           </DialogContent>

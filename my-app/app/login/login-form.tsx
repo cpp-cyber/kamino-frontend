@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
-import Link from "next/link"
 
 interface FormData {
   username: string
@@ -115,7 +114,7 @@ export function LoginForm({
         <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading ? "Logging in..." : "Login"}
         </Button>
-        <div className="text-center text-sm">
+        {/* <div className="text-center text-sm">
           Don&apos;t have an account?{" "}
           <Link 
             href="/register" 
@@ -123,7 +122,7 @@ export function LoginForm({
           >
             Sign up
           </Link>
-        </div>
+        </div> */}
       </div>
     </form>
   )

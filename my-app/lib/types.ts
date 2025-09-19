@@ -149,3 +149,9 @@ export interface CreateUsersRequest {
   username: string
   password: string
 }
+
+export interface UserDashboardResponse {
+  pods: DeployedPod[]
+  templates: PodTemplate[]
+  user_info: User
+}

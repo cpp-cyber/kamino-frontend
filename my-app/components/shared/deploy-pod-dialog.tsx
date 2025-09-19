@@ -291,33 +291,6 @@ export function DeployPodDialog({ onPodDeployed, trigger }: DeployPodDialogProps
                   ))}
                 </SelectContent>
               </Select>
-              
-              {/* Template Details */}
-              {selectedTemplate && (() => {
-                const template = templates.find(t => t.name === selectedTemplate)
-                return template && (
-                  <div className="mt-4 p-4 bg-muted/50 rounded-lg border space-y-2">
-                    <h4 className="font-medium text-sm">Template Details</h4>
-                    {template.description && (
-                      <p className="text-sm text-muted-foreground">
-                        {template.description}
-                      </p>
-                    )}
-                    {template.authors && (
-                      <p className="text-sm">
-                        <span className="text-muted-foreground">Authors: </span>
-                        <span className="font-medium">{template.authors}</span>
-                      </p>
-                    )}
-                    {template.vm_count && (
-                      <p className="text-sm">
-                        <span className="text-muted-foreground">VM Count: </span>
-                        <span className="font-medium">{template.vm_count}</span>
-                      </p>
-                    )}
-                  </div>
-                )
-              })()}
             </div>
           </div>
         )

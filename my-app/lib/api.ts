@@ -13,6 +13,7 @@ import {
   GetUsersResponse,
   DashboardResponse,
   CreateUsersRequest,
+  UserDashboardResponse,
 } from './types'
 
 // Request deduplication cache
@@ -168,6 +169,15 @@ export async function getPodTemplates(): Promise<PodTemplate[]> {
   )
   console.log('Fetched pod templates:', data.templates)
   return data.templates || []
+}
+
+// Get unified dashboard data (pods, templates, user info)
+export async function getUserDashboard(): Promise<UserDashboardResponse> {
+  const data: UserDashboardResponse = await deduplicatedFetch(
+    'userDashboard',
+    () => fetch('/api/v1/dashboard', { cache: 'no-store' })
+  )
+  return data
 }
 
 // Clone/deploy a pod template

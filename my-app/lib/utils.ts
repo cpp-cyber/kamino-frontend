@@ -22,7 +22,7 @@ export function formatUptime(uptime: number): React.ReactNode {
 }
 
 export function formatBytes(bytes: number) {
-  if (bytes === 0) return '0 B'
+  if (!bytes || bytes === 0 || isNaN(bytes)) return '0 B'
   const k = 1024
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
@@ -31,7 +31,7 @@ export function formatBytes(bytes: number) {
 
 // Calculate resource utilization percentage
 export function calculateUtilization(used: number, total: number): number {
-  if (total === 0) return 0
+  if (!used || !total || total === 0 || isNaN(used) || isNaN(total)) return 0
   return Math.round((used / total) * 100)
 }
 
@@ -283,4 +283,14 @@ export const createSortingToggleHandler = (column: Column<unknown, unknown>) => 
 
 export const getSortDirection = (column: Column<unknown, unknown>): false | "asc" | "desc" => {
   return column.getIsSorted()
+}
+
+// Helper function to format pod names by replacing underscores with spaces and capitalizing
+export function formatPodName(name: string): string {
+  if (!name) return name
+  return name
+    .replace(/_/g, ' ')
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ')
 }

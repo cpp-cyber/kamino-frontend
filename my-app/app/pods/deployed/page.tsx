@@ -44,8 +44,8 @@ export default function Page() {
 
   const pageHeader = (
     <div className="flex flex-col items-center justify-center min-h-[125px] text-center">
-      <h1 className="text-4xl font-bold text-primary">Deployed Pods</h1>
-      <p className="text-primary/90 mt-2">
+      <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight text-balance">Deployed Pods</h1>
+      <p className="text-muted-foreground text-xl leading-7 [&:not(:first-child)]:mt-2">
         Browse and manage your deployed pod instances.
       </p>
     </div>

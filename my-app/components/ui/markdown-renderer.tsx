@@ -25,29 +25,41 @@ export function MarkdownRenderer({
   }
 
   return (
-    <div className={`prose ${getVariantClasses()} max-w-none ${className}`}>
+    <div className={`prose ${getVariantClasses()} max-w-none ${className} leading-relaxed`}>
       <ReactMarkdown 
         remarkPlugins={[remarkGfm]}
         components={{
-          p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
-          h1: ({ children }) => <h1 className="text-3xl font-semibold mb-1">{children}</h1>,
-          h2: ({ children }) => <h2 className="text-2xl font-semibold mb-1">{children}</h2>,
-          h3: ({ children }) => <h3 className="text-xl font-medium mb-1">{children}</h3>,
-          ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
-          ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
-          li: ({ children }) => <li>{children}</li>,
+          p: ({ children }) => <p className="mb-4 last:mb-0 leading-relaxed">{children}</p>,
+          h1: ({ children }) => <h1 className="text-3xl font-semibold mb-4 mt-6 first:mt-0">{children}</h1>,
+          h2: ({ children }) => <h2 className="text-2xl font-semibold mb-3 mt-5 first:mt-0">{children}</h2>,
+          h3: ({ children }) => <h3 className="text-xl font-medium mb-3 mt-4 first:mt-0">{children}</h3>,
+          ul: ({ children }) => (
+            <ul className="list-disc list-outside ml-6 mb-4 space-y-1 [&_ul]:list-[circle] [&_ul]:mt-2 [&_ul]:mb-2 [&_ul_ul]:list-[square]">
+              {children}
+            </ul>
+          ),
+          ol: ({ children }) => (
+            <ol className="list-decimal list-outside ml-6 mb-4 space-y-1 [&_ol]:list-[lower-alpha] [&_ol]:mt-2 [&_ol]:mb-2 [&_ol_ol]:list-[lower-roman]">
+              {children}
+            </ol>
+          ),
+          li: ({ children }) => (
+            <li className="pl-1">
+              {children}
+            </li>
+          ),
           code: ({ children, className }) => {
             const isInline = !className;
             return isInline ? (
               <code className="bg-muted px-1 py-0.5 rounded text-sm font-mono">{children}</code>
             ) : (
-              <pre className="bg-muted p-2 rounded text-sm font-mono overflow-x-auto mb-2">
+              <pre className="bg-muted p-2 rounded text-sm font-mono overflow-x-auto mb-4">
                 <code>{children}</code>
               </pre>
             );
           },
           blockquote: ({ children }) => (
-            <blockquote className="border-l-2 border-muted-foreground/30 pl-3 italic mb-2">
+            <blockquote className="border-l-2 border-muted-foreground/30 pl-3 italic mb-4">
               {children}
             </blockquote>
           ),
@@ -64,7 +76,7 @@ export function MarkdownRenderer({
                 src={src}
                 alt={alt || ''}
                 unoptimized
-                className="max-w-full max-h-96 object-contain rounded-md mb-2"
+                className="max-w-full max-h-96 object-contain rounded-md mb-4"
                 width={384}
                 height={384}
               />
