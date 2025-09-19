@@ -48,14 +48,19 @@ export function MarkdownRenderer({
               {children}
             </li>
           ),
-          code: ({ children, className }) => {
-            const isInline = !className;
-            return isInline ? (
-              <code className="bg-muted px-1 py-0.5 rounded text-sm font-mono">{children}</code>
-            ) : (
-              <pre className="bg-muted p-2 rounded text-sm font-mono overflow-x-auto mb-4">
-                <code>{children}</code>
+          pre: ({ children }) => (
+            <div className="bg-muted text-white rounded-md mb-4 overflow-x-auto overflow-y-hidden border border-border/20">
+              <pre className="p-4 whitespace-pre font-mono text-sm min-w-max m-0 leading-normal [&>code]:block [&>code]:p-0 [&>code]:bg-transparent">
+                {children}
               </pre>
+            </div>
+          ),
+          code: ({ children, className, ...props }) => {
+            // This is for inline code only, as multiline code blocks are handled by the pre component
+            return (
+              <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono" {...props}>
+                {children}
+              </code>
             );
           },
           blockquote: ({ children }) => (
