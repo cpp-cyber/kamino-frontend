@@ -216,6 +216,7 @@ export function TemplatePublishWizard() {
                 description={description}
                 vmCount={vmCount}
                 imageFiles={imageFiles}
+                authors={authors}
                 isTemplateVisible={isTemplateVisible}
                 onVisibilityChange={setIsTemplateVisible}
                 onSubmit={handleSubmit}
