@@ -1,6 +1,15 @@
 import Image from 'next/image'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import type { BundledLanguage } from "@/components/ui/kibo-ui/code-block"
+import {
+  CodeBlock,
+  CodeBlockBody,
+  CodeBlockContent,
+  CodeBlockCopyButton,
+  CodeBlockHeader,
+  CodeBlockItem,
+} from "@/components/ui/kibo-ui/code-block"
 
 interface MarkdownRendererProps {
   content: string
@@ -22,6 +31,40 @@ export function MarkdownRenderer({
       default:
         return 'prose'
     }
+  }
+
+  // Helper function to render code blocks with the shadcn CodeBlock component
+  const renderCodeBlock = (code: string, language?: string) => {
+    const displayLanguage = language || 'text'
+    const codeData = [{
+      language: displayLanguage as BundledLanguage,
+      filename: `code.${displayLanguage}`,
+      code: code.trim()
+    }]
+
+    return (
+      <div className="mb-4">
+        <CodeBlock data={codeData} defaultValue={codeData[0].language}>
+          <CodeBlockHeader>
+            <div className="flex items-center justify-between w-full">
+              <span className="text-sm font-medium text-muted-foreground px-3 py-1">
+                {displayLanguage}
+              </span>
+              <CodeBlockCopyButton />
+            </div>
+          </CodeBlockHeader>
+          <CodeBlockBody>
+            {(item) => (
+              <CodeBlockItem key={item.language} value={item.language}>
+                <CodeBlockContent language={item.language as BundledLanguage}>
+                  {item.code}
+                </CodeBlockContent>
+              </CodeBlockItem>
+            )}
+          </CodeBlockBody>
+        </CodeBlock>
+      </div>
+    )
   }
 
   return (
@@ -48,13 +91,25 @@ export function MarkdownRenderer({
               {children}
             </li>
           ),
-          pre: ({ children }) => (
-            <div className="bg-muted text-white rounded-md mb-4 overflow-x-auto overflow-y-hidden border border-border/20">
-              <pre className="p-4 whitespace-pre font-mono text-sm min-w-max m-0 leading-normal [&>code]:block [&>code]:p-0 [&>code]:bg-transparent">
-                {children}
-              </pre>
-            </div>
-          ),
+          pre: ({ children }) => {
+            // ReactMarkdown wraps code blocks in pre > code structure
+            const codeElement = Array.isArray(children) ? children[0] : children;
+            
+            if (codeElement && typeof codeElement === 'object' && 'props' in codeElement) {
+              const codeProps = codeElement.props;
+              const className = codeProps.className || '';
+              
+              // Extract language from className (e.g., "language-python3" -> "python3")
+              const languageMatch = className.match(/language-([a-zA-Z0-9_+-]+)/);
+              const language = languageMatch ? languageMatch[1] : undefined;
+              const code = codeProps.children;
+              
+              return renderCodeBlock(code, language);
+            }
+            
+            // Fallback for simple text content
+            return renderCodeBlock(children?.toString() || '');
+          },
           code: ({ children, className, ...props }) => {
             // This is for inline code only, as multiline code blocks are handled by the pre component
             return (
