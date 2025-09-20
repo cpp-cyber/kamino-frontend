@@ -7,7 +7,7 @@ const data = {
     sdc: 'https://www.cpp.edu/cba/digital-innovation/about-us.shtml',
     programs: 'https://www.cpp.edu/cba/digital-innovation/what-we-do/programs.shtml',
     faculty: 'https://www.cpp.edu/cba/digital-innovation/people/faculty.shtml',
-    news: 'https://www.cpp.edu/cba/digital-innovation/news-and-events2.shtml',
+    news: 'https://www.cpp.edu/cba/digital-innovation/news-and-events.shtml',
   },
   help: {
     kamino: '/info#what-is-kamino',

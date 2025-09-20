@@ -119,28 +119,28 @@ export default function TopNav() {
                   </svg>
                 </Button>
               </PopoverTrigger>
-              <PopoverContent align="start" className="w-37 p-1 md:hidden">
+              <PopoverContent align="start" className="w-37 p-1 md:hidden bg-background border-0 rounded-none rounded-b-lg shadow-lg mt-3">
                 <NavigationMenu>
                   <NavigationMenuList className="flex-col items-start gap-0 md:gap-2">
-                    <NavigationMenuItem className="w-full">
-                      <NavigationMenuLink
-                        href="/pods/templates"
-                        active={pathname === "/pods/templates"}
-                      >
-                        <div className="flex gap-2 py-2.5">
-                          <Copy className="size-5" />
-                          Pod Templates
-                        </div>
-                      </NavigationMenuLink>
-                    </NavigationMenuItem>
                     <NavigationMenuItem className="w-full">
                       <NavigationMenuLink
                         href="/pods/deployed"
                         active={pathname === "/pods/deployed"}
                       >
-                        <div className="flex gap-2 py-2.5">
-                          <Rocket className="size-5" />
+                        <div className="flex gap-2 py-1.5 font-medium text-muted-foreground">
+                          <Rocket className="size-5 text-foreground" />
                           Deployed Pods
+                        </div>
+                      </NavigationMenuLink>
+                    </NavigationMenuItem>
+                    <NavigationMenuItem className="w-full">
+                      <NavigationMenuLink
+                        href="/pods/templates"
+                        active={pathname === "/pods/templates"}
+                      >
+                        <div className="flex gap-2 py-1.5 font-medium text-muted-foreground">
+                          <Copy className="size-5 text-foreground" />
+                          Pod Templates
                         </div>
                       </NavigationMenuLink>
                     </NavigationMenuItem>
@@ -149,8 +149,8 @@ export default function TopNav() {
                         href="/info"
                         active={pathname === "/info"}
                       >
-                        <div className="flex gap-2 py-2.5">
-                          <FileQuestion className="size-4" />
+                        <div className="flex gap-2 py-1.5 font-medium text-muted-foreground">
+                          <FileQuestion className="size-4 text-foreground" />
                           Info
                         </div>
                       </NavigationMenuLink>
@@ -231,14 +231,14 @@ export default function TopNav() {
           <Separator orientation="vertical" className="max-h-6"/>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-2 px-3 py-2 h-auto">
+              <Button variant="ghost" className="flex items-center gap-2 px-3 py-4 h-auto">
                 <UserCircle2 className="size-5 text-muted-foreground" />
                 <span className="text-sm">{authState.username}</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-28">
-              <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive focus:text-destructive">
-                <LogOut/>
+            <DropdownMenuContent align="end" className="w-28 bg-background border-0 rounded-none rounded-b-lg">
+              <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive focus:text-destructive font-semibold">
+                <LogOut className="size-4 text-foreground" />
                 Logout
               </DropdownMenuItem>
             </DropdownMenuContent>

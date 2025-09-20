@@ -168,7 +168,7 @@ export default function Page() {
               <CardHeader>
                 <CardTitle>
                   <span className="text-xl font-semibold text-foreground inline-flex items-center gap-2">
-                    <Rocket className="size-5" />
+                    <Rocket className="size-5 text-kamino-yellow" />
                     My Deployed Pods
                   </span>
                   <p className="mt-1 text-sm text-muted-foreground">
@@ -252,7 +252,7 @@ export default function Page() {
             <CardHeader>
               <CardTitle>
                 <span className="text-xl font-semibold text-foreground inline-flex items-center gap-2">
-                  <Copy className="size-5" />
+                  <Copy className="size-5 text-kamino-green" />
                   Pod Templates
                 </span>
                 <p className="mt-1 text-sm text-muted-foreground">
