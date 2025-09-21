@@ -126,7 +126,12 @@ export function MarkdownRenderer({
           strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
           em: ({ children }) => <em className="italic">{children}</em>,
           a: ({ children, href }) => (
-            <a href={href} className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">
+            <a 
+              href={href} 
+              className="text-blue-600 dark:text-blue-400 underline hover:text-blue-800 dark:hover:text-blue-300 font-medium transition-colors duration-200 break-words" 
+              target="_blank" 
+              rel="noopener noreferrer"
+            >
               {children}
             </a>
           ),
@@ -136,7 +141,7 @@ export function MarkdownRenderer({
                 src={src}
                 alt={alt || ''}
                 unoptimized
-                className="max-w-full max-h-96 object-contain rounded-md mb-4"
+                className="px-4 w-full max-h-75 object-contain rounded-md mb-4"
                 width={384}
                 height={384}
               />

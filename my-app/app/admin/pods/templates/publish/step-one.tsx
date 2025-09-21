@@ -17,6 +17,7 @@ import { AlertTriangle } from "lucide-react"
 import { getUnpublishedTemplates } from "@/lib/api"
 import { UnpublishedPodTemplate } from "@/lib/types"
 import { Separator } from "@/components/ui/separator"
+import { formatPodName } from "@/lib/utils"
 
 interface StepOneProps {
   selectedTemplate: string
@@ -92,7 +93,7 @@ export function StepOne({ selectedTemplate, onTemplateSelect, onNext }: StepOneP
             <SelectContent>
               {templates.map((template) => (
               <SelectItem key={template.name} value={template.name}>
-                {template.name}
+                {formatPodName(template.name)}
               </SelectItem>
               ))}
             </SelectContent>

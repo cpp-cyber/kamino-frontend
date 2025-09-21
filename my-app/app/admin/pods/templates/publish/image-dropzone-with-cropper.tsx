@@ -178,7 +178,7 @@ const TemplateImageDropzoneWithCropper = ({
               onClick={handleReset}
               className="shrink-0"
             >
-              <RotateCcw className="h-4 w-4" />
+              <RotateCcw />
             </Button>
           </div>
 
@@ -189,15 +189,15 @@ const TemplateImageDropzoneWithCropper = ({
               variant="outline"
               onClick={handleCropCancel}
             >
-              <X className="h-4 w-4 mr-2" />
+              <X />
               Cancel
             </Button>
             <Button
               type="button"
               onClick={handleCropConfirm}
             >
-              <Check className="h-4 w-4 mr-2" />
-              Apply Crop
+              <Check />
+              Use Image
             </Button>
           </div>
         </div>

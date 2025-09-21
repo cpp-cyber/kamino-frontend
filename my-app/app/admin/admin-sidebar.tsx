@@ -98,16 +98,16 @@ const data = {
       url: "#",
       items: [
         {
-          title: "Users & Groups",
-          url: "/admin/guides/users",
-          isActive: false,
-          icon: User
-        },
-        {
           title: "Templates",
           url: "/admin/guides/templates",
           isActive: false,
           icon: Copy
+        },
+        {
+          title: "Users & Groups",
+          url: "/admin/guides/users",
+          isActive: false,
+          icon: User
         },
       ],
     }

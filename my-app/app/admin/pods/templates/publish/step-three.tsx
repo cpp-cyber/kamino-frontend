@@ -18,6 +18,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { VisuallyHidden } from "radix-ui"
 import Image from "next/image"
+import { formatPodName } from "@/lib/utils"
 
 interface StepThreeProps {
   selectedTemplate: string
@@ -107,7 +108,7 @@ export function StepThree({
                     })}
                   </p>
                   <h1 className="text-3xl font-semibold leading-tight text-wrap py-2">
-                    {selectedTemplate}
+                    {formatPodName(selectedTemplate)}
                   </h1>
                   {authors && (
                     <div className="flex items-center text-sm">
@@ -243,7 +244,7 @@ export function StepThree({
                     })}
                   </p>
                   <h1 className="text-4xl font-semibold leading-tight text-wrap py-2">
-                    {selectedTemplate}
+                    {formatPodName(selectedTemplate)}
                   </h1>
                   {authors && (
                     <div className="flex items-center text-sm">
