@@ -110,7 +110,7 @@ export function MarkdownRenderer({
             // Fallback for simple text content
             return renderCodeBlock(children?.toString() || '');
           },
-          code: ({ children, className, ...props }) => {
+          code: ({ children, ...props }) => {
             // This is for inline code only, as multiline code blocks are handled by the pre component
             return (
               <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono" {...props}>

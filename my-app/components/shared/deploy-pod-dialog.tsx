@@ -23,7 +23,7 @@ import { getAllPodTemplates, getAllUsers, getGroups } from "@/lib/api"
 import { handleAdminPodDeployment } from "@/lib/admin-operations"
 import { PodTemplate, User, Group } from "@/lib/types"
 import { Rocket, ChevronLeft, ChevronRight, Check } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn, formatPodName } from "@/lib/utils"
 
 interface DeployPodDialogProps {
   onPodDeployed?: () => void
@@ -286,7 +286,7 @@ export function DeployPodDialog({ onPodDeployed, trigger }: DeployPodDialogProps
                 <SelectContent>
                   {templates.map(template => (
                     <SelectItem key={template.name} value={template.name}>
-                      {template.name}
+                      {formatPodName(template.name)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -446,7 +446,7 @@ export function DeployPodDialog({ onPodDeployed, trigger }: DeployPodDialogProps
                 <div className="flex items-center space-x-3 p-4 bg-background border rounded-lg">
                   <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                   <div className="flex-1">
-                    <p className="font-medium">{selectedTemplate}</p>
+                    <p className="font-medium">{formatPodName(selectedTemplate)}</p>
                     {(() => {
                       const template = templates.find(t => t.name === selectedTemplate)
                       return template?.authors && (

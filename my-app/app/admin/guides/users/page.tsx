@@ -144,6 +144,7 @@ export default function AdminUsersGuide() {
 
                 <p className="text-lg text-muted-foreground leading-relaxed">
                   Groups are created, modified, and removed through the <strong><Link href="/admin/groups" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline">Groups</Link></strong> Kamino admin panel page. All changes are synchronized with Active Directory and Proxmox to ensure consistent access control.
+                   Admins can use groups if they want to clone a single pod for multiple users to interact with. For example, if a competition were to be held, an admin could create a group for each team, clone a pod for each group, and add users to the appropriate groups instead of making a user for each team.
                 </p>
               </div>
 
