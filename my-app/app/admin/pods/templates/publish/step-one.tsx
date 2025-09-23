@@ -17,6 +17,7 @@ import { AlertTriangle } from "lucide-react"
 import { getUnpublishedTemplates } from "@/lib/api"
 import { UnpublishedPodTemplate } from "@/lib/types"
 import { Separator } from "@/components/ui/separator"
+import { formatPodName } from "@/lib/utils"
 
 interface StepOneProps {
   selectedTemplate: string
@@ -92,7 +93,7 @@ export function StepOne({ selectedTemplate, onTemplateSelect, onNext }: StepOneP
             <SelectContent>
               {templates.map((template) => (
               <SelectItem key={template.name} value={template.name}>
-                {template.name}
+                {formatPodName(template.name)}
               </SelectItem>
               ))}
             </SelectContent>
@@ -109,9 +110,14 @@ export function StepOne({ selectedTemplate, onTemplateSelect, onNext }: StepOneP
             <AlertTriangle className="h-4 w-4" />
             <AlertTitle>Notice</AlertTitle>
             <AlertDescription>
-              Publishing this template will convert all VMs in the pool to templates. 
-              Once converted, it will be very difficult to make edits to the environment. 
-              Please ensure you have completed all necessary configurations before proceeding.
+              <div>
+                <p>This will attempt to convert all VMs to templates, meaning:</p>
+                <ul className="list-disc list-inside ml-2">
+                  <li>No further changes can be made to the VMs</li>
+                  <li>All running VMs will be shutdown</li>
+                  <li>All VM snapshots will be deleted</li>
+                </ul>
+              </div>
             </AlertDescription>
           </Alert>
         )}

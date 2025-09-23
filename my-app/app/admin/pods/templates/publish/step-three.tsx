@@ -1,7 +1,7 @@
 "use client"
 
 import { useId, useState } from "react"
-import { Eye, EyeOff, RocketIcon, ServerIcon, CalendarIcon, Rocket } from "lucide-react"
+import { Eye, EyeOff, RocketIcon, ServerIcon, Calendar, Rocket, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
@@ -9,15 +9,23 @@ import { Switch } from "@/components/ui/switch"
 import { Separator } from "@/components/ui/separator"
 import { MarkdownRenderer } from "@/components/ui/markdown-renderer"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { VisuallyHidden } from "radix-ui"
 import Image from "next/image"
+import { formatPodName } from "@/lib/utils"
 
 interface StepThreeProps {
   selectedTemplate: string
   description: string
   vmCount: number
   imageFiles: File[]
+  authors?: string
   isTemplateVisible: boolean
   onVisibilityChange: (templateVisible: boolean) => void
   onSubmit: () => void
@@ -30,6 +38,7 @@ export function StepThree({
   description,
   vmCount,
   imageFiles,
+  authors,
   isTemplateVisible,
   onVisibilityChange,
   onSubmit, 
@@ -58,7 +67,7 @@ export function StepThree({
           <h4 className="font-medium text-sm">Template Preview</h4>
           <div className="flex justify-center px-14">
             <div 
-              className="opacity-100 hover:opacity-95 transition-all duration-300 group h-[480px] w-full max-w-xl overflow-hidden rounded-xl bg-card shadow-lg hover:shadow-xl border cursor-pointer"
+              className="opacity-100 hover:opacity-95 transition-all duration-300 group h-[480px] w-full max-w-xl overflow-hidden rounded-xl bg-gradient-to-br from-primary/5 to-muted/5 border-primary/20 shadow-lg hover:shadow-xl border cursor-pointer"
               onClick={handlePreviewClick}
             >
               {/* Pod Image */}
@@ -88,32 +97,38 @@ export function StepThree({
               {/* Pod Content */}
               <div className="flex h-[280px] flex-col p-6">
                 
-                {/* Pod Name */}
-                <h3 className="mb-1 text-2xl font-bold">{selectedTemplate}</h3>
-                
-                {/* Pod Description */}
-                <div className="mb-4 text-sm text-muted-foreground leading-relaxed h-[120px] overflow-hidden">
-                  <div className="h-full relative">
-                    <MarkdownRenderer
-                      content={description}
-                      variant="card"
-                      className="h-full overflow-hidden"
-                    />
-                    <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-card to-transparent pointer-events-none" />
-                  </div>
+                {/* Date, title, & authors */}
+                <div className="flex-1 flex flex-col">
+                  <p className="flex items-center text-xs text-muted-foreground">
+                    <Calendar className="mr-1.5 h-4 w-4" />
+                    {new Date().toLocaleDateString(undefined, {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </p>
+                  <h1 className="text-3xl font-semibold leading-tight text-wrap py-2">
+                    {formatPodName(selectedTemplate)}
+                  </h1>
+                  {authors && (
+                    <div className="flex items-center text-sm">
+                      <User className="text-muted-foreground mr-1.5 size-4" />
+                      <span className="text-muted-foreground">{authors}</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Pod Stats */}
                 <div className="mt-auto pt-1">
-                  <div className="flex items-center rounded-lg bg-muted/50 p-3">
+                  <div className="flex items-center rounded-lg bg-muted/50 shadow-md p-3">
                     
                     {/* VMs */}
                     <div className="flex-1 flex justify-center">
                       <div className="flex flex-col items-center text-center">
-                        <div className="text-sm font-bold mb-1">{vmCount}</div>
+                        <div className="text-lg font-bold mb-1">{vmCount}</div>
                         <div className="flex items-center space-x-1">
                           <ServerIcon className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-sm text-muted-foreground">
                             {vmCount === 1 ? "VM" : "VMs"}
                           </span>
                         </div>
@@ -126,10 +141,10 @@ export function StepThree({
                     {/* Deployments */}
                     <div className="flex-1 flex justify-center">
                       <div className="flex flex-col items-center text-center">
-                        <div className="text-sm font-bold mb-1">0</div>
+                        <div className="text-lg font-bold mb-1">0</div>
                         <div className="flex items-center space-x-1">
                           <RocketIcon className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-sm text-muted-foreground">
                             Deployments
                           </span>
                         </div>
@@ -142,8 +157,6 @@ export function StepThree({
             </div>
           </div>
         </div>
-
-        {/* <Separator /> */}
 
         {/* Visibility Settings */}
         <div className="space-y-4">
@@ -176,20 +189,6 @@ export function StepThree({
           </div>
         </div>
 
-        {/* <Separator /> */}
-
-        {/* Ready to Publish */}
-        {/* <div className="space-y-4">
-          <div className="flex items-center space-x-2">
-            <CheckCircle className="h-5 w-5 text-green-600" />
-            <h4 className="font-medium text-sm">Ready to Publish</h4>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            Your template configuration is complete and ready to be published. 
-            Once published, the template will be {isTemplateVisible ? "immediately available to users" : "saved but hidden from users"}.
-          </p>
-        </div> */}
-
         {/* Navigation Buttons */}
         <div className="flex justify-between">
           <Button variant="outline" onClick={onBack} disabled={isSubmitting}>
@@ -206,11 +205,11 @@ export function StepThree({
         <VisuallyHidden.Root>
           <DialogTitle>Template Preview</DialogTitle>
         </VisuallyHidden.Root>
-        <DialogContent className="max-w-full md:min-w-2xl p-6 bg-card">
-          <div>
-            <div className="space-y-6">
+        <DialogContent className="max-w-full md:min-w-2xl max-h-[100vh] p-6 bg-card !duration-0 data-[state=closed]:animate-none data-[state=open]:animate-none overflow-hidden flex flex-col">
+          <div className="flex flex-col h-full overflow-hidden">
+            <div className="flex-1 overflow-y-auto space-y-6 pr-2">
               {/* Top section with image, date, and title */}
-              <div className="flex gap-4 pb-2">
+              <div className="flex gap-4">
                 {/* Square image */}
                 <div className="flex-shrink-0">
                   <div className="w-48 h-48 rounded-lg border bg-muted overflow-hidden shadow-xl">
@@ -234,35 +233,68 @@ export function StepThree({
                   </div>
                 </div>
                 
-                {/* Date and title */}
+                {/* Date, title, & authors */}
                 <div className="flex-1 flex flex-col justify-center">
                   <p className="flex items-center text-xs text-muted-foreground">
-                    <CalendarIcon className="mr-1.5 h-4 w-4" />
+                    <Calendar className="mr-1.5 h-4 w-4" />
                     {new Date().toLocaleDateString(undefined, {
                       year: "numeric",
                       month: "short",
                       day: "numeric",
                     })}
                   </p>
-                  <h1 className="text-4xl font-semibold leading-tight text-wrap">
-                    {selectedTemplate}
+                  <h1 className="text-4xl font-semibold leading-tight text-wrap py-2">
+                    {formatPodName(selectedTemplate)}
                   </h1>
+                  {authors && (
+                    <div className="flex items-center text-sm">
+                      <User className="text-muted-foreground mr-1.5 size-4" />
+                      <span className="text-muted-foreground">{authors}</span>
+                    </div>
+                  )}
                 </div>
               </div>
                               
-              {/* Scrollable description */}
-              <div className="space-y-2">
-                <ScrollArea className="h-[350px] w-full border rounded-md p-2">
-                  <MarkdownRenderer 
-                    content={description || 'No description available'} 
-                    variant="compact"
-                  />
-                </ScrollArea>
-              </div>
+              {/* Description Accordion */}
+              <Accordion type="multiple" defaultValue={["description"]} className="space-y-4">
+                <AccordionItem value="description" className="border-b-0">
+                  <AccordionTrigger className="justify-start gap-3 py-2 text-xl font-semibold text-foreground hover:no-underline rounded-b-none border-b pb-4 [&>svg]:-order-1 items-center">
+                    Description
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="h-fit mt-4 bg-gradient-to-br from-primary/5 border rounded-xl shadow">
+                      <div className="p-4">
+                        {description ? (
+                          description.length > 1000 ? (
+                            <ScrollArea className="h-96 w-full rounded-md">
+                              <div className="prose prose-sm max-w-none dark:prose-invert">
+                                <MarkdownRenderer 
+                                  content={description} 
+                                  variant="compact"
+                                />
+                              </div>
+                            </ScrollArea>
+                          ) : (
+                            <div className="prose prose-sm max-w-none dark:prose-invert">
+                              <MarkdownRenderer 
+                                content={description} 
+                              />
+                            </div>
+                          )
+                        ) : (
+                          <div className="flex items-center justify-center py-8 text-muted-foreground">
+                            <span className="italic">No description available</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
               
               {/* Pod Stats */}
               <div className="mt-auto mb-5">
-                <div className="flex items-center rounded-lg bg-muted/50 p-3">
+                <div className="flex items-center rounded-lg bg-muted/50 p-3 shadow">
                   
                   {/* VMs */}
                   <div className="flex-1 flex justify-center">
@@ -278,7 +310,7 @@ export function StepThree({
                   </div>
 
                   {/* Separator */}
-                  <div className="h-6 w-[2px] bg-border" />
+                  <Separator orientation="vertical" className="min-h-6" />
                   
                   {/* Deployments */}
                   <div className="flex-1 flex justify-center">
@@ -296,17 +328,16 @@ export function StepThree({
               </div>
             </div>
               
-            {/* Bottom buttons */}
-            <div className="flex justify-end gap-2">
-              <Button 
-                size="sm"
-                className="w-full h-10"
-                disabled
-              >
-                <Rocket />
-                Deploy
-              </Button>
-            </div>
+            {/* Bottom buttons - fixed at bottom */}
+            <Separator className="mb-4" />
+            <Button 
+              size="sm"
+              className="w-full h-10 text-sm bg-gradient-to-r from-kamino-green to-kamino-yellow font-medium hover:brightness-90 cursor-pointer !text-white"
+              disabled
+            >
+              <Rocket />
+              Deploy
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

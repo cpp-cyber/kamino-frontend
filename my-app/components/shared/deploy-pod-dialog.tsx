@@ -23,7 +23,7 @@ import { getAllPodTemplates, getAllUsers, getGroups } from "@/lib/api"
 import { handleAdminPodDeployment } from "@/lib/admin-operations"
 import { PodTemplate, User, Group } from "@/lib/types"
 import { Rocket, ChevronLeft, ChevronRight, Check } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn, formatPodName } from "@/lib/utils"
 
 interface DeployPodDialogProps {
   onPodDeployed?: () => void
@@ -84,6 +84,7 @@ export function DeployPodDialog({ onPodDeployed, trigger }: DeployPodDialogProps
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [userSearch, setUserSearch] = useState("")
   const [groupSearch, setGroupSearch] = useState("")
+  const [startingVmId, setStartingVmId] = useState<string>("")
   const hasLoadedDataRef = useRef(false)
 
   // Filter users and groups based on search
@@ -180,6 +181,7 @@ export function DeployPodDialog({ onPodDeployed, trigger }: DeployPodDialogProps
     setSelectedGroups([])
     setUserSearch("")
     setGroupSearch("")
+    setStartingVmId("")
     hasLoadedDataRef.current = false // Reset data loading flag
   }
 
@@ -238,6 +240,12 @@ export function DeployPodDialog({ onPodDeployed, trigger }: DeployPodDialogProps
       return
     }
 
+    // Validate starting VMID if provided
+    if (startingVmId && (isNaN(Number(startingVmId)) || Number(startingVmId) < 100 || Number(startingVmId) > 999900)) {
+      toast.error("Starting VMID must be a number between 100 and 999900")
+      return
+    }
+
     console.log('Proceeding with deployment...')
     setIsSubmitting(true)
     
@@ -246,6 +254,7 @@ export function DeployPodDialog({ onPodDeployed, trigger }: DeployPodDialogProps
         selectedTemplate,
         selectedUsers,
         selectedGroups,
+        startingVmId ? Number(startingVmId) : undefined,
         () => {
           // Success: Reset form and close dialog
           resetForm()
@@ -286,38 +295,11 @@ export function DeployPodDialog({ onPodDeployed, trigger }: DeployPodDialogProps
                 <SelectContent>
                   {templates.map(template => (
                     <SelectItem key={template.name} value={template.name}>
-                      {template.name}
+                      {formatPodName(template.name)}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              
-              {/* Template Details */}
-              {selectedTemplate && (() => {
-                const template = templates.find(t => t.name === selectedTemplate)
-                return template && (
-                  <div className="mt-4 p-4 bg-muted/50 rounded-lg border space-y-2">
-                    <h4 className="font-medium text-sm">Template Details</h4>
-                    {template.description && (
-                      <p className="text-sm text-muted-foreground">
-                        {template.description}
-                      </p>
-                    )}
-                    {template.authors && (
-                      <p className="text-sm">
-                        <span className="text-muted-foreground">Authors: </span>
-                        <span className="font-medium">{template.authors}</span>
-                      </p>
-                    )}
-                    {template.vm_count && (
-                      <p className="text-sm">
-                        <span className="text-muted-foreground">VM Count: </span>
-                        <span className="font-medium">{template.vm_count}</span>
-                      </p>
-                    )}
-                  </div>
-                )
-              })()}
             </div>
           </div>
         )
@@ -473,7 +455,7 @@ export function DeployPodDialog({ onPodDeployed, trigger }: DeployPodDialogProps
                 <div className="flex items-center space-x-3 p-4 bg-background border rounded-lg">
                   <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                   <div className="flex-1">
-                    <p className="font-medium">{selectedTemplate}</p>
+                    <p className="font-medium">{formatPodName(selectedTemplate)}</p>
                     {(() => {
                       const template = templates.find(t => t.name === selectedTemplate)
                       return template?.authors && (
@@ -538,6 +520,36 @@ export function DeployPodDialog({ onPodDeployed, trigger }: DeployPodDialogProps
                       </div>
                     </div>
                   )}
+                </div>
+              </div>
+
+              {/* Starting VMID Section */}
+              <div className="space-y-3">
+                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                  VM Configuration (Optional)
+                </h4>
+                <div className="p-4 bg-background border rounded-lg">
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                      <Label htmlFor="starting-vmid" className="font-medium">Starting VMID</Label>
+                    </div>
+                    <div className="space-y-2">
+                      <Input
+                        id="starting-vmid"
+                        type="number"
+                        placeholder="e.g., 1000 (optional)"
+                        value={startingVmId}
+                        onChange={(e) => setStartingVmId(e.target.value)}
+                        min={100}
+                        max={999900}
+                        className="w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Optional: Set the starting VMID for cloned VMs (100-999900). If not specified, the system will assign IDs automatically.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
 

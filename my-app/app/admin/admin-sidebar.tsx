@@ -16,7 +16,7 @@ import {
   SidebarMenuItem,
   SidebarFooter,
 } from "@/components/ui/sidebar"
-import { Camera, Copy, CopyPlusIcon, Edit, LayoutDashboard, Rocket, Server, User } from "lucide-react"
+import { Copy, CopyPlusIcon, Edit, LayoutDashboard, Rocket, Server, User } from "lucide-react"
 import { IconUsersGroup } from "@tabler/icons-react"
 
 const data = {
@@ -98,23 +98,17 @@ const data = {
       url: "#",
       items: [
         {
-          title: "Users",
+          title: "Templates",
+          url: "/admin/guides/templates",
+          isActive: false,
+          icon: Copy
+        },
+        {
+          title: "Users & Groups",
           url: "/admin/guides/users",
           isActive: false,
           icon: User
         },
-        {
-          title: "Templates",
-          url: "/admin/guides/templates",
-          isActive: false,
-          icon: CopyPlusIcon
-        },
-        {
-          title: "Snapshots",
-          url: "/admin/guides/snapshots",
-          isActive: false,
-          icon: Camera
-        }
       ],
     }
   ],
@@ -128,7 +122,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" className="mb-4" asChild>
+            <SidebarMenuButton size="lg" className="h-15 pb-3 mb-3" asChild>
               <a href="/admin/dashboard">
                 <Image src="/kaminoLogo.svg" alt="Logo" width={40} height={40} className="size-10" />
                 <div className="grid flex-1 text-left text-sm leading-tight">

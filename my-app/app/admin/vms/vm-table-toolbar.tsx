@@ -70,7 +70,7 @@ export function VMTableToolbar({
         <div className="relative flex-1 max-w-sm">
           <SearchIcon className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search VMs by name, node, ID, pool, or status..."
+            placeholder="Search VMs by name, node, ID, or pool..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
             className="pl-8 bg-background"
