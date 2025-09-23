@@ -84,6 +84,7 @@ export function DeployPodDialog({ onPodDeployed, trigger }: DeployPodDialogProps
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [userSearch, setUserSearch] = useState("")
   const [groupSearch, setGroupSearch] = useState("")
+  const [startingVmId, setStartingVmId] = useState<string>("")
   const hasLoadedDataRef = useRef(false)
 
   // Filter users and groups based on search
@@ -180,6 +181,7 @@ export function DeployPodDialog({ onPodDeployed, trigger }: DeployPodDialogProps
     setSelectedGroups([])
     setUserSearch("")
     setGroupSearch("")
+    setStartingVmId("")
     hasLoadedDataRef.current = false // Reset data loading flag
   }
 
@@ -238,6 +240,12 @@ export function DeployPodDialog({ onPodDeployed, trigger }: DeployPodDialogProps
       return
     }
 
+    // Validate starting VMID if provided
+    if (startingVmId && (isNaN(Number(startingVmId)) || Number(startingVmId) < 100 || Number(startingVmId) > 999900)) {
+      toast.error("Starting VMID must be a number between 100 and 999900")
+      return
+    }
+
     console.log('Proceeding with deployment...')
     setIsSubmitting(true)
     
@@ -246,6 +254,7 @@ export function DeployPodDialog({ onPodDeployed, trigger }: DeployPodDialogProps
         selectedTemplate,
         selectedUsers,
         selectedGroups,
+        startingVmId ? Number(startingVmId) : undefined,
         () => {
           // Success: Reset form and close dialog
           resetForm()
@@ -511,6 +520,36 @@ export function DeployPodDialog({ onPodDeployed, trigger }: DeployPodDialogProps
                       </div>
                     </div>
                   )}
+                </div>
+              </div>
+
+              {/* Starting VMID Section */}
+              <div className="space-y-3">
+                <h4 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+                  VM Configuration (Optional)
+                </h4>
+                <div className="p-4 bg-background border rounded-lg">
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                      <Label htmlFor="starting-vmid" className="font-medium">Starting VMID</Label>
+                    </div>
+                    <div className="space-y-2">
+                      <Input
+                        id="starting-vmid"
+                        type="number"
+                        placeholder="e.g., 1000 (optional)"
+                        value={startingVmId}
+                        onChange={(e) => setStartingVmId(e.target.value)}
+                        min={100}
+                        max={999900}
+                        className="w-full [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Optional: Set the starting VMID for cloned VMs (100-999900). If not specified, the system will assign IDs automatically.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
 

@@ -66,6 +66,7 @@ export async function handleAdminPodDeployment(
   template: string,
   usernames: string[],
   groups: string[],
+  startingVmId?: number,
   onSuccess?: () => void,
   onError?: (error: Error) => void
 ): Promise<void> {
@@ -77,7 +78,7 @@ export async function handleAdminPodDeployment(
   })
 
   try {
-    await clonePodTemplates(template, usernames, groups)
+    await clonePodTemplates(template, usernames, groups, startingVmId)
     console.log(`Successfully deployed template: ${template} to ${targetCount} targets`)
     
     // Simple success toast

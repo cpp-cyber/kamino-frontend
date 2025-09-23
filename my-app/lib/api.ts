@@ -643,22 +643,34 @@ export async function uploadTemplateImage(file: File): Promise<string> {
 }
 
 // Clone pod templates to users/groups (accepts array for bulk cloning)
-export async function clonePodTemplates(template: string, usernames: string[], groups: string[]): Promise<void> {
+export async function clonePodTemplates(template: string, usernames: string[], groups: string[], startingVmId?: number): Promise<void> {
   const controller = new AbortController()
   const timeoutId = setTimeout(() => controller.abort(), 300000) // 5 minutes timeout for bulk cloning
   
   try {
+    const requestBody: {
+      template: string;
+      usernames: string[];
+      groups: string[];
+      starting_vmid?: number;
+    } = {
+      template: template,
+      usernames: usernames,
+      groups: groups
+    }
+    
+    // Add starting_vmid only if provided
+    if (startingVmId !== undefined) {
+      requestBody.starting_vmid = startingVmId
+    }
+    
     const response = await fetch('/api/v1/admin/templates/clone', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       credentials: 'include',
-      body: JSON.stringify({
-        "template": template,
-        "usernames": usernames,
-        "groups": groups
-      }),
+      body: JSON.stringify(requestBody),
       signal: controller.signal
     })
 
