@@ -94,7 +94,7 @@ export default function Page() {
                         Deployed Pods
                       </span>
                       <span className="font-semibold text-foreground">
-                        <Badge variant="secondary" className="bg-card shadow-md dark:shadow-primary/10">{deployedPods?.length || 0}</Badge>
+                        <Badge variant="secondary" className="bg-card shadow-md dark:shadow-primary/10">{deployedPods?.length || 0} / 5</Badge>
                       </span>
                     </div>
                     
