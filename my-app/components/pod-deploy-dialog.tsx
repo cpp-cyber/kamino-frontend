@@ -91,13 +91,13 @@ function PodDeployProgress({ templateName, onComplete, onError }: PodDeployProgr
           credentials: 'include'
         })
 
-        if (res.ok) {
-          setProgress(100)
-          setCurrentMessage("✅ Deployment complete!")
-          onComplete()
-          router.push("/pods/deployed")
-          return
-        }
+        // if (res.ok) {
+        //   setProgress(100)
+        //   setCurrentMessage("✅ Deployment complete!")
+        //   onComplete()
+        //   router.push("/pods/deployed")
+        //   return
+        // }
 
         // Handle non-successful responses
         if (!res.ok) {
@@ -148,8 +148,6 @@ function PodDeployProgress({ templateName, onComplete, onError }: PodDeployProgr
                 
                 // Check if deployment is complete
                 if (progressValue >= 100) {
-                  setProgress(100)
-                  setCurrentMessage("✅ Deployment complete!")
                   onComplete()
                   router.push("/pods/deployed")
                   return
