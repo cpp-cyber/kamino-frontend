@@ -44,7 +44,7 @@ interface PodDeployProgressProps {
 }
 
 function PodDeployProgress({ templateName, onComplete, onError }: PodDeployProgressProps) {
-  const [currentMessage, setCurrentMessage] = useState("Starting deployment...")
+  const [currentMessage, setCurrentMessage] = useState("Starting deployment")
   const [progress, setProgress] = useState(0)
   const [hasError, setHasError] = useState(false)
   const router = useRouter()
@@ -57,17 +57,47 @@ function PodDeployProgress({ templateName, onComplete, onError }: PodDeployProgr
       return
     }
 
+    // For visual editing - mock progress instead of actual API call
+    if (templateName === "example-template") {
+      let mockProgress = 0
+      const interval = setInterval(() => {
+        mockProgress += 10
+        setProgress(mockProgress)
+        
+        if (mockProgress <= 30) {
+          setCurrentMessage("Initializing deployment")
+        } else if (mockProgress <= 60) {
+          setCurrentMessage("Setting up virtual machines")
+        } else if (mockProgress <= 90) {
+          setCurrentMessage("Configuring network")
+        } else {
+          setCurrentMessage("✅ Deployment complete!")
+          clearInterval(interval)
+        }
+      }, 3000)
+      
+      return () => clearInterval(interval)
+    }
+
     let isActive = true
 
     const startDeploymentStream = async () => {
       try {
-        // const res = await fetch("http://localhost:8080/api/v1/template/clone", { // Development
-        const res = await fetch("/api/v1/template/clone", {
+        const res = await fetch("http://localhost:8080/api/v1/template/clone", { // Development
+        // const res = await fetch("/api/v1/template/clone", {
           method: "POST",
           body: JSON.stringify({ template: templateName }),
           headers: { "Content-Type": "application/json" },
           credentials: 'include'
         })
+
+        if (res.ok) {
+          setProgress(100)
+          setCurrentMessage("✅ Deployment complete!")
+          onComplete()
+          router.push("/pods/deployed")
+          return
+        }
 
         // Handle non-successful responses
         if (!res.ok) {
@@ -118,6 +148,8 @@ function PodDeployProgress({ templateName, onComplete, onError }: PodDeployProgr
                 
                 // Check if deployment is complete
                 if (progressValue >= 100) {
+                  setProgress(100)
+                  setCurrentMessage("✅ Deployment complete!")
                   onComplete()
                   router.push("/pods/deployed")
                   return
@@ -153,17 +185,29 @@ function PodDeployProgress({ templateName, onComplete, onError }: PodDeployProgr
 
   return (
     <div className="space-y-3">
-      <div>
-        <h2 className={`text-sm font-medium mb-2 ${hasError ? 'text-destructive' : 'text-gray-700'}`}>
-          {currentMessage}
-        </h2>
+      {/* Progress bar */}
+      <div className="space-y-2">
         <Progress 
           value={progress} 
-          className={`w-full ${hasError ? '[&>div]:bg-destructive' : ''}`} 
+          className={`w-full h-5 shadow ${hasError ? '[&>div]:bg-destructive' : '[&>div]:bg-gradient-to-r [&>div]:from-kamino-green [&>div]:to-kamino-yellow'}`} 
         />
-        <div className="text-xs text-gray-500 mt-1 text-right">
+      </div>
+      
+      {/* Progress message and percentage */}
+      <div className="flex justify-between items-start gap-3">
+        <p className={`text-sm font-medium flex-1 ${hasError ? 'text-destructive' : 'text-muted-foreground'}`}>
+          {currentMessage}
+          {!hasError && progress < 100 && (
+            <span className="inline-block ml-0.5">
+              <span className="animate-[pulse_1.5s_ease-in-out_infinite]">.</span>
+              <span className="animate-[pulse_1.5s_ease-in-out_0.2s_infinite]">.</span>
+              <span className="animate-[pulse_1.5s_ease-in-out_0.4s_infinite]">.</span>
+            </span>
+          )}
+        </p>
+        <span className={`text-sm font-semibold tabular-nums ${hasError ? 'text-destructive' : 'text-foreground'}`}>
           {progress}%
-        </div>
+        </span>
       </div>
     </div>
   )
@@ -323,29 +367,32 @@ export function PodDeployDialog({ isOpen, onClose, selectedPod }: PodDeployDialo
       
       {/* Deployment progress popup */}
       <AlertDialog open={deployProgress} onOpenChange={setDeployProgress}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Deploying Pod</AlertDialogTitle>
-          </AlertDialogHeader>
-          <div className="space-y-4">
-            <AlertDialogDescription>
-              You will automatically be taken to your pod once it is deployed.
-            </AlertDialogDescription>
-            <div className="p-2">
-              <div className="flex justify-center">
-                <div className="w-full max-w-md">
-                  <PodDeployProgress
-                    templateName={deployingTemplate}
-                    onComplete={() => {
-                      setDeployProgress(false)
-                    }}
-                    onError={() => {
-                      setDeployProgress(false)
-                    }}
-                  />
-                </div>
-              </div>
+        <AlertDialogContent className="sm:max-w-[500px]">
+          <AlertDialogHeader className="space-y-3">
+            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-kamino-green/20 mx-auto">
+              <Rocket className="w-6 h-6 text-kamino-yellow" />
             </div>
+            <AlertDialogTitle className="text-center text-2xl">
+              Deploying Your Pod
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center text-sm space-y-2">
+              You will be automatically redirected once deployment completes.
+              <span className="block mt-1 font-medium text-muted-foreground">
+                Average deployment time: ~3 minutes
+              </span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          
+          <div className="mt-2">
+            <PodDeployProgress
+              templateName={deployingTemplate}
+              onComplete={() => {
+                setDeployProgress(false)
+              }}
+              onError={() => {
+                setDeployProgress(false)
+              }}
+            />
           </div>
         </AlertDialogContent>
       </AlertDialog>
