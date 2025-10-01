@@ -83,8 +83,8 @@ function PodDeployProgress({ templateName, onComplete, onError }: PodDeployProgr
 
     const startDeploymentStream = async () => {
       try {
-        const res = await fetch("http://localhost:8080/api/v1/template/clone", { // Development
-        // const res = await fetch("/api/v1/template/clone", {
+        // const res = await fetch("http://localhost:8080/api/v1/template/clone", { // Development
+        const res = await fetch("/api/v1/template/clone", {
           method: "POST",
           body: JSON.stringify({ template: templateName }),
           headers: { "Content-Type": "application/json" },
