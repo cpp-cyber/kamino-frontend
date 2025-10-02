@@ -46,8 +46,31 @@ interface PodDeployProgressProps {
 function PodDeployProgress({ templateName, onComplete, onError }: PodDeployProgressProps) {
   const [currentMessage, setCurrentMessage] = useState("Starting deployment")
   const [progress, setProgress] = useState(0)
+  const [lastCheckpoint, setLastCheckpoint] = useState(0)
   const [hasError, setHasError] = useState(false)
   const router = useRouter()
+
+  const MAX_INCREMENT = 65 // Maximum increment beyond last checkpoint
+
+  // Effect to gradually increment progress every 3 seconds
+  useEffect(() => {
+    if (hasError || progress >= 100) {
+      return
+    }
+
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        const maxAllowed = Math.min(lastCheckpoint + MAX_INCREMENT, 100)
+        // Increment by 1, but don't exceed maxAllowed
+        if (prev < maxAllowed) {
+          return prev + 1
+        }
+        return prev
+      })
+    }, 3000) // Increment by 1 every 3 seconds
+
+    return () => clearInterval(interval)
+  }, [hasError, progress, lastCheckpoint])
 
   useEffect(() => {
     if (!templateName) {
@@ -91,13 +114,6 @@ function PodDeployProgress({ templateName, onComplete, onError }: PodDeployProgr
           credentials: 'include'
         })
 
-        // if (res.ok) {
-        //   setProgress(100)
-        //   setCurrentMessage("✅ Deployment complete!")
-        //   onComplete()
-        //   router.push("/pods/deployed")
-        //   return
-        // }
 
         // Handle non-successful responses
         if (!res.ok) {
@@ -143,7 +159,8 @@ function PodDeployProgress({ templateName, onComplete, onError }: PodDeployProgr
             if (data) {
               try {
                 const { message, progress: progressValue } = JSON.parse(data)
-                setProgress(progressValue)
+                setProgress(progressValue) // Update progress to backend checkpoint value
+                setLastCheckpoint(progressValue) // Store the checkpoint for max calculation
                 setCurrentMessage(message)
                 
                 // Check if deployment is complete
