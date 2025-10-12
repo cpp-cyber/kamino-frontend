@@ -67,7 +67,7 @@ function PodDeployProgress({ templateName, onComplete, onError }: PodDeployProgr
         }
         return prev
       })
-    }, 3000) // Increment by 1 every 3 seconds
+    }, 1500) // Increment by 1 every 1.5 seconds
 
     return () => clearInterval(interval)
   }, [hasError, progress, lastCheckpoint])
