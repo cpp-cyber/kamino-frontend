@@ -94,7 +94,17 @@ export default function Page() {
                         Deployed Pods
                       </span>
                       <span className="font-semibold text-foreground">
-                        <Badge variant="secondary" className="bg-card shadow-md dark:shadow-primary/10">{deployedPods?.length || 0}</Badge>
+                        <Tooltip >
+                          <TooltipTrigger>
+                            <span className="font-semibold text-foreground">
+                              <Badge variant="secondary" className="bg-card shadow-md dark:shadow-primary/10">{deployedPods?.length || 0} / 5</Badge>
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent className="text-sm">
+                            <p>Maximum of 5 deployed pods allowed per user</p>
+                          </TooltipContent>
+                        </Tooltip>
+                        
                       </span>
                     </div>
                     

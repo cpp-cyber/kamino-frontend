@@ -4,9 +4,7 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogContent,
-  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogDescription,
@@ -29,7 +27,6 @@ import { Progress } from "@/components/ui/progress"
 import { CalendarIcon, Rocket, Server as ServerIcon, Rocket as RocketIcon, User } from "lucide-react"
 import Image from "next/image"
 import { VisuallyHidden } from "radix-ui"
-import { handleUserPodDeployment } from "@/lib/admin-operations"
 import { PodTemplate } from "@/lib/types"
 import { formatPodName } from "@/lib/utils"
 import { Separator } from "./ui/separator"
@@ -40,75 +37,208 @@ interface PodDeployDialogProps {
   selectedPod: PodTemplate | null
 }
 
-function PodDeployProgress() {
+interface PodDeployProgressProps {
+  templateName: string
+  onComplete: () => void
+  onError: () => void
+}
+
+function PodDeployProgress({ templateName, onComplete, onError }: PodDeployProgressProps) {
+  const [currentMessage, setCurrentMessage] = useState("Starting deployment")
   const [progress, setProgress] = useState(0)
+  const [lastCheckpoint, setLastCheckpoint] = useState(0)
+  const [hasError, setHasError] = useState(false)
   const router = useRouter()
 
-  useEffect(() => {
-    const start = Date.now()
-    const duration = 180000 // 3 minutes (180 seconds) - increased for cloning operations
-    let animationFrame: number
+  const MAX_INCREMENT = 65 // Maximum increment beyond last checkpoint
 
-    const updateProgress = () => {
-      const elapsed = Date.now() - start
-      const percent = Math.min((elapsed / duration) * 100, 100)
-      setProgress(percent)
-      if (percent < 100) {
-        animationFrame = requestAnimationFrame(updateProgress)
+  // Effect to gradually increment progress every 3 seconds
+  useEffect(() => {
+    if (hasError || progress >= 100) {
+      return
+    }
+
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        const maxAllowed = Math.min(lastCheckpoint + MAX_INCREMENT, 100)
+        // Increment by 1, but don't exceed maxAllowed
+        if (prev < maxAllowed) {
+          return prev + 1
+        }
+        return prev
+      })
+    }, 1500) // Increment by 1 every 1.5 seconds
+
+    return () => clearInterval(interval)
+  }, [hasError, progress, lastCheckpoint])
+
+  useEffect(() => {
+    if (!templateName) {
+      setCurrentMessage("❌ No template specified")
+      setHasError(true)
+      setTimeout(() => onError(), 5000)
+      return
+    }
+
+    // For visual editing - mock progress instead of actual API call
+    if (templateName === "example-template") {
+      let mockProgress = 0
+      const interval = setInterval(() => {
+        mockProgress += 10
+        setProgress(mockProgress)
+        
+        if (mockProgress <= 30) {
+          setCurrentMessage("Initializing deployment")
+        } else if (mockProgress <= 60) {
+          setCurrentMessage("Setting up virtual machines")
+        } else if (mockProgress <= 90) {
+          setCurrentMessage("Configuring network")
+        } else {
+          setCurrentMessage("✅ Deployment complete!")
+          clearInterval(interval)
+        }
+      }, 3000)
+      
+      return () => clearInterval(interval)
+    }
+
+    let isActive = true
+
+    const startDeploymentStream = async () => {
+      try {
+        // const res = await fetch("http://localhost:8080/api/v1/template/clone", { // Development
+        const res = await fetch("/api/v1/template/clone", {
+          method: "POST",
+          body: JSON.stringify({ template: templateName }),
+          headers: { "Content-Type": "application/json" },
+          credentials: 'include'
+        })
+
+
+        // Handle non-successful responses
+        if (!res.ok) {
+          try {
+            const errorData = await res.json()
+            const errorMessage = errorData.error || "Deployment failed"
+            const errorDetails = errorData.details || `HTTP ${res.status}: ${res.statusText}`
+            setCurrentMessage(`❌ ${errorMessage}: ${errorDetails}`)
+          } catch {
+            // Fallback if response body is not JSON
+            setCurrentMessage(`❌ Deployment failed (${res.status}: ${res.statusText})`)
+            setTimeout(() => onError(), 5000)
+            return
+          }
+          setHasError(true)
+          setTimeout(() => onError(), 5000)
+          return
+        }
+
+        if (!res.body) {
+          setCurrentMessage("❌ No response from server")
+          setHasError(true)
+          setTimeout(() => onError(), 2000)
+          return
+        }
+
+        const reader = res.body.getReader()
+        const decoder = new TextDecoder()
+
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+
+          const chunk = decoder.decode(value, { stream: true })
+          
+          // Parse SSE data lines
+          const dataLines = chunk
+            .split("\n")
+            .filter(line => line.startsWith("data:"))
+            .map(line => line.slice(5).trim())
+
+          for (const data of dataLines) {
+            if (data) {
+              try {
+                const { message, progress: progressValue } = JSON.parse(data)
+                setProgress(progressValue) // Update progress to backend checkpoint value
+                setLastCheckpoint(progressValue) // Store the checkpoint for max calculation
+                setCurrentMessage(message)
+                
+                // Check if deployment is complete
+                if (progressValue >= 100) {
+                  onComplete()
+                  router.push("/pods/deployed")
+                  return
+                }
+              } catch {
+                setCurrentMessage(`❌ Invalid response format: ${data}`)
+                setHasError(true)
+                setTimeout(() => onError(), 2000)
+                return
+              }
+            }
+          }
+        }
+      } catch (error) {
+        let errorMessage = "Deployment failed"
+        if (error instanceof Error) {
+          errorMessage = error.message
+        }
+        setCurrentMessage(`❌ ${errorMessage}`)
+        setHasError(true)
+        if (isActive) {
+          setTimeout(() => onError(), 5000)
+        }
       }
     }
 
-    animationFrame = requestAnimationFrame(updateProgress)
-    return () => cancelAnimationFrame(animationFrame)
-  }, [])
+    startDeploymentStream()
 
-  useEffect(() => {
-    if (progress === 100) {
-      const redirectDelay = setTimeout(() => {
-        router.push("/pods/deployed")
-      }, 500)
-      return () => clearTimeout(redirectDelay)
+    return () => {
+      isActive = false
     }
-  }, [progress, router])
+  }, [templateName, onComplete, onError, router])
 
-  return <Progress value={progress} className="w-full" />
+  return (
+    <div className="space-y-3">
+      {/* Progress bar */}
+      <div className="space-y-2">
+        <Progress 
+          value={progress} 
+          className={`w-full h-5 shadow ${hasError ? '[&>div]:bg-destructive' : '[&>div]:bg-gradient-to-r [&>div]:from-kamino-green [&>div]:to-kamino-yellow'}`} 
+        />
+      </div>
+      
+      {/* Progress message and percentage */}
+      <div className="flex justify-between items-start gap-3">
+        <p className={`text-sm font-medium flex-1 ${hasError ? 'text-destructive' : 'text-muted-foreground'}`}>
+          {currentMessage}
+          {!hasError && progress < 100 && (
+            <span className="inline-block ml-0.5">
+              <span className="animate-[pulse_1.5s_ease-in-out_infinite]">.</span>
+              <span className="animate-[pulse_1.5s_ease-in-out_0.2s_infinite]">.</span>
+              <span className="animate-[pulse_1.5s_ease-in-out_0.4s_infinite]">.</span>
+            </span>
+          )}
+        </p>
+        <span className={`text-sm font-semibold tabular-nums ${hasError ? 'text-destructive' : 'text-foreground'}`}>
+          {progress}%
+        </span>
+      </div>
+    </div>
+  )
 }
 
 export function PodDeployDialog({ isOpen, onClose, selectedPod }: PodDeployDialogProps) {
   const [deployProgress, setDeployProgress] = useState(false)
-  const [showErrorDialog, setShowErrorDialog] = useState(false)
+  const [deployingTemplate, setDeployingTemplate] = useState<string>("")
 
   const handleConfirmDeploy = async () => {
     if (!selectedPod?.name) return
     
+    // Capture the template name before closing the dialog
+    setDeployingTemplate(selectedPod.name)
     onClose()
     setDeployProgress(true)
-    
-    try {
-      await handleUserPodDeployment(
-        selectedPod.name,
-        () => {
-          // Success: Just hide progress after a short delay
-          setTimeout(() => {
-            setDeployProgress(false)
-          }, 2000)
-        },
-        () => {
-          // Error: Show error dialog and hide progress
-          setDeployProgress(false)
-          setShowErrorDialog(true)
-        }
-      )
-    } catch (error) {
-      // Fallback error handling
-      console.error('Deployment failed:', error)
-      setDeployProgress(false)
-      setShowErrorDialog(true)
-    }
-  }
-
-  const handleCloseErrorDialog = () => {
-    setShowErrorDialog(false)
   }
 
   return (
@@ -252,27 +382,38 @@ export function PodDeployDialog({ isOpen, onClose, selectedPod }: PodDeployDialo
       
       {/* Deployment progress popup */}
       <AlertDialog open={deployProgress} onOpenChange={setDeployProgress}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Deploying Pod</AlertDialogTitle>
-          </AlertDialogHeader>
-          <div className="space-y-4">
-            <AlertDialogDescription>
-              You will automatically be taken to your pod once it is deployed.
-            </AlertDialogDescription>
-            <div className="p-2">
-              <div className="flex justify-center">
-                <div className="w-full max-w-md">
-                  <PodDeployProgress />
-                </div>
-              </div>
+        <AlertDialogContent className="sm:max-w-[500px]">
+          <AlertDialogHeader className="space-y-3">
+            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-kamino-green/20 mx-auto">
+              <Rocket className="w-6 h-6 text-kamino-yellow" />
             </div>
+            <AlertDialogTitle className="text-center text-2xl">
+              Deploying Your Pod
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center text-sm space-y-2">
+              You will be automatically redirected once deployment completes.
+              <span className="block mt-1 font-medium text-muted-foreground">
+                Average deployment time: ~3 minutes
+              </span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          
+          <div className="mt-2">
+            <PodDeployProgress
+              templateName={deployingTemplate}
+              onComplete={() => {
+                setDeployProgress(false)
+              }}
+              onError={() => {
+                setDeployProgress(false)
+              }}
+            />
           </div>
         </AlertDialogContent>
       </AlertDialog>
 
       {/* Error Dialog */}
-      <AlertDialog open={showErrorDialog} onOpenChange={setShowErrorDialog}>
+      {/* <AlertDialog open={showErrorDialog} onOpenChange={setShowErrorDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="text-destructive flex items-center gap-2">
@@ -297,7 +438,7 @@ export function PodDeployDialog({ isOpen, onClose, selectedPod }: PodDeployDialo
             </AlertDialogFooter>
           </div>
         </AlertDialogContent>
-      </AlertDialog>
+      </AlertDialog> */}
     </>
   )
 }
