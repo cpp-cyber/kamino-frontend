@@ -1,48 +1,38 @@
-import { useMemo } from "react"
-import { User } from "@/lib/types"
+import { useMemo } from "react";
+import { User } from "@/lib/types";
 
 interface UseUserFiltersProps {
-  users: User[]
-  searchTerm: string
-  showEnabledUsers: boolean
-  showDisabledUsers: boolean
+  users: User[];
+  searchTerm: string;
 }
 
-export function useUserFilters({ 
-  users, 
-  searchTerm, 
-  showEnabledUsers, 
-  showDisabledUsers 
-}: UseUserFiltersProps) {
+export function useUserFilters({ users, searchTerm }: UseUserFiltersProps) {
   return useMemo(() => {
-    let filteredUsers = users
-
-    // Apply status filters
-    filteredUsers = filteredUsers.filter(user => {
-      if (user.enabled && !showEnabledUsers) return false
-      if (!user.enabled && !showDisabledUsers) return false
-      return true
-    })
+    let filteredUsers = users;
 
     // Apply search filter
     if (searchTerm) {
-      const lowercaseSearch = searchTerm.toLowerCase()
-      
-      filteredUsers = filteredUsers.filter(user => {
+      const lowercaseSearch = searchTerm.toLowerCase();
+
+      filteredUsers = filteredUsers.filter((user) => {
         // Search in username
         if (user.name.toLowerCase().includes(lowercaseSearch)) {
-          return true
+          return true;
         }
-        
+
         // Search in groups
-        if (user.groups.some(group => group.name.toLowerCase().includes(lowercaseSearch))) {
-          return true
+        if (
+          user.groups.some((group) =>
+            group.toLowerCase().includes(lowercaseSearch),
+          )
+        ) {
+          return true;
         }
-        
-        return false
-      })
+
+        return false;
+      });
     }
 
-    return filteredUsers
-  }, [users, searchTerm, showEnabledUsers, showDisabledUsers])
+    return filteredUsers;
+  }, [users, searchTerm]);
 }

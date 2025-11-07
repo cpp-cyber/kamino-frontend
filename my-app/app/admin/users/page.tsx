@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { toast } from "sonner"
-import { AuthGuard } from "@/components/auth-guard"
-import { PageLayout } from "@/app/admin/admin-page-layout"
-import { UsersTable } from "@/app/admin/users/users-table"
-import { EditGroupsDialog } from "@/app/admin/users/edit-groups-dialog"
-import { deleteUser, enableUser, disableUser } from "@/lib/api"
+import { useState } from "react";
+import { toast } from "sonner";
+import { AuthGuard } from "@/components/auth-guard";
+import { PageLayout } from "@/app/admin/admin-page-layout";
+import { UsersTable } from "@/app/admin/users/users-table";
+import { EditGroupsDialog } from "@/app/admin/users/edit-groups-dialog";
+import { deleteUser } from "@/lib/api";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,84 +15,70 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { User } from "@/lib/types"
+} from "@/components/ui/alert-dialog";
+import { User } from "@/lib/types";
 
-const breadcrumbs = [{ label: "Users", href: "/admin/users" }]
+const breadcrumbs = [{ label: "Users", href: "/admin/users" }];
 
 export default function AdminUsersPage() {
-  const [alertOpen, setAlertOpen] = useState(false)
-  const [editGroupsOpen, setEditGroupsOpen] = useState(false)
-  const [selectedUser, setSelectedUser] = useState<User | null>(null)
-  const [selectedAction, setSelectedAction] = useState<'enable' | 'disable' | 'editGroups' | 'delete' | null>(null)
-  const [refreshKey, setRefreshKey] = useState(0)
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [editGroupsOpen, setEditGroupsOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedAction, setSelectedAction] = useState<
+    "editGroups" | "delete" | null
+  >(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const handleRefresh = async () => {
-    setRefreshKey(prev => prev + 1)
+    setRefreshKey((prev) => prev + 1);
     // Simulate async operation
-    await new Promise(resolve => setTimeout(resolve, 500))
-  }
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  };
 
-  const handleUserAction = (user: User, action: 'enable' | 'disable' | 'editGroups' | 'delete') => {
-    setSelectedUser(user)
-    setSelectedAction(action)
-    
-    if (action === 'editGroups') {
-      setEditGroupsOpen(true)
-      return
+  const handleUserAction = (user: User, action: "editGroups" | "delete") => {
+    setSelectedUser(user);
+    setSelectedAction(action);
+
+    if (action === "editGroups") {
+      setEditGroupsOpen(true);
+      return;
     }
-    
-    setAlertOpen(true)
-  }
+
+    setAlertOpen(true);
+  };
 
   const getActionText = () => {
-    if (!selectedAction) return ''
-    switch (selectedAction) {
-      case 'enable': return 'enable'
-      case 'disable': return 'disable'
-      case 'delete': return 'delete'
-      default: return selectedAction
-    }
-  }
+    if (!selectedAction) return "";
+    return selectedAction === "delete" ? "delete" : selectedAction;
+  };
 
   const getActionButtonText = () => {
-    if (!selectedAction) return ''
-    switch (selectedAction) {
-      case 'enable': return 'Enable'
-      case 'disable': return 'Disable'
-      case 'delete': return 'Delete'
-      default: return selectedAction
-    }
-  }
+    if (!selectedAction) return "";
+    return selectedAction === "delete" ? "Delete" : selectedAction;
+  };
 
   const handleConfirmAction = async () => {
-    if (!selectedUser || !selectedAction) return
-    
+    if (!selectedUser || !selectedAction) return;
+
     try {
-      switch (selectedAction) {
-        case 'enable':
-          await enableUser(selectedUser.name)
-          toast.success(`User "${selectedUser.name}" has been enabled successfully.`)
-          break
-        case 'disable':
-          await disableUser(selectedUser.name)
-          toast.success(`User "${selectedUser.name}" has been disabled successfully.`)
-          break
-        case 'delete':
-          await deleteUser(selectedUser.name)
-          toast.success(`User "${selectedUser.name}" has been deleted successfully.`)
-          break
+      if (selectedAction === "delete") {
+        await deleteUser(selectedUser.name);
+        toast.success(
+          `User "${selectedUser.name}" has been deleted successfully.`,
+        );
       }
-      
-      setAlertOpen(false)
-      setSelectedUser(null)
-      setSelectedAction(null)
+
+      setAlertOpen(false);
+      setSelectedUser(null);
+      setSelectedAction(null);
       // Trigger a refresh of the users table
-      handleRefresh()
+      handleRefresh();
     } catch (error) {
-      toast.error(`Failed to ${getActionText()} user: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      toast.error(
+        `Failed to ${getActionText()} user: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
     }
-  }
+  };
 
   return (
     <AuthGuard adminOnly>
@@ -105,8 +91,8 @@ export default function AdminUsersPage() {
                 Manage user accounts and permissions
               </p>
             </div>
-            <UsersTable 
-              onUserAction={handleUserAction} 
+            <UsersTable
+              onUserAction={handleUserAction}
               onRefresh={handleRefresh}
               key={refreshKey}
             />
@@ -119,14 +105,19 @@ export default function AdminUsersPage() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              Are you sure you want to {getActionText()} &quot;{selectedUser?.name}&quot;?
+              Are you sure you want to {getActionText()} &quot;
+              {selectedUser?.name}&quot;?
             </AlertDialogTitle>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleConfirmAction} 
-              className={selectedAction === 'delete' ? "bg-destructive hover:bg-destructive/90" : ""}
+            <AlertDialogAction
+              onClick={handleConfirmAction}
+              className={
+                selectedAction === "delete"
+                  ? "bg-destructive hover:bg-destructive/90"
+                  : ""
+              }
             >
               {getActionButtonText()}
             </AlertDialogAction>
@@ -142,5 +133,5 @@ export default function AdminUsersPage() {
         onSuccess={handleRefresh}
       />
     </AuthGuard>
-  )
+  );
 }

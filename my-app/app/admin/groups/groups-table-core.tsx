@@ -1,18 +1,18 @@
-import React from 'react'
-import { SortingState } from "@tanstack/react-table"
-import { Group } from "@/lib/types"
-import { GroupsTableCore } from "./groups-table-columns"
+import React from "react";
+import { SortingState } from "@tanstack/react-table";
+import { Group } from "@/lib/types";
+import { GroupsTableCore } from "./groups-table-columns";
 
 interface GroupsTableCoreWrapperProps {
-  groups: Group[]
-  sorting: SortingState
-  onSortingChange: (sorting: SortingState) => void
-  onGroupAction: (groupName: string, action: 'rename' | 'delete') => void
-  searchTerm: string
-  selectedGroups: string[]
-  onSelectGroup: (groupName: string, checked: boolean) => void
-  onSelectAll: (checked: boolean) => void
-  onBulkAction: (action: 'delete') => void
+  groups: Group[];
+  sorting: SortingState;
+  onSortingChange: (sorting: SortingState) => void;
+  onGroupAction: (groupName: string, action: "delete" | "edit") => void;
+  searchTerm: string;
+  selectedGroups: string[];
+  onSelectGroup: (groupName: string, checked: boolean) => void;
+  onSelectAll: (checked: boolean) => void;
+  onBulkAction: (action: "delete") => void;
 }
 
 export function GroupsTableCoreWrapper({
@@ -24,7 +24,7 @@ export function GroupsTableCoreWrapper({
   selectedGroups,
   onSelectGroup,
   onSelectAll,
-  onBulkAction
+  onBulkAction,
 }: GroupsTableCoreWrapperProps) {
   return (
     <GroupsTableCore
@@ -38,5 +38,5 @@ export function GroupsTableCoreWrapper({
       sorting={sorting}
       onSortingChange={onSortingChange}
     />
-  )
+  );
 }
