@@ -1,15 +1,19 @@
-import TopNav from "@/components/top-nav"
-import Footer4Col from "@/components/footer"
+import TopNav from "@/components/top-nav";
+import Footer4Col from "@/components/footer";
 
 interface PageLayoutProps {
-  children: React.ReactNode
-  header?: React.ReactNode
-  headerClassName?: string
-  showGradientBackground?: boolean
+  children: React.ReactNode;
+  header?: React.ReactNode;
+  headerClassName?: string;
+  showGradientBackground?: boolean;
 }
 
-export function PageLayout({ children, header, headerClassName, showGradientBackground = false }: PageLayoutProps) {
-
+export function PageLayout({
+  children,
+  header,
+  headerClassName,
+  showGradientBackground = false,
+}: PageLayoutProps) {
   return (
     <div className="min-h-screen">
       <TopNav />
@@ -27,11 +31,15 @@ export function PageLayout({ children, header, headerClassName, showGradientBack
             }}
           />
         )}
-        
-        <div className={`relative z-10 mx-auto max-w-7xl px-4 md:px-8 lg:px-16 xl:px-24`}>
+
+        <div
+          className={`relative z-10 mx-auto max-w-7xl px-4 md:px-8 lg:px-16 xl:px-24`}
+        >
           {header && (
             <>
-              <div className={`px-4 py-6 rounded-b-xl text-shadow ${headerClassName || ''}`}>
+              <div
+                className={`px-4 py-6 rounded-b-xl text-shadow ${headerClassName || ""}`}
+              >
                 {header}
               </div>
             </>
@@ -45,5 +53,5 @@ export function PageLayout({ children, header, headerClassName, showGradientBack
       </div>
       <Footer4Col />
     </div>
-  )
+  );
 }
