@@ -37,17 +37,14 @@ export function VMsTable({ onVMAction }: VMsTableProps) {
   const [showStoppedVMs, setShowStoppedVMs] = React.useState(false);
 
   // Node filter states - all nodes selected by default
-  const availableNodes = React.useMemo(() => {
-    const nodesEnv = process.env.NEXT_PUBLIC_PROXMOX_NODES;
-    if (nodesEnv) {
-      return nodesEnv
-        .split(",")
-        .map((node) => node.trim())
-        .filter(Boolean);
-    }
-    // Fallback to default nodes if environment variable is not set
-    return ["commando", "gemini", "godfrey", "gonk", "malenia", "radahn"];
-  }, []);
+  const availableNodes = [
+    "commando",
+    "gemini",
+    "godfrey",
+    "gonk",
+    "malenia",
+    "radahn",
+  ];
   const [selectedNodes, setSelectedNodes] =
     React.useState<string[]>(availableNodes);
 

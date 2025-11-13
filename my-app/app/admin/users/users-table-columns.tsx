@@ -21,7 +21,6 @@ import {
 import { User } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import { SortingState } from "@tanstack/react-table";
-import { isFacultyMode } from "@/lib/utils";
 
 interface UsersTableCoreProps {
   users: User[];
@@ -48,7 +47,6 @@ export function UsersTableCore({
   sorting,
   onSortingChange,
 }: UsersTableCoreProps) {
-  const facultyMode = isFacultyMode();
   const isAllSelected = users.length > 0 && selectedUsers.size === users.length;
   const isSomeSelected =
     selectedUsers.size > 0 && selectedUsers.size < users.length;
@@ -125,25 +123,23 @@ export function UsersTableCore({
             <span className="font-medium">Groups</span>
           </TableHead>
           <TableHead className="w-[20px]">
-            {!facultyMode && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    onClick={onBulkDelete}
-                    className="cursor-pointer text-destructive focus:text-destructive"
-                    disabled={selectedUsersCount === 0}
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete ({selectedUsersCount})
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={onBulkDelete}
+                  className="cursor-pointer text-destructive focus:text-destructive"
+                  disabled={selectedUsersCount === 0}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete ({selectedUsersCount})
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </TableHead>
         </TableRow>
       </TableHeader>
@@ -209,18 +205,16 @@ export function UsersTableCore({
                     <UserPlus className="mr-2 h-4 w-4" />
                     Edit Groups
                   </DropdownMenuItem>
-                  {!facultyMode && (
-                    <>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onClick={() => onUserAction(user, "delete")}
-                        className="cursor-pointer text-destructive focus:text-destructive"
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Delete
-                      </DropdownMenuItem>
-                    </>
-                  )}
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => onUserAction(user, "delete")}
+                      className="cursor-pointer text-destructive focus:text-destructive"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Delete
+                    </DropdownMenuItem>
+                  </>
                 </DropdownMenuContent>
               </DropdownMenu>
             </TableCell>

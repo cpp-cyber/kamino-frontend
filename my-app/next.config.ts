@@ -1,15 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: 'standalone',
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: 'http://localhost:8080/api/:path*', // Mock API testing
-      },
-    ];
-  },
+  output: "standalone",
+  // async rewrites() {
+  //   return [
+  //     {
+  //       source: '/api/:path*',
+  //       destination: 'http://localhost:8080/api/:path*', // Mock API testing
+  //     },
+  //   ];
+  // },
 };
 
 export default nextConfig;

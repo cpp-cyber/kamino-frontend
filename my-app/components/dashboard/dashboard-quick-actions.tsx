@@ -13,7 +13,6 @@ import { CreateUserDialog } from "@/components/shared/create-user-dialog";
 import { CreateGroupDialog } from "@/components/shared/create-group-dialog";
 import { DeployPodDialog } from "@/components/shared/deploy-pod-dialog";
 import { UserPlus, Users, Rocket, FileText } from "lucide-react";
-import { isFacultyMode } from "@/lib/utils";
 
 interface DashboardQuickActionsProps {
   onRefresh?: () => void;
@@ -23,7 +22,6 @@ export function DashboardQuickActions({
   onRefresh,
 }: DashboardQuickActionsProps) {
   const router = useRouter();
-  const facultyMode = isFacultyMode();
 
   const handlePublishTemplate = () => {
     router.push("/admin/pods/templates/publish");
@@ -44,21 +42,17 @@ export function DashboardQuickActions({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div
-          className={`grid grid-cols-1 gap-4 ${facultyMode ? "md:grid-cols-3" : "md:grid-cols-2 lg:grid-cols-4"}`}
-        >
+        <div className={`grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4`}>
           {/* Create User */}
-          {!facultyMode && (
-            <CreateUserDialog
-              onUserCreated={handleActionSuccess}
-              trigger={
-                <Button className="h-20 w-full bg-gradient-to-br from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700 text-white shadow-md hover:shadow-lg transition-all duration-200 flex flex-col items-center justify-center gap-2">
-                  <UserPlus className="size-6" />
-                  <span className="text-sm font-medium">Create Users</span>
-                </Button>
-              }
-            />
-          )}
+          <CreateUserDialog
+            onUserCreated={handleActionSuccess}
+            trigger={
+              <Button className="h-20 w-full bg-gradient-to-br from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700 text-white shadow-md hover:shadow-lg transition-all duration-200 flex flex-col items-center justify-center gap-2">
+                <UserPlus className="size-6" />
+                <span className="text-sm font-medium">Create Users</span>
+              </Button>
+            }
+          />
 
           {/* Create Group */}
           <CreateGroupDialog

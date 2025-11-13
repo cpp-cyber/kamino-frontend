@@ -11,7 +11,6 @@ import { GetUsersResponse } from "@/lib/types";
 import { User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CreateUserDialog } from "@/components/shared/create-user-dialog";
-import { isFacultyMode } from "@/lib/utils";
 
 interface HeaderStatsProps {
   usersData: GetUsersResponse;
@@ -19,12 +18,10 @@ interface HeaderStatsProps {
 }
 
 export function HeaderStats({ usersData, onUserCreated }: HeaderStatsProps) {
-  const facultyMode = isFacultyMode();
-
   return (
     <>
       <div
-        className={`*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs pb-2 ${facultyMode ? "grid-cols-1" : "lg:grid-cols-2 grid-cols-1"}`}
+        className={`*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs pb-2 lg:grid-cols-2 grid-cols-1`}
       >
         <Card className="@container/card">
           <CardHeader>
@@ -38,20 +35,18 @@ export function HeaderStats({ usersData, onUserCreated }: HeaderStatsProps) {
           </CardHeader>
         </Card>
 
-        {!facultyMode && (
-          <CreateUserDialog
-            onUserCreated={onUserCreated}
-            trigger={
-              <Button
-                className="h-full w-full bg-gradient-to-br from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700 text-white shadow-md rounded-xl hover:shadow-lg transition-all duration-200 flex flex-col items-center justify-center gap-2"
-                type="button"
-              >
-                <User />
-                Create Users
-              </Button>
-            }
-          />
-        )}
+        <CreateUserDialog
+          onUserCreated={onUserCreated}
+          trigger={
+            <Button
+              className="h-full w-full bg-gradient-to-br from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700 text-white shadow-md rounded-xl hover:shadow-lg transition-all duration-200 flex flex-col items-center justify-center gap-2"
+              type="button"
+            >
+              <User />
+              Create Users
+            </Button>
+          }
+        />
       </div>
     </>
   );

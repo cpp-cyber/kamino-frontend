@@ -316,8 +316,3 @@ export function formatPodName(name: string): string {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 }
-
-// Faculty mode check - disables user creation and deletion when enabled
-export function isFacultyMode(): boolean {
-  return process.env.NEXT_PUBLIC_FACULTY_MODE === "true";
-}

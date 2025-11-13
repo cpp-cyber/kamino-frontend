@@ -17,12 +17,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { User } from "@/lib/types";
-import { isFacultyMode } from "@/lib/utils";
 
 const breadcrumbs = [{ label: "Users", href: "/admin/users" }];
 
 export default function AdminUsersPage() {
-  const facultyMode = isFacultyMode();
   const [alertOpen, setAlertOpen] = useState(false);
   const [editGroupsOpen, setEditGroupsOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -47,7 +45,7 @@ export default function AdminUsersPage() {
     }
 
     // Prevent delete action in faculty mode
-    if (action === "delete" && facultyMode) {
+    if (action === "delete") {
       toast.error("User deletion is disabled in faculty mode");
       return;
     }

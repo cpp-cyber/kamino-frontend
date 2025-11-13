@@ -250,7 +250,7 @@ export function PodsTableCore({
               <TableCell className="font-medium">
                 <Button variant="link" size="sm" className="p-0">
                   <Link
-                    href={`https://${process.env.NEXT_PUBLIC_PROXMOX_HOST}/#v1:0:=%2Fpool%2F${pod.name}`}
+                    href={`https://gonk.sdc.cpp:8006/#v1:0:=%2Fpool%2F${pod.name}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
