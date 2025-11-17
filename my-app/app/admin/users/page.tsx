@@ -44,12 +44,6 @@ export default function AdminUsersPage() {
       return;
     }
 
-    // Prevent delete action in faculty mode
-    if (action === "delete") {
-      toast.error("User deletion is disabled in faculty mode");
-      return;
-    }
-
     setAlertOpen(true);
   };
 
