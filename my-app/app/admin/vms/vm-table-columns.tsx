@@ -194,7 +194,7 @@ export function VMsTableCore({
             <TableCell className="font-medium">
               <Button variant="link" className="p-0">
                 <Link
-                  href={`https://gonk.sdc.cpp:8006/#v1:0:=qemu%2F${vm.vmid}`}
+                  href={`https://proxmox.sdc.cpp/#v1:0:=qemu%2F${vm.vmid}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="truncate block"

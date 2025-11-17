@@ -47,17 +47,20 @@ export interface Group {
 export interface UserLogin {
   username: string;
   isAdmin: boolean;
+  isCreator?: boolean;
 }
 
 export interface UserProfileResponse {
   username: string;
   isAdmin: boolean;
+  isCreator?: boolean;
 }
 
 export interface SessionResponse {
   authenticated: boolean;
   username?: string;
   isAdmin?: boolean;
+  isCreator?: boolean;
 }
 
 // Virtual Machine types for the admin VMs page

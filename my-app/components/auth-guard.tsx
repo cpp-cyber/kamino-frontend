@@ -1,41 +1,60 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { useAuth } from "@/contexts/auth-context"
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/auth-context";
 
 interface AuthGuardProps {
-  children: React.ReactNode
-  adminOnly?: boolean
+  children: React.ReactNode;
+  adminOnly?: boolean;
+  creatorOnly?: boolean;
+  creatorOrAdmin?: boolean;
 }
 
-export function AuthGuard({ children, adminOnly = false }: AuthGuardProps) {
-  const [redirectTo, setRedirectTo] = useState<string | null>(null)
-  const router = useRouter()
-  const { authState } = useAuth()
+export function AuthGuard({
+  children,
+  adminOnly = false,
+  creatorOnly = false,
+  creatorOrAdmin = false,
+}: AuthGuardProps) {
+  const [redirectTo, setRedirectTo] = useState<string | null>(null);
+  const router = useRouter();
+  const { authState } = useAuth();
 
   useEffect(() => {
-    if (authState.loading) return
+    if (authState.loading) return;
 
     if (!authState.authenticated) {
-      setRedirectTo('/login')
-      return
+      setRedirectTo("/login");
+      return;
     }
 
     // Check admin access
     if (adminOnly && !authState.isAdmin) {
-      setRedirectTo('/login')
-      return
+      setRedirectTo("/login");
+      return;
     }
 
-    setRedirectTo(null)
-  }, [authState, adminOnly])
+    // Check creator access
+    if (creatorOnly && !authState.isCreator) {
+      setRedirectTo("/login");
+      return;
+    }
+
+    // Check creator or admin access
+    if (creatorOrAdmin && !authState.isCreator && !authState.isAdmin) {
+      setRedirectTo("/login");
+      return;
+    }
+
+    setRedirectTo(null);
+  }, [authState, adminOnly, creatorOnly, creatorOrAdmin]);
 
   useEffect(() => {
     if (redirectTo) {
-      router.push(redirectTo)
+      router.push(redirectTo);
     }
-  }, [redirectTo, router])
+  }, [redirectTo, router]);
 
   if (authState.loading) {
     return (
@@ -45,16 +64,24 @@ export function AuthGuard({ children, adminOnly = false }: AuthGuardProps) {
           <p>Loading...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (adminOnly && !authState.isAdmin) {
-    return null // Will redirect in useEffect
+    return null; // Will redirect in useEffect
+  }
+
+  if (creatorOnly && !authState.isCreator) {
+    return null; // Will redirect in useEffect
+  }
+
+  if (creatorOrAdmin && !authState.isCreator && !authState.isAdmin) {
+    return null; // Will redirect in useEffect
   }
 
   if (!authState.authenticated) {
-    return null // Will redirect in useEffect
+    return null; // Will redirect in useEffect
   }
 
-  return <>{children}</>
+  return <>{children}</>;
 }

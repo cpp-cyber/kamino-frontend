@@ -67,7 +67,7 @@ export function VMTable({ vms, onVMAction }: VMTableProps) {
                 <TableCell className="font-medium">
                   <Button variant="link" className="truncate -ml-3" size="sm">
                     <Link
-                      href={`https://gonk.sdc.cpp:8006/#v1:0:=qemu%2F${vm.vmid}`}
+                      href={`https://proxmox.sdc.cpp/#v1:0:=qemu%2F${vm.vmid}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >

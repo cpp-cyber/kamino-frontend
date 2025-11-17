@@ -1,34 +1,32 @@
-"use client"
+"use client";
 
-import {
-  IconDotsVertical,
-  IconLogout,
-} from "@tabler/icons-react"
+import { IconDotsVertical, IconLogout } from "@tabler/icons-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import { UserCircle } from "lucide-react"
-import { useAuth } from "@/contexts/auth-context"
-import { useRouter } from "next/navigation"
+} from "@/components/ui/sidebar";
+import { UserCircle } from "lucide-react";
+import { useAuth } from "@/contexts/auth-context";
+import { useRouter } from "next/navigation";
 
 export function NavUser({
   user,
 }: {
   user: {
-    name: string
-    isAdmin?: boolean
-  }
+    name: string;
+    isAdmin?: boolean;
+    isCreator?: boolean;
+  };
 }) {
-  const { logout } = useAuth()
-  const router = useRouter()
+  const { logout } = useAuth();
+  const router = useRouter();
 
   /**
    * Handles user logout
@@ -36,14 +34,14 @@ export function NavUser({
    */
   const handleLogout = async () => {
     try {
-      await logout()
-      router.push('/login')
+      await logout();
+      router.push("/login");
     } catch (error) {
-      console.error('Logout failed:', error)
+      console.error("Logout failed:", error);
       // Still redirect on error to ensure user is logged out
-      router.push('/login')
+      router.push("/login");
     }
-  }
+  };
 
   return (
     <SidebarMenu>
@@ -59,7 +57,14 @@ export function NavUser({
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
                   {user.isAdmin && (
-                    <span className="truncate text-xs text-muted-foreground">Administrator</span>
+                    <span className="truncate text-xs text-muted-foreground">
+                      Administrator
+                    </span>
+                  )}
+                  {user.isCreator && !user.isAdmin && (
+                    <span className="truncate text-xs text-muted-foreground">
+                      Creator
+                    </span>
                   )}
                 </div>
               </div>
@@ -72,7 +77,10 @@ export function NavUser({
             align="end"
             sideOffset={4}
           >
-            <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
+            <DropdownMenuItem
+              onClick={handleLogout}
+              className="text-destructive focus:text-destructive"
+            >
               <IconLogout />
               Log out
             </DropdownMenuItem>
@@ -80,5 +88,5 @@ export function NavUser({
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }

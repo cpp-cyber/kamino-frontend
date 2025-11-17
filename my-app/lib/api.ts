@@ -601,17 +601,17 @@ export async function adminDeletePods(podNames: string[]): Promise<void> {
 // ADMIN TEMPLATE MANAGEMENT ENDPOINTS
 // =============================================================================
 
-// Get all pod templates (admin view)
+// Get all pod templates (creator view)
 export async function getAllPodTemplates(): Promise<PodTemplate[]> {
   const data: PodTemplateResponse = await deduplicatedFetch(
     "allPodTemplates",
     () =>
-      fetch("/api/v1/admin/templates", {
+      fetch("/api/v1/creator/templates", {
         cache: "no-store",
         credentials: "include",
       }),
   );
-  console.log("Fetched admin pod templates:", data.templates);
+  console.log("Fetched creator pod templates:", data.templates);
   return data.templates || [];
 }
 
@@ -622,7 +622,7 @@ export async function getUnpublishedTemplates(): Promise<
   const data: { templates: string[] } = await deduplicatedFetch(
     "unpublishedTemplates",
     () =>
-      fetch("/api/v1/admin/templates/unpublished", {
+      fetch("/api/v1/creator/templates/unpublished", {
         cache: "no-store",
         credentials: "include",
       }),
@@ -632,7 +632,7 @@ export async function getUnpublishedTemplates(): Promise<
 
 // Publish template
 export async function publishTemplate(template: PodTemplate): Promise<void> {
-  const response = await fetch(`/api/v1/admin/template/publish`, {
+  const response = await fetch(`/api/v1/creator/template/publish`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -650,7 +650,7 @@ export async function publishTemplate(template: PodTemplate): Promise<void> {
 
 // Edit template
 export async function editTemplate(template: PodTemplate): Promise<void> {
-  const response = await fetch(`/api/v1/admin/template/edit`, {
+  const response = await fetch(`/api/v1/creator/template/edit`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -668,7 +668,7 @@ export async function editTemplate(template: PodTemplate): Promise<void> {
 
 // Delete templates (accepts array for bulk deletion)
 export async function deleteTemplate(templateName: string): Promise<void> {
-  const response = await fetch(`/api/v1/admin/template/delete`, {
+  const response = await fetch(`/api/v1/creator/template/delete`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -688,7 +688,7 @@ export async function deleteTemplate(templateName: string): Promise<void> {
 export async function toggleTemplateVisibility(
   templateName: string,
 ): Promise<void> {
-  const response = await fetch(`/api/v1/admin/template/visibility`, {
+  const response = await fetch(`/api/v1/creator/template/visibility`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -726,7 +726,7 @@ export async function uploadTemplateImage(file: File): Promise<string> {
   const formData = new FormData();
   formData.append("image", file);
 
-  const response = await fetch("/api/v1/admin/template/image/upload", {
+  const response = await fetch("/api/v1/creator/template/image/upload", {
     method: "POST",
     credentials: "include",
     body: formData,
@@ -800,7 +800,7 @@ export async function getProxmoxTemplates(): Promise<{
 }> {
   const data: { status: string; vm_templates: VirtualMachine[] } =
     await deduplicatedFetch("proxmoxTemplates", () =>
-      fetch("/api/v1/admin/templates/vms", {
+      fetch("/api/v1/creator/templates/vms", {
         cache: "no-store",
         credentials: "include",
       }),
@@ -812,7 +812,7 @@ export async function getProxmoxTemplates(): Promise<{
 export async function getProxmoxTemplateNames(): Promise<string[]> {
   const data: { status: string; template_pools: string[] } =
     await deduplicatedFetch("proxmoxTemplateNames", () =>
-      fetch("/api/v1/admin/templates/proxmox", {
+      fetch("/api/v1/creator/templates/proxmox", {
         cache: "no-store",
         credentials: "include",
       }),
@@ -840,7 +840,7 @@ export async function createKaminoTemplateInProxmox(templateData: {
   add_router: boolean;
   vms: Array<{ node: string; vmid: number; name: string }>;
 }): Promise<void> {
-  const response = await fetch("/api/v1/admin/template/create", {
+  const response = await fetch("/api/v1/creator/template/create", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

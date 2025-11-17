@@ -1,0 +1,34 @@
+"use client";
+
+import { AuthGuard } from "@/components/auth-guard";
+import { CreatorPageLayout } from "@/app/creator/creator-page-layout";
+import { TemplateCreateWizard } from "@/components/templates/create-wizard/template-wizard";
+
+const breadcrumbs = [
+  { label: "Create Template", href: "/creator/templates/create" },
+];
+
+export default function CreatorCreateTemplatePage() {
+  return (
+    <AuthGuard creatorOrAdmin>
+      <CreatorPageLayout breadcrumbs={breadcrumbs}>
+        <div className="@container/main flex flex-1 flex-col gap-2">
+          <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+            {/* Page Header */}
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">
+                Create Template
+              </h1>
+              <p className="text-muted-foreground">
+                Create a new Kamino template from Proxmox VMs
+              </p>
+            </div>
+
+            {/* Wizard Content */}
+            <TemplateCreateWizard />
+          </div>
+        </div>
+      </CreatorPageLayout>
+    </AuthGuard>
+  );
+}

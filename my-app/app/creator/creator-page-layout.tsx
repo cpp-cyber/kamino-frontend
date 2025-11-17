@@ -1,4 +1,4 @@
-import { AppSidebar } from "@/app/admin/admin-sidebar";
+import { CreatorSidebar } from "@/app/creator/creator-sidebar";
 import { ModeToggle } from "@/components/nav-mode";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
@@ -29,13 +29,16 @@ interface PageLayoutProps {
   headerClassName?: string;
 }
 
-export function PageLayout({
+export function CreatorPageLayout({
   children,
   breadcrumbs = [],
   header,
   headerClassName,
 }: PageLayoutProps) {
-  breadcrumbs = [{ label: "Admin", href: "/admin/dashboard" }, ...breadcrumbs];
+  breadcrumbs = [
+    { label: "Creator", href: "/creator/dashboard" },
+    ...breadcrumbs,
+  ];
 
   return (
     <SidebarProvider
@@ -45,7 +48,7 @@ export function PageLayout({
         } as React.CSSProperties
       }
     >
-      <AppSidebar />
+      <CreatorSidebar />
       <SidebarInset>
         <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger />
@@ -82,9 +85,7 @@ export function PageLayout({
           </div>
         </header>
         {header && (
-          <div
-            className={`border-b bg-muted/40 px-4 py-6 md:px-6 ${headerClassName || ""}`}
-          >
+          <div className={`px-4 py-6 md:px-6 ${headerClassName || ""}`}>
             <div className="w-full">{header}</div>
           </div>
         )}

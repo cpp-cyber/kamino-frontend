@@ -176,7 +176,7 @@ export function SectionCards({ pods, onDelete }: SectionCardsProps) {
                           vms.map((vm) => (
                             <Link
                               key={vm.vmid}
-                              href={`https://gonk.sdc.cpp:8006/#v1:0:=qemu%2F${vm.vmid}`}
+                              href={`https://proxmox.sdc.cpp/#v1:0:=qemu%2F${vm.vmid}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="block group"

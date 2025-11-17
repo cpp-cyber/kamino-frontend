@@ -4,7 +4,7 @@ import React from "react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { AuthGuard } from "@/components/auth-guard";
-import { PageLayout } from "@/app/admin/admin-page-layout";
+import { CreatorPageLayout } from "@/app/creator/creator-page-layout";
 import { PodTemplateTable } from "@/components/templates/templates-table/templates-table";
 import {
   AlertDialog,
@@ -18,9 +18,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { deleteTemplate, toggleTemplateVisibility } from "@/lib/api";
 
-const breadcrumbs = [{ label: "Pod Templates", href: "/admin/pods/templates" }];
+const breadcrumbs = [{ label: "Pod Templates", href: "/creator/templates" }];
 
-// Placeholder API functions (to be implemented later)
+// Template API functions
 const templateVisibility = async (templateName: string) => {
   await toggleTemplateVisibility(templateName);
   console.log(`Toggled template: ${templateName}`);
@@ -33,7 +33,7 @@ const deletePodTemplate = async (templateName: string) => {
   return Promise.resolve();
 };
 
-export default function AdminPodTemplatePage() {
+export default function CreatorPodTemplatePage() {
   const [alertOpen, setAlertOpen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<{
     name: string;
@@ -90,8 +90,8 @@ export default function AdminPodTemplatePage() {
   };
 
   return (
-    <AuthGuard adminOnly>
-      <PageLayout breadcrumbs={breadcrumbs}>
+    <AuthGuard creatorOrAdmin>
+      <CreatorPageLayout breadcrumbs={breadcrumbs}>
         <div className="@container/main flex flex-1 flex-col gap-2">
           <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
             <div>
@@ -108,7 +108,7 @@ export default function AdminPodTemplatePage() {
             />
           </div>
         </div>
-      </PageLayout>
+      </CreatorPageLayout>
 
       {/* Template Deletion Confirmation Dialog */}
       <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>

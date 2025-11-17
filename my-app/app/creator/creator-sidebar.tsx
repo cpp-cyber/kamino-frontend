@@ -1,0 +1,108 @@
+"use client"
+
+import * as React from "react"
+import Image from "next/image"
+import { NavUser } from "@/components/nav-user"
+import { useAuth } from "@/contexts/auth-context"
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarFooter,
+} from "@/components/ui/sidebar"
+import { Copy, CopyPlusIcon, Edit, LayoutDashboard } from "lucide-react"
+
+const data = {
+  navMain: [
+    {
+      title: "Navigation",
+      url: "#",
+      items: [
+        {
+          title: "User Panel",
+          url: "/",
+          isActive: false,
+          icon: LayoutDashboard
+        }
+      ],
+    },
+    {
+      title: "Templates",
+      url: "#",
+      items: [
+        {
+          title: "All Templates",
+          url: "/creator/templates",
+          isActive: false,
+          icon: Copy
+        },
+        {
+          title: "Publish Templates",
+          url: "/creator/templates/publish",
+          isActive: false,
+          icon: Edit
+        },
+        {
+          title: "Create Templates",
+          url: "/creator/templates/create",
+          isActive: false,
+          icon: CopyPlusIcon
+        }
+      ],
+    },
+  ],
+}
+
+export function CreatorSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { authState } = useAuth()
+
+  return (
+    <Sidebar variant="floating" {...props}>
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" className="h-15 pb-3 mb-3" asChild>
+              <a href="/creator/dashboard">
+                <Image src="/kaminoLogo.svg" alt="Logo" width={40} height={40} className="size-10" />
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate text-lg font-bold">Kamino</span>
+                  <span className="truncate text-xs text-muted-foreground">Creator Dashboard</span>
+                </div>
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+      <SidebarContent>
+        {data.navMain.map((item) => (
+          <SidebarGroup key={item.title}>
+            <SidebarGroupLabel className="text-lg text-muted-foreground">{item.title}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {item.items?.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton tooltip={item.title} asChild>
+                      <a href={item.url}>
+                        <item.icon className="size-4" />
+                        <span className="text-base">{item.title}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
+      </SidebarContent>
+      <SidebarFooter>
+        {authState.username && <NavUser user={{ name: authState.username, isAdmin: authState.isAdmin, isCreator: authState.isCreator }} />}
+      </SidebarFooter>
+    </Sidebar>
+  )
+}
