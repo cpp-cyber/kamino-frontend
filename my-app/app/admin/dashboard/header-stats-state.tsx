@@ -1,20 +1,24 @@
-"use client"
+"use client";
 
-import { Card, CardDescription, CardHeader } from "@/components/ui/card"
-import { LoadingSpinnerSmall } from "@/components/ui/loading-spinner"
-import { Button } from "@/components/ui/button"
-import { RefreshCw } from "lucide-react"
+import { Card, CardDescription, CardHeader } from "@/components/ui/card";
+import { LoadingSpinnerSmall } from "@/components/ui/loading-spinner";
+import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
 
 interface HeaderStatsStateProps {
-  loading: boolean
-  error: string | null
-  refetch: () => void
+  loading: boolean;
+  error: string | null;
+  refetch: () => void;
 }
 
-export function HeaderStatsState({ loading, error, refetch }: HeaderStatsStateProps) {
+export function HeaderStatsState({
+  loading,
+  error,
+  refetch,
+}: HeaderStatsStateProps) {
   if (loading) {
     return (
-      <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs grid-cols-4">
+      <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs grid-cols-4">
         {Array.from({ length: 4 }).map((_, index) => (
           <Card key={index} className="@container/card">
             <CardHeader>
@@ -26,12 +30,12 @@ export function HeaderStatsState({ loading, error, refetch }: HeaderStatsStatePr
           </Card>
         ))}
       </div>
-    )
+    );
   }
 
   if (error) {
     return (
-      <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs grid-cols-4">
+      <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs grid-cols-4">
         <Card className="@container/card col-span-full">
           <CardHeader>
             <CardDescription>Dashboard Error</CardDescription>
@@ -47,8 +51,8 @@ export function HeaderStatsState({ loading, error, refetch }: HeaderStatsStatePr
           </CardHeader>
         </Card>
       </div>
-    )
+    );
   }
 
-  return null
+  return null;
 }
