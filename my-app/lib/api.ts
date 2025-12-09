@@ -278,13 +278,11 @@ export async function getAllUsers(): Promise<GetUsersResponse> {
     }),
   );
 
-  // Normalize groups to ensure it's always an array and filter out empty strings
+  // Ensure groups is always an array
   if (data.users) {
     data.users = data.users.map((user) => ({
       ...user,
-      groups: Array.isArray(user.groups)
-        ? user.groups.filter((g) => g && g.trim() !== "")
-        : [],
+      groups: Array.isArray(user.groups) ? user.groups : [],
     }));
   }
 

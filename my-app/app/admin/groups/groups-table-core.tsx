@@ -7,7 +7,7 @@ interface GroupsTableCoreWrapperProps {
   groups: Group[];
   sorting: SortingState;
   onSortingChange: (sorting: SortingState) => void;
-  onGroupAction: (groupName: string, action: "delete" | "edit") => void;
+  onGroupAction: (groupName: string, action: "delete" | "rename") => void;
   searchTerm: string;
   selectedGroups: string[];
   onSelectGroup: (groupName: string, checked: boolean) => void;

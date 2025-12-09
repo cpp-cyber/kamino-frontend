@@ -28,10 +28,7 @@ interface UsersTableProps {
 export function UsersTable({ onUserAction, onRefresh }: UsersTableProps) {
   const [searchTerm, setSearchTerm] = React.useState("");
   const [isRefreshing, setIsRefreshing] = React.useState(false);
-  const [usersData, setUsersData] = React.useState<GetUsersResponse>({
-    users: [],
-    count: 0,
-  });
+  const [users, setUsers] = React.useState<User[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -46,7 +43,7 @@ export function UsersTable({ onUserAction, onRefresh }: UsersTableProps) {
 
   // Sorting state
   const [sorting, setSorting] = React.useState<SortingState>([
-    { id: "name", desc: false }, // Default sort by name
+    { id: "created_at", desc: false }, // Default sort by created_at (recent to old)
   ]);
 
   // Dialog states
@@ -56,9 +53,19 @@ export function UsersTable({ onUserAction, onRefresh }: UsersTableProps) {
   const [deleteConfirmDialogOpen, setDeleteConfirmDialogOpen] =
     React.useState(false);
 
+  // Compute stats from users data
+  const stats = React.useMemo(() => {
+    return {
+      count: users.length,
+      disabled_count: users.filter((u) => !u.enabled).length,
+      admin_count: users.filter((u) => u.is_admin).length,
+      creator_count: users.filter((u) => u.is_creator).length,
+    };
+  }, [users]);
+
   // Apply filters
   const filteredUsers = useUserFilters({
-    users: usersData.users,
+    users,
     searchTerm,
   });
 
@@ -79,6 +86,11 @@ export function UsersTable({ onUserAction, onRefresh }: UsersTableProps) {
       } else if (sort.id === "groups") {
         aValue = a.groups.length;
         bValue = b.groups.length;
+      } else if (sort.id === "created_at") {
+        // Sort by date (most recent first by default)
+        const aDate = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const bDate = b.created_at ? new Date(b.created_at).getTime() : 0;
+        return sort.desc ? aDate - bDate : bDate - aDate;
       } else {
         return 0;
       }
@@ -98,8 +110,8 @@ export function UsersTable({ onUserAction, onRefresh }: UsersTableProps) {
 
   // Get selected user objects
   const selectedUserObjects = React.useMemo(() => {
-    return usersData.users.filter((user) => selectedUsers.has(user.name));
-  }, [usersData.users, selectedUsers]);
+    return users.filter((user) => selectedUsers.has(user.name));
+  }, [users, selectedUsers]);
 
   // Bulk operation handlers
   const handleBulkAddToGroup = () => {
@@ -206,7 +218,7 @@ export function UsersTable({ onUserAction, onRefresh }: UsersTableProps) {
       setLoading(true);
       setError(null);
       const fetchedUsersData = await getAllUsers();
-      setUsersData(fetchedUsersData);
+      setUsers(fetchedUsersData.users);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to fetch users";
@@ -272,7 +284,7 @@ export function UsersTable({ onUserAction, onRefresh }: UsersTableProps) {
   return (
     <div className="space-y-4">
       {/* Header Stats */}
-      <HeaderStats usersData={usersData} onUserCreated={handleRefresh} />
+      <HeaderStats stats={stats} onUserCreated={handleRefresh} />
 
       {/* Users Table */}
       <div className="rounded-md border">

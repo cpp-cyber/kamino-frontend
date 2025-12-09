@@ -147,8 +147,8 @@ export default function Page() {
                             </span>
                           </TooltipTrigger>
                           <TooltipContent className="text-sm">
-                            {currentUserData.groups.map((group: string) => (
-                              <p key={group}>{group}</p>
+                            {currentUserData.groups.map((group) => (
+                              <p key={group.name}>{group.name}</p>
                             ))}
                           </TooltipContent>
                         </Tooltip>

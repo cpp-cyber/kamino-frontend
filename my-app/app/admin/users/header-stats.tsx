@@ -7,21 +7,27 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { GetUsersResponse } from "@/lib/types";
-import { User } from "lucide-react";
+import { User, UserX, Shield, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CreateUserDialog } from "@/components/shared/create-user-dialog";
 
+interface UserStats {
+  count: number;
+  disabled_count: number;
+  admin_count: number;
+  creator_count: number;
+}
+
 interface HeaderStatsProps {
-  usersData: GetUsersResponse;
+  stats: UserStats;
   onUserCreated?: () => void;
 }
 
-export function HeaderStats({ usersData, onUserCreated }: HeaderStatsProps) {
+export function HeaderStats({ stats, onUserCreated }: HeaderStatsProps) {
   return (
     <>
       <div
-        className={`*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs pb-2 lg:grid-cols-2 grid-cols-1`}
+        className={`*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs pb-2 lg:grid-cols-3 xl:grid-cols-5 grid-cols-1`}
       >
         <Card className="@container/card">
           <CardHeader>
@@ -30,7 +36,43 @@ export function HeaderStats({ usersData, onUserCreated }: HeaderStatsProps) {
               <User />
             </CardAction>
             <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-              {usersData.count}
+              {stats.count}
+            </CardTitle>
+          </CardHeader>
+        </Card>
+
+        <Card className="@container/card">
+          <CardHeader>
+            <CardDescription>Disabled Users</CardDescription>
+            <CardAction>
+              <UserX />
+            </CardAction>
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+              {stats.disabled_count}
+            </CardTitle>
+          </CardHeader>
+        </Card>
+
+        <Card className="@container/card">
+          <CardHeader>
+            <CardDescription>Admin Users</CardDescription>
+            <CardAction>
+              <Shield />
+            </CardAction>
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+              {stats.admin_count}
+            </CardTitle>
+          </CardHeader>
+        </Card>
+
+        <Card className="@container/card">
+          <CardHeader>
+            <CardDescription>Creator Users</CardDescription>
+            <CardAction>
+              <Pencil />
+            </CardAction>
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+              {stats.creator_count}
             </CardTitle>
           </CardHeader>
         </Card>

@@ -18,9 +18,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { User } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import { SortingState } from "@tanstack/react-table";
+import { formatRelativeTime, formatDateTime } from "@/lib/utils";
 
 interface UsersTableCoreProps {
   users: User[];
@@ -122,6 +128,19 @@ export function UsersTableCore({
           <TableHead className="min-w-[150px]">
             <span className="font-medium">Groups</span>
           </TableHead>
+          <TableHead className="min-w-[180px]">
+            <div className="flex items-center justify-between pr-2 group">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleSortingChange("created_at")}
+                className="-ml-3 flex-1 justify-start hover:bg-muted transition-colors"
+              >
+                <span className="font-medium">Created</span>
+              </Button>
+              <SortingIcon sortDirection={getSortDirection("created_at")} />
+            </div>
+          </TableHead>
           <TableHead className="w-[20px]">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -147,7 +166,7 @@ export function UsersTableCore({
         {users.length === 0 && (
           <TableRow key="empty-state">
             <TableCell
-              colSpan={4}
+              colSpan={5}
               className="text-center py-8 text-muted-foreground"
             >
               {searchTerm
@@ -172,23 +191,36 @@ export function UsersTableCore({
             </TableCell>
             <TableCell>
               <div className="flex flex-wrap gap-1">
-                {user.groups &&
-                user.groups.filter((g) => g && g.trim() !== "").length > 0 ? (
-                  user.groups
-                    .filter((g) => g && g.trim() !== "")
-                    .map((group) => (
-                      <Badge
-                        key={group}
-                        variant="secondary"
-                        className="text-xs"
-                      >
-                        {group}
-                      </Badge>
-                    ))
+                {user.groups && user.groups.length > 0 ? (
+                  user.groups.map((group) => (
+                    <Badge
+                      key={group.name}
+                      variant="secondary"
+                      className="text-xs"
+                    >
+                      {group.name}
+                    </Badge>
+                  ))
                 ) : (
                   <span className="text-muted-foreground text-sm">N/A</span>
                 )}
               </div>
+            </TableCell>
+            <TableCell>
+              {user.created_at ? (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="text-sm text-muted-foreground">
+                      {formatRelativeTime(user.created_at)}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{formatDateTime(user.created_at)}</p>
+                  </TooltipContent>
+                </Tooltip>
+              ) : (
+                <span className="text-sm text-muted-foreground">N/A</span>
+              )}
             </TableCell>
             <TableCell>
               <DropdownMenu>

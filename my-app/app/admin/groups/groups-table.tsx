@@ -12,7 +12,7 @@ import { GroupsTablePagination } from "./groups-table-pagination";
 import { SortingState } from "@tanstack/react-table";
 
 interface GroupsTableProps {
-  onGroupAction: (groupName: string, action: "delete" | "edit") => void;
+  onGroupAction: (groupName: string, action: "delete" | "rename") => void;
   onBulkDeleteRequest?: (groupNames: string[]) => void;
 }
 
@@ -31,9 +31,9 @@ export function GroupsTable({
   // Pagination state
   const [currentPage, setCurrentPage] = React.useState(1);
   const [itemsPerPage, setItemsPerPage] = React.useState(25);
-  // Sorting state with default sort by name
+  // Sorting state with default sort by created_at (recent to old)
   const [sorting, setSorting] = React.useState<SortingState>([
-    { id: "name", desc: false },
+    { id: "created_at", desc: false },
   ]);
   // Multi-select state
   const [selectedGroups, setSelectedGroups] = React.useState<string[]>([]);
@@ -80,9 +80,11 @@ export function GroupsTable({
       } else if (sort.id === "user_count") {
         aValue = a.user_count || 0;
         bValue = b.user_count || 0;
-      } else if (sort.id === "comment") {
-        aValue = (a.comment || "").toLowerCase();
-        bValue = (b.comment || "").toLowerCase();
+      } else if (sort.id === "created_at") {
+        // Sort by date (most recent first by default)
+        const aDate = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const bDate = b.created_at ? new Date(b.created_at).getTime() : 0;
+        return sort.desc ? aDate - bDate : bDate - aDate;
       } else {
         return 0;
       }
