@@ -99,10 +99,10 @@ export function ManageGroupMembersDialog({
     // Filter based on operation
     if (operation === "add") {
       // Show users NOT in the selected group
-      return !user.groups.includes(selectedGroup);
+      return !user.groups.some((group) => group.name === selectedGroup);
     } else {
       // Show users IN the selected group
-      return user.groups.includes(selectedGroup);
+      return user.groups.some((group) => group.name === selectedGroup);
     }
   });
 
@@ -379,11 +379,11 @@ export function ManageGroupMembersDialog({
                                 <div className="flex gap-2 flex-wrap justify-end">
                                   {user.groups.slice(0, 3).map((group) => (
                                     <Badge
-                                      key={group}
+                                      key={group.name}
                                       variant="outline"
                                       className="text-muted-foreground"
                                     >
-                                      {group}
+                                      {group.name}
                                     </Badge>
                                   ))}
                                   {user.groups.length > 3 && (

@@ -33,15 +33,20 @@ export interface DeployedPodResponse {
   pods: DeployedPod[];
 }
 
-export interface User {
-  name: string;
-  groups: string[];
-}
-
 export interface Group {
   name: string;
+  can_modify: boolean;
+  created_at?: string;
   user_count?: number;
-  comment?: string;
+}
+
+export interface User {
+  name: string;
+  created_at: string;
+  enabled: boolean;
+  is_admin: boolean;
+  is_creator: boolean;
+  groups: Group[];
 }
 
 export interface UserLogin {
@@ -93,7 +98,10 @@ export interface VirtualMachinesResponse {
 
 export interface GetUsersResponse {
   users: User[];
-  count: number;
+  count?: number;
+  disabled_count?: number;
+  admin_count?: number;
+  creator_count?: number;
 }
 
 export interface Resources {

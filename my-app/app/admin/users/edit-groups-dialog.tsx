@@ -62,10 +62,10 @@ export function EditGroupsDialog({
   // Set initial selected groups when user changes
   useEffect(() => {
     if (user) {
-      // Filter out empty strings from groups
-      const validGroups = user.groups.filter((g) => g && g.trim() !== "");
-      setSelectedGroups(validGroups);
-      setInitialGroups(validGroups);
+      // Extract group names from Group objects
+      const groupNames = user.groups.map((g) => g.name);
+      setSelectedGroups(groupNames);
+      setInitialGroups(groupNames);
     }
   }, [user]);
 

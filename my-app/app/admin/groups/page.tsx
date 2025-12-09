@@ -5,6 +5,8 @@ import { AuthGuard } from "@/components/auth-guard";
 import { PageLayout } from "@/app/admin/admin-page-layout";
 import { GroupsTable } from "@/app/admin/groups/groups-table";
 import { handleDeleteGroups } from "@/lib/admin-operations";
+import { renameGroup } from "@/lib/api";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,16 +16,30 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { Group } from "@/lib/types";
 
 const breadcrumbs = [{ label: "Groups", href: "/admin/groups" }];
 
 export default function AdminGroupsPage() {
   const [alertOpen, setAlertOpen] = useState(false);
+  const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
   const [bulkDeleteGroups, setBulkDeleteGroups] = useState<string[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
+  const [newGroupName, setNewGroupName] = useState("");
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+  const [isRenaming, setIsRenaming] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
   const handleRefresh = async () => {
@@ -32,11 +48,18 @@ export default function AdminGroupsPage() {
     await new Promise((resolve) => setTimeout(resolve, 500));
   };
 
-  const handleGroupAction = (groupName: string, action: "delete" | "edit") => {
+  const handleGroupAction = (
+    groupName: string,
+    action: "delete" | "rename",
+  ) => {
     const group = { name: groupName } as Group;
     if (action === "delete") {
       setSelectedGroup(group);
       setAlertOpen(true);
+    } else if (action === "rename") {
+      setSelectedGroup(group);
+      setNewGroupName(groupName);
+      setRenameDialogOpen(true);
     }
   };
 
@@ -79,6 +102,32 @@ export default function AdminGroupsPage() {
     }
   };
 
+  const handleConfirmRename = async () => {
+    if (!selectedGroup || !newGroupName.trim()) return;
+    if (newGroupName.trim() === selectedGroup.name) {
+      toast.error("New name must be different from current name");
+      return;
+    }
+    setIsRenaming(true);
+    try {
+      await renameGroup(selectedGroup.name, newGroupName.trim());
+      toast.success(
+        `Group renamed from "${selectedGroup.name}" to "${newGroupName.trim()}"`,
+      );
+      setRenameDialogOpen(false);
+      setSelectedGroup(null);
+      setNewGroupName("");
+      handleRefresh();
+    } catch (error) {
+      toast.error(
+        `Failed to rename group: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
+      console.error("Failed to rename group:", error);
+    } finally {
+      setIsRenaming(false);
+    }
+  };
+
   return (
     <AuthGuard adminOnly>
       <PageLayout breadcrumbs={breadcrumbs}>
@@ -96,6 +145,45 @@ export default function AdminGroupsPage() {
           </div>
         </div>
       </PageLayout>
+
+      {/* Rename Dialog */}
+      <Dialog open={renameDialogOpen} onOpenChange={setRenameDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Rename Group</DialogTitle>
+            <DialogDescription>
+              Enter a new name for &quot;{selectedGroup?.name}&quot;
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="name">New Group Name</Label>
+              <Input
+                id="name"
+                value={newGroupName}
+                onChange={(e) => setNewGroupName(e.target.value)}
+                placeholder="Enter new group name"
+                disabled={isRenaming}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setRenameDialogOpen(false)}
+              disabled={isRenaming}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmRename}
+              disabled={isRenaming || !newGroupName.trim()}
+            >
+              {isRenaming ? "Renaming..." : "Rename"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>

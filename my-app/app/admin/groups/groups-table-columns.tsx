@@ -1,5 +1,5 @@
 import React from "react";
-import { MoreVertical, Trash2, Pencil } from "lucide-react";
+import { MoreVertical, Trash2, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SortingIcon } from "@/components/table-components";
@@ -18,13 +18,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Group } from "@/lib/types";
 import { SortingState } from "@tanstack/react-table";
+import { formatRelativeTime, formatDateTime } from "@/lib/utils";
 
 interface GroupsTableCoreProps {
   groups: Group[];
   searchTerm: string;
-  onGroupAction: (groupName: string, action: "delete" | "edit") => void;
+  onGroupAction: (groupName: string, action: "delete" | "rename") => void;
   selectedGroups: string[];
   onSelectGroup: (groupName: string, checked: boolean) => void;
   onSelectAll: (checked: boolean) => void;
@@ -87,7 +93,7 @@ export function GroupsTableCore({
               disabled={allSelectableGroups.length === 0}
             />
           </TableHead>
-          <TableHead className="w-[300px]">
+          <TableHead>
             <div className="flex items-center justify-between pr-2 group">
               <Button
                 variant="ghost"
@@ -100,7 +106,7 @@ export function GroupsTableCore({
               <SortingIcon sortDirection={getSortDirection("name")} />
             </div>
           </TableHead>
-          <TableHead className="w-[175px]">
+          <TableHead>
             <div className="flex items-center justify-between pr-2 group">
               <Button
                 variant="ghost"
@@ -113,12 +119,20 @@ export function GroupsTableCore({
               <SortingIcon sortDirection={getSortDirection("user_count")} />
             </div>
           </TableHead>
-          <TableHead className="min-w-[200px]">
-            <div>
-              <span className="font-medium">Comment</span>
+          <TableHead>
+            <div className="flex items-center justify-between pr-2 group">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleSortingChange("created_at")}
+                className="-ml-3 flex-1 justify-start hover:bg-muted transition-colors"
+              >
+                <span className="font-medium">Created At</span>
+              </Button>
+              <SortingIcon sortDirection={getSortDirection("created_at")} />
             </div>
           </TableHead>
-          <TableHead className="w-[20px]">
+          <TableHead className="w-[50px]">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" disabled={selectedGroups.length === 0}>
@@ -169,8 +183,21 @@ export function GroupsTableCore({
             <TableCell className="text-muted-foreground">
               {group.user_count ?? 0}
             </TableCell>
-            <TableCell className="text-muted-foreground max-w-[300px]">
-              <div className="truncate">{group.comment || ""}</div>
+            <TableCell>
+              {group.created_at ? (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="text-sm text-muted-foreground cursor-help">
+                      {formatRelativeTime(group.created_at)}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{formatDateTime(group.created_at)}</p>
+                  </TooltipContent>
+                </Tooltip>
+              ) : (
+                <span className="text-sm text-muted-foreground">N/A</span>
+              )}
             </TableCell>
             <TableCell>
               <DropdownMenu>
@@ -181,16 +208,18 @@ export function GroupsTableCore({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem
-                    onClick={() => onGroupAction(group.name, "edit")}
+                    onClick={() => onGroupAction(group.name, "rename")}
                     className="cursor-pointer"
+                    disabled={!group.can_modify}
                   >
-                    <Pencil className="mr-2 h-4 w-4" />
-                    Edit
+                    <Edit className="mr-2 h-4 w-4" />
+                    Rename
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={() => onGroupAction(group.name, "delete")}
                     className="cursor-pointer text-destructive focus:text-destructive"
+                    disabled={!group.can_modify}
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
                     Delete

@@ -23,7 +23,7 @@ export function useUserFilters({ users, searchTerm }: UseUserFiltersProps) {
         // Search in groups
         if (
           user.groups.some((group) =>
-            group.toLowerCase().includes(lowercaseSearch),
+            group.name.toLowerCase().includes(lowercaseSearch),
           )
         ) {
           return true;
