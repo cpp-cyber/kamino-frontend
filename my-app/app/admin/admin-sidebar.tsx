@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Image from "next/image"
-import { NavUser } from "@/components/nav-user"
-import { useAuth } from "@/contexts/auth-context"
+import * as React from "react";
+import Image from "next/image";
+import { NavUser } from "@/components/nav-user";
+import { useAuth } from "@/contexts/auth-context";
 import {
   Sidebar,
   SidebarContent,
@@ -15,9 +15,17 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarFooter,
-} from "@/components/ui/sidebar"
-import { Copy, CopyPlusIcon, Edit, LayoutDashboard, Rocket, Server, User } from "lucide-react"
-import { IconUsersGroup } from "@tabler/icons-react"
+} from "@/components/ui/sidebar";
+import {
+  Copy,
+  CopyPlusIcon,
+  Edit,
+  LayoutDashboard,
+  Rocket,
+  Server,
+  User,
+} from "lucide-react";
+import { IconUsersGroup } from "@tabler/icons-react";
 
 const data = {
   navMain: [
@@ -29,8 +37,8 @@ const data = {
           title: "User Panel",
           url: "/",
           isActive: false,
-          icon: LayoutDashboard
-        }
+          icon: LayoutDashboard,
+        },
       ],
     },
     {
@@ -41,19 +49,19 @@ const data = {
           title: "Users",
           url: "/admin/users",
           isActive: false,
-          icon: User
+          icon: User,
         },
         {
           title: "Groups",
           url: "/admin/groups",
           isActive: false,
-          icon: IconUsersGroup
+          icon: IconUsersGroup,
         },
         {
           title: "Deployed Pods",
           url: "/admin/pods/deployed",
           isActive: false,
-          icon: Rocket
+          icon: Rocket,
         },
         // {
         //   title: "Pod Templates",
@@ -65,8 +73,8 @@ const data = {
           title: "Virtual Machines",
           url: "/admin/vms",
           isActive: false,
-          icon: Server
-        }
+          icon: Server,
+        },
       ],
     },
     {
@@ -77,20 +85,20 @@ const data = {
           title: "All Templates",
           url: "/admin/pods/templates",
           isActive: false,
-          icon: Copy
+          icon: Copy,
         },
         {
-          title: "Publish Templates",
+          title: "Publish Template",
           url: "/admin/pods/templates/publish",
           isActive: false,
-          icon: Edit
+          icon: Edit,
         },
         {
-          title: "Create Templates",
+          title: "Create Template",
           url: "/admin/pods/templates/create",
           isActive: false,
-          icon: CopyPlusIcon
-        }
+          icon: CopyPlusIcon,
+        },
       ],
     },
     {
@@ -98,24 +106,18 @@ const data = {
       url: "#",
       items: [
         {
-          title: "Templates",
-          url: "/admin/guides/templates",
+          title: "Pods & Pod Templates",
+          url: "https://github.com/cpp-cyber/kamino-frontend/blob/main/docs/PodsAndPodTemplates.md",
           isActive: false,
-          icon: Copy
-        },
-        {
-          title: "Users & Groups",
-          url: "/admin/guides/users",
-          isActive: false,
-          icon: User
+          icon: Copy,
         },
       ],
-    }
+    },
   ],
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { authState } = useAuth()
+  const { authState } = useAuth();
 
   return (
     <Sidebar variant="floating" {...props}>
@@ -124,10 +126,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" className="h-15 pb-3 mb-3" asChild>
               <a href="/admin/dashboard">
-                <Image src="/kaminoLogo.svg" alt="Logo" width={40} height={40} className="size-10" />
+                <Image
+                  src="/kaminoLogo.svg"
+                  alt="Logo"
+                  width={40}
+                  height={40}
+                  className="size-10"
+                />
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate text-lg font-bold">Kamino</span>
-                  <span className="truncate text-xs text-muted-foreground">Admin Dashboard</span>
+                  <span className="truncate text-xs text-muted-foreground">
+                    Admin Dashboard
+                  </span>
                 </div>
               </a>
             </SidebarMenuButton>
@@ -137,7 +147,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         {data.navMain.map((item) => (
           <SidebarGroup key={item.title}>
-            <SidebarGroupLabel className="text-lg text-muted-foreground">{item.title}</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-lg text-muted-foreground">
+              {item.title}
+            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {item.items?.map((item) => (
@@ -156,8 +168,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         ))}
       </SidebarContent>
       <SidebarFooter>
-        {authState.username && <NavUser user={{ name: authState.username, isAdmin: authState.isAdmin }} />}
+        {authState.username && (
+          <NavUser
+            user={{ name: authState.username, isAdmin: authState.isAdmin }}
+          />
+        )}
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

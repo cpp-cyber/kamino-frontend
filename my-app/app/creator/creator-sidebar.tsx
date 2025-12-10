@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Image from "next/image"
-import { NavUser } from "@/components/nav-user"
-import { useAuth } from "@/contexts/auth-context"
+import * as React from "react";
+import Image from "next/image";
+import { NavUser } from "@/components/nav-user";
+import { useAuth } from "@/contexts/auth-context";
 import {
   Sidebar,
   SidebarContent,
@@ -15,8 +15,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarFooter,
-} from "@/components/ui/sidebar"
-import { Copy, CopyPlusIcon, Edit, LayoutDashboard } from "lucide-react"
+} from "@/components/ui/sidebar";
+import { Copy, CopyPlusIcon, Edit, LayoutDashboard } from "lucide-react";
 
 const data = {
   navMain: [
@@ -28,8 +28,8 @@ const data = {
           title: "User Panel",
           url: "/",
           isActive: false,
-          icon: LayoutDashboard
-        }
+          icon: LayoutDashboard,
+        },
       ],
     },
     {
@@ -40,27 +40,41 @@ const data = {
           title: "All Templates",
           url: "/creator/templates",
           isActive: false,
-          icon: Copy
+          icon: Copy,
         },
         {
-          title: "Publish Templates",
+          title: "Publish Template",
           url: "/creator/templates/publish",
           isActive: false,
-          icon: Edit
+          icon: Edit,
         },
         {
-          title: "Create Templates",
+          title: "Create Template",
           url: "/creator/templates/create",
           isActive: false,
-          icon: CopyPlusIcon
-        }
+          icon: CopyPlusIcon,
+        },
+      ],
+    },
+    {
+      title: "Guides",
+      url: "#",
+      items: [
+        {
+          title: "Pods & Pod Templates",
+          url: "https://github.com/cpp-cyber/kamino-frontend/blob/main/docs/PodsAndPodTemplates.md",
+          isActive: false,
+          icon: Copy,
+        },
       ],
     },
   ],
-}
+};
 
-export function CreatorSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { authState } = useAuth()
+export function CreatorSidebar({
+  ...props
+}: React.ComponentProps<typeof Sidebar>) {
+  const { authState } = useAuth();
 
   return (
     <Sidebar variant="floating" {...props}>
@@ -69,10 +83,18 @@ export function CreatorSidebar({ ...props }: React.ComponentProps<typeof Sidebar
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" className="h-15 pb-3 mb-3" asChild>
               <a href="/creator/dashboard">
-                <Image src="/kaminoLogo.svg" alt="Logo" width={40} height={40} className="size-10" />
+                <Image
+                  src="/kaminoLogo.svg"
+                  alt="Logo"
+                  width={40}
+                  height={40}
+                  className="size-10"
+                />
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate text-lg font-bold">Kamino</span>
-                  <span className="truncate text-xs text-muted-foreground">Creator Dashboard</span>
+                  <span className="truncate text-xs text-muted-foreground">
+                    Creator Dashboard
+                  </span>
                 </div>
               </a>
             </SidebarMenuButton>
@@ -82,7 +104,9 @@ export function CreatorSidebar({ ...props }: React.ComponentProps<typeof Sidebar
       <SidebarContent>
         {data.navMain.map((item) => (
           <SidebarGroup key={item.title}>
-            <SidebarGroupLabel className="text-lg text-muted-foreground">{item.title}</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-lg text-muted-foreground">
+              {item.title}
+            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {item.items?.map((item) => (
@@ -101,8 +125,16 @@ export function CreatorSidebar({ ...props }: React.ComponentProps<typeof Sidebar
         ))}
       </SidebarContent>
       <SidebarFooter>
-        {authState.username && <NavUser user={{ name: authState.username, isAdmin: authState.isAdmin, isCreator: authState.isCreator }} />}
+        {authState.username && (
+          <NavUser
+            user={{
+              name: authState.username,
+              isAdmin: authState.isAdmin,
+              isCreator: authState.isCreator,
+            }}
+          />
+        )}
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }
