@@ -56,7 +56,7 @@ export default function Page() {
   const pageHeader = (
     <div className="flex flex-col items-center justify-center min-h-[125px] text-center">
       <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight text-balance">
-        Kamino Dashboard
+        Kamino Dashboard Test 2 17
       </h1>
       <p className="text-muted-foreground text-xl leading-7 [&:not(:first-child)]:mt-2">
         Browse, deploy, and manage your own instance of our curated interactive
