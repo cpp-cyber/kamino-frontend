@@ -10,14 +10,21 @@ import { ErrorDisplay } from "@/components/ui/error-display";
 import { Copy, CopyPlusIcon, Edit } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/auth-context";
 
 export default function CreatorDashboardPage() {
+  const { authState } = useAuth();
+  const creatorOrAdmin =
+    authState.authenticated === true &&
+    (authState.isCreator === true || authState.isAdmin === true);
+
   const {
     data: templates,
     loading: templatesLoading,
     error: templatesError,
   } = useApiState({
     fetchFn: getAllPodTemplates,
+    enabled: creatorOrAdmin,
   });
 
   const {
@@ -26,6 +33,7 @@ export default function CreatorDashboardPage() {
     error: unpublishedError,
   } = useApiState({
     fetchFn: getUnpublishedTemplates,
+    enabled: creatorOrAdmin,
   });
 
   const publishedCount = templates?.length || 0;

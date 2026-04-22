@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 interface UseApiStateOptions<T> {
   fetchFn: () => Promise<T>
   deps?: React.DependencyList
+  enabled?: boolean
 }
 
 interface UseApiStateReturn<T> {
@@ -12,7 +13,7 @@ interface UseApiStateReturn<T> {
   refetch: () => void
 }
 
-export function useApiState<T>({ fetchFn, deps = [] }: UseApiStateOptions<T>): UseApiStateReturn<T> {
+export function useApiState<T>({ fetchFn, deps = [], enabled = true }: UseApiStateOptions<T>): UseApiStateReturn<T> {
   const [data, setData] = useState<T | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -31,6 +32,10 @@ export function useApiState<T>({ fetchFn, deps = [] }: UseApiStateOptions<T>): U
   }
 
   useEffect(() => {
+    if (!enabled) {
+      setLoading(true)
+      return
+    }
     fetchData()
   }, deps)
 
