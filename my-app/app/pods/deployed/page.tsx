@@ -10,6 +10,7 @@ import { useApiState } from "@/hooks/use-api-state"
 import { deletePod, getDeployedPods } from "@/lib/api"
 import { DeployedPod } from "@/lib/types"
 import { SectionCards } from "@/app/pods/deployed/deployed-pods-cards"
+import { useAuth } from "@/contexts/auth-context"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,8 +24,10 @@ import {
 export default function Page() {
   const [alertOpen, setAlertOpen] = useState(false)
   const [selectedPod, setSelectedPod] = useState<DeployedPod | null>(null)
+  const { authState } = useAuth()
   const { data: pods, loading, error } = useApiState({
     fetchFn: getDeployedPods,
+    enabled: authState.authenticated === true,
   })
 
   const handleDeleteClick = (pod: DeployedPod) => {

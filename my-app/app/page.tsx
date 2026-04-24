@@ -42,6 +42,7 @@ export default function Page() {
     error: dashboardError,
   } = useApiState({
     fetchFn: getUserDashboard,
+    enabled: authState.authenticated === true,
   });
 
   // Extract data from the unified response
