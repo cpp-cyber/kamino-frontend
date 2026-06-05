@@ -23,11 +23,6 @@ const requestCache = new Map<
 >();
 const CACHE_DURATION = 5000; // 5 seconds for deduplication
 
-// Clear all cached/in-flight requests
-export function clearRequestCache(): void {
-  requestCache.clear();
-}
-
 // Helper function to handle request deduplication
 async function deduplicatedFetch<T>(
   key: string,
@@ -54,15 +49,8 @@ async function deduplicatedFetch<T>(
   // Cache the promise
   requestCache.set(key, { promise, timestamp: now });
 
-  promise.catch(() => {
-    const entry = requestCache.get(key);
-    if (entry && entry.timestamp === now) {
-      requestCache.delete(key);
-    }
-  });
-
   // Clean up cache after completion
-  promise.then(() => {
+  promise.finally(() => {
     setTimeout(() => {
       const entry = requestCache.get(key);
       if (entry && entry.timestamp === now) {
