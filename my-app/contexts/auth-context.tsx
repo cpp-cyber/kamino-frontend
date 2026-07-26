@@ -8,7 +8,6 @@ import {
   useEffect,
   useCallback,
 } from "react";
-import { clearRequestCache } from "@/lib/api";
 
 interface SessionData {
   authenticated: boolean;
@@ -111,7 +110,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Clear cache to force fresh request
     sessionCache = null;
     sessionPromise = null;
-    clearRequestCache();
     setAuthState((prev) => ({ ...prev, loading: true }));
     await checkSession();
   }, [checkSession]);
@@ -122,7 +120,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Clear cache and update state
       sessionCache = null;
       sessionPromise = null;
-      clearRequestCache();
       setAuthState({
         authenticated: false,
         loading: false,

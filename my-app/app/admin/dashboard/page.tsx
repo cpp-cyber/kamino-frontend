@@ -12,14 +12,11 @@ import { NodeResources } from "@/app/admin/dashboard/node-resources"
 import { DashboardQuickActions } from "@/components/dashboard/dashboard-quick-actions"
 import { Button } from "@/components/ui/button"
 import { RefreshCw } from "lucide-react"
-import { useAuth } from "@/contexts/auth-context"
 
 export default function AdminDashboardPage() {
-  const { authState } = useAuth()
   // Fetch unified dashboard data
   const { data: dashboardData, loading, error, refetch } = useApiState({
     fetchFn: getDashboardData,
-    enabled: authState.authenticated === true && authState.isAdmin === true,
     deps: []
   })
 

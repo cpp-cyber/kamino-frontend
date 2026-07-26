@@ -9,15 +9,12 @@ import { SectionCards } from "@/app/pods/templates/pod-templates-cards"
 import { getPodTemplates } from "@/lib/api"
 import { PodDeployDialog } from "@/components/pod-deploy-dialog"
 import { usePodDeployment } from "@/hooks/use-pod-deployment"
-import { useAuth } from "@/contexts/auth-context"
 
 export default function Page() {
   const { isDialogOpen, selectedPod, openDeployDialog, closeDeployDialog } = usePodDeployment()
-  const { authState } = useAuth()
-
+  
   const { data: pods, loading, error } = useApiState({
     fetchFn: getPodTemplates,
-    enabled: authState.authenticated === true,
   })
 
   const pageHeader = (
